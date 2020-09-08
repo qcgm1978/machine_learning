@@ -1,0 +1,57 @@
+from datatype import DataTypes
+import unittest
+import pandas
+from mysql_data.decorators_func import singleton
+class TDD_TEST_SD(unittest.TestCase):
+    @singleton
+    def setUp(self):
+        file = "data/metabolic.csv"
+        X = ["Sex", "Metabolic rate"]
+        y = "CO2"
+        predictVals = [2300, 1300]
+        self.__class__.d = DataTypes({"file": file, "x": X, "y": y})
+        self.__class__.l1 = self.__class__.d.queryDf('Sex == "Male"')
+        self.__class__.l2 = self.__class__.d.queryDf('Sex == "Female"')
+        self.__class__.s1 = self.__class__.d.getSD(self.__class__.l1)
+        self.__class__.s2 = self.__class__.d.getSD(self.__class__.l2)
+    def test_test_SD(self):
+        self.assertIsInstance(self.d.df, pandas.core.frame.DataFrame)
+        mr = self.d.getDfCol()
+        self.assertIsInstance(mr, pandas.core.series.Series)
+        self.assertAlmostEqual(self.d.getPSD(mr), 694.4, 1)
+        self.assertAlmostEqual(self.s1, 894.37, 2)
+        self.assertAlmostEqual(self.s2, 420.96, 2)
+    def test_plot(self):
+        # self.d.plotGroupedBar(
+        #     l1=self.l1,
+        #     l2=self.l2,
+        #     l1txt="Male",
+        #     l2txt="Female",
+        #     title='Furness data set on metabolic rates of northern fulmars',
+        #     prop='Metabolic rate'
+        # )
+        y1 = self.l1
+        y2 = self.l2
+        mMean = self.d.getMean(self.l1)
+        fMean = self.d.getMean(self.l2)
+        t1 = ['Female', 'Std. Dev.', int(round(self.s1))]
+        t2 = ['Male', "Std. Dev", int(round(self.s2))]
+        # self.d.scatterGrouped(
+        #     [
+        #         ("Female", y2.values.tolist()+[fMean],t1),
+        #         ("Male", y1.values.tolist() + [mMean],t2),
+        #         ("Female Mean", [fMean]),
+        #         ("Male Mean", [mMean]),
+        #     ],
+        #     title=['Sample standard deviation of','metabolic rate in male and female fulmars'],
+        #     yTxt="Matabolic rate",
+        #     xTxt="Sex",
+        # )
+    def test_PSD(self):
+        l = [2, 4, 4, 4, 5, 5, 7, 9]
+        p = self.d.getPSD(l)
+        self.assertEqual(p, 2)
+    def test_average_height(self):
+        pass
+if __name__ == "__main__":
+    unittest.main()
