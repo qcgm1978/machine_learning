@@ -1,9 +1,13 @@
 # Machine Learning is making the computer learn from studying data and statistics.
+import sys
+sys.path
+sys.executable
 import pandas, pydotplus, math, numpy as np, matplotlib.image as pltimg, matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from mathMethods.doMath import DoMath
 from do_statistics.doStats import DoStats
 from mysql_data.mysqlOp import MysqlOp
+from pint import UnitRegistry
 class HandleData(DoMath, DoStats, MysqlOp):
     def __init__(self, n=None):
         if isinstance(n, dict):
@@ -37,6 +41,10 @@ class HandleData(DoMath, DoStats, MysqlOp):
             return self.info[i]
         except KeyError:
             return None
+    def ito(self, unit, toUnit, num=1):
+        ureg = UnitRegistry()
+        current=num*ureg[unit]
+        return current.to(ureg[toUnit])
     def getAndFormatData(self, file, dictionary):
         df = self.readCsv(file)
         self.mapStrToNum(dictionary, df)

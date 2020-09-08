@@ -1,7 +1,6 @@
 from scipy import stats, constants
 import math, numpy as np
 
-
 class DoStats(object):
     def getMode(self):
         return stats.mode(self.list)
