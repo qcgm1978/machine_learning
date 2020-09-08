@@ -1,12 +1,13 @@
-import sys
-import os
+import sys, os
 PACKAGE_PARENT = '..'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 from datatype import DataTypes
-import unittest
-import pandas
+import unittest,pandas
 from mysql_data.decorators_func import singleton
+from unum.units import * # Load a number of common units.
+from pint import UnitRegistry
+ureg = UnitRegistry()
 class TDD_TEST_SD(unittest.TestCase):
     @singleton
     def setUp(self):
@@ -57,6 +58,8 @@ class TDD_TEST_SD(unittest.TestCase):
         p = self.d.getPSD(l)
         self.assertEqual(p, 2)
     def test_average_height(self):
-        pass
+        m=self.d.ito('inch','m')
+        self.assertEqual(m,0.0254*ureg.m)
+
 if __name__ == "__main__":
     unittest.main()
