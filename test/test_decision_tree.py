@@ -9,15 +9,15 @@ import unittest
 import pandas
 class TDD_DECISION_TREE(unittest.TestCase):
     def setUp(self):
-        file = "shows.csv"
+        file = "data/shows.csv"
         d1 = {"UK": 0, "USA": 1, "N": 2}
         d2 = {"YES": 1, "NO": 0}
         mapData = {"Nationality": d1, "Go": d2}
         self.d = DataTypes({"file": file, "mapData": mapData, 'target': "Go"})
         return super().setUp()
     def test_decision_tree(self):
-        file = "shows.csv"
-        img = "mydecisiontree.png"
+        file = "data/shows.csv"
+        img = "img/mydecisiontree.png"
         X = ["Age", "Experience", "Rank", "Nationality"]
         y = "Go"
         d1 = {"UK": 0, "USA": 1, "N": 2}

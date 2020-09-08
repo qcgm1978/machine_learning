@@ -28,7 +28,7 @@ class TDD_REGRESSION(unittest.TestCase):
         r = d.getRSquared()
         self.assertAlmostEqual(r, .07, 2)
     def test_multiple_regression(self):
-        file = "cars.csv"
+        file = "data/cars.csv"
         X = ['Weight', 'Volume']
         y = 'CO2'
         # predict the CO2 emission of a car where the weight is 2300kg, and the volume is 1300ccm:
@@ -59,7 +59,7 @@ class TDD_REGRESSION(unittest.TestCase):
         self.assertAlmostEqual(
             predict4[0], predict[0] + predict[1][0] * 1000, 3)
     def test_scale(self):
-        file = "cars.csv"
+        file = "data/cars.csv"
         scaleCols = ['Weight', 'Volume']
         d = DataTypes()
         scale = d.scale(file, scaleCols)
