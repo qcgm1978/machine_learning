@@ -1,3 +1,8 @@
+import sys
+import os
+PACKAGE_PARENT = '..'
+SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
+sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 import unittest, math
 from datatype import DataTypes
 import numpy
@@ -31,8 +36,8 @@ class TDD_GETTING_STARTED(unittest.TestCase):
     def test_standard_deviation(self):
         d = DataTypes({"speed": [86, 87, 88, 86, 87, 85, 86]})
         d1 = DataTypes({"speed": [32, 111, 138, 28, 59, 77, 97]})
-        s = d.getSD()
-        s1 = d1.getSD()
+        s = d.getPSD()
+        s1 = d1.getPSD()
         self.assertAlmostEqual(s, 0.9, 2)
         self.assertAlmostEqual(s1, 37.85, 2)
         v = d1.getVariance()
@@ -43,8 +48,8 @@ class TDD_GETTING_STARTED(unittest.TestCase):
     def test_uniform(self):
         d = DataTypes({"speed": [86, 87.7, 88, 86, 87, 85, 86]})
         d1 = DataTypes({"speed": [91.6, 87.7, 88, 86, 87, 85, 86]})
-        s = d.getSD()
-        s1 = d1.getSD()
+        s = d.getPSD()
+        s1 = d1.getPSD()
         self.assertAlmostEqual(s, 1.00, 2)
         self.assertAlmostEqual(s1, 2.00, 2)
         self.assertEqual(d.getProbability(), 0.683)

@@ -1,3 +1,8 @@
+import sys
+import os
+PACKAGE_PARENT = '..'
+SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
+sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 from datatype import DataTypes
 import math, unittest, numpy as np
 from mysql_data.decorators_func import singleton
@@ -24,7 +29,7 @@ class TDD_TEST_DATA(unittest.TestCase):
         l = [86, 87, 88, 86, 87, 85, 86]
         count = self.d.updateField({"field": "speed", "to": l})
         self.assertEqual(count, 1)
-        sd = self.d.getSD()
+        sd = self.d.getPSD()
         self.assertAlmostEqual(sd, 0.9, 1)
         self.assertTrue(self.d.isNormalSD())
         self.assertAlmostEqual(self.d.getMean(), 86.4, 1)

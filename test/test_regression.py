@@ -1,9 +1,12 @@
+import sys
+import os
+PACKAGE_PARENT = '..'
+SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
+sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 from datatype import DataTypes
 import numpy as np
 import unittest
 import pandas
-
-
 class TDD_REGRESSION(unittest.TestCase):
     def test_regression(self):
         x = [1, 2, 3, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 18, 19, 21, 22]
@@ -15,7 +18,6 @@ class TDD_REGRESSION(unittest.TestCase):
         self.assertAlmostEqual(r, .95, 2)
         speed = d.predictPolynomialRegression(17)
         self.assertAlmostEqual(speed, 87, 0)
-
     def test_bad_fit(self):
         x = [89, 43, 36, 36, 95, 10, 66, 34, 38, 20,
              26, 29, 48, 64, 6, 5, 36, 66, 72, 40]
@@ -25,7 +27,6 @@ class TDD_REGRESSION(unittest.TestCase):
         # d.polynomialRegressionLine()
         r = d.getRSquared()
         self.assertAlmostEqual(r, .07, 2)
-
     def test_multiple_regression(self):
         file = "cars.csv"
         X = ['Weight', 'Volume']
@@ -57,7 +58,6 @@ class TDD_REGRESSION(unittest.TestCase):
         predict4 = d.predictMultipleRegression(file, predictVals4)
         self.assertAlmostEqual(
             predict4[0], predict[0] + predict[1][0] * 1000, 3)
-
     def test_scale(self):
         file = "cars.csv"
         scaleCols = ['Weight', 'Volume']
@@ -72,7 +72,6 @@ class TDD_REGRESSION(unittest.TestCase):
         l = list(scale)
         e = list(map(lambda x: round(x, 2), l[0]))
         self.assertEqual(e, [-2.1, -1.59])
-
     def test_scale_predict(self):
         file = "cars2.csv"
         X = ['Weight', 'Volume']
@@ -80,7 +79,6 @@ class TDD_REGRESSION(unittest.TestCase):
         d = DataTypes({'x': X, 'y': y})
         p = d.predictScale(file, [2300, 1.3])
         self.assertAlmostEqual(p[0], 107.209, 3)
-
     def test_test_model(self):
         np.random.seed(2)
         x = np.random.normal(3, 1, 100)
@@ -88,7 +86,6 @@ class TDD_REGRESSION(unittest.TestCase):
         d = DataTypes({'x': x, 'y': y})
         # d.plotScatter('train')
         # d.plotScatter('test')
-
     def test_polynormial_line(self):
         np.random.seed(2)
         x = np.random.normal(3, 1, 100)
@@ -105,7 +102,5 @@ class TDD_REGRESSION(unittest.TestCase):
         self.assertAlmostEqual(r2, .838, 3)
         p = d.predictPolynomialRegression(5)
         self.assertAlmostEqual(p, 24.88, 2)
-
-
 if __name__ == '__main__':
     unittest.main()

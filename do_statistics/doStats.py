@@ -74,7 +74,7 @@ class DoStats(object):
             differenceStd = difference / unitStd
             return differenceStd
         else:
-            return self.getSD()
+            return self.getPSD()
 
     def getPercentile(self, percent):
         # listP = self.list.copy()
