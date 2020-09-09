@@ -78,8 +78,7 @@ class Plot(object):
         colors=['#535EB2','#FF5252']+plt.rcParams['axes.prop_cycle'].by_key()['color']
         fig, ax = plt.subplots()
         for index, val in enumerate(l):
-            # ax = fig.add_subplot(1,1,1)
-            n, bins, rects = ax.hist(val, bars,color=colors[index],alpha=.9)
+            n, bins, rects = ax.hist(val, bars,color=colors[index],alpha=.8)
             for r in rects:
                 height = r.get_height() / r.get_width()
                 if height>350:
@@ -88,6 +87,7 @@ class Plot(object):
                     r.set_height(height )
         # set the y limit
         plt.ylim(0,400)
+        plt.xlim(0,230)
         self.show()
     def polynomialRegressionLine(self):
         x = self.info["x"]
