@@ -8,6 +8,7 @@ from mathMethods.doMath import DoMath
 from do_statistics.doStats import DoStats
 from mysql_data.mysqlOp import MysqlOp
 from pint import UnitRegistry
+from scipy import  constants
 class HandleData(DoMath, DoStats, MysqlOp):
     def __init__(self, n=None):
         if isinstance(n, dict):
@@ -41,7 +42,9 @@ class HandleData(DoMath, DoStats, MysqlOp):
             return self.info[i]
         except KeyError:
             return None
-    def ito(self, unit, toUnit, num=1):
+    def getConstants(self):
+        return constants
+    def to(self, unit, toUnit, num=1):
         ureg = UnitRegistry()
         current=num*ureg[unit]
         return current.to(ureg[toUnit])
