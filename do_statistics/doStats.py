@@ -14,7 +14,11 @@ class DoStats(object):
         if l is None:
             l = self.list
         #μ: the population mean or expected value in probability and statistics
-        μ=np.mean(l)
+        if len(np.array(l).shape) == 1:
+            μ=np.mean(l)
+        else:
+            mulProb = map(lambda item: item[0] * item[1], l)
+            μ=sum(mulProb)
         return μ
     def getMedian(self):
         # speed = self['speed'].copy()
@@ -27,27 +31,32 @@ class DoStats(object):
         return α < 2
     # In the population standard deviation formula, the denominator is N instead of N − 1.
     def getPSD(self,l=None):
-        return self.getSD(l,ddof=0)
+        return self.getSD(l, ddof=0)
+    def getSdWithProb(self,val):
+            μ = self.getMean(val)
+            l1 = map(lambda item: item[1]*(item[0] - μ) ** 2, val)
+            summation = sum(l1)
+            σ = math.sqrt(summation )
+            return σ
     # Standard deviation may be abbreviated SD,
-    def getSD(self, l=None,ddof=1):
+    def getSD(self, l=None,ddof=1,expected='μ',isEqlProb=True):
         """
-        :return: Standard deviation may be abbreviated SD, and is most commonly represented in mathematical texts and equations by the lower case Greek letter sigma σ
+        :return: Not all random variables have a standard deviation, since these expected values need not exist.
+        Standard deviation may be abbreviated SD, and is most commonly represented in mathematical texts and equations by the lower case Greek letter sigma σ
         :rtype: list
         """
+        if expected != 'μ':
+            return None
         if l is None:
             l = self.list
-        if len(np.array(l).shape) == 1:
+        if len(np.array(l).shape) == 1 or not isEqlProb:
             l = [l]
         ret = []
         for val in l:
-            """Algorithm
-            """
-            # μ = self.getMean(val)
-            # l1 = map(lambda item: (item - μ) ** 2, val)
-            # ∑ = sum(l1)
-            # denominator = (len(val) - ddof)
-            # s = math.sqrt(∑ / denominator)
-            σ = np.std(val,ddof=ddof)
+            if isEqlProb:
+                σ = np.std(val,ddof=ddof)
+            else:
+                σ = self.getSdWithProb(val)
             ret.append(σ)
         return ret if len(ret) > 1 else ret[0]
     def get1stdProbability(self):
