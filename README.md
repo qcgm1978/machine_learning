@@ -1,5 +1,11 @@
 # machine_learning
 
+switch pip source:
+
+pip install -i https://pypi.douban.com/simple <需要安装的包>
+比如：
+pip install -i https://pypi.douban.com/simple requests
+
 [source](https://www.w3schools.com/python/python_ml_standard_deviation.asp)
 
 https://brownmath.com/swt/symbol.htm

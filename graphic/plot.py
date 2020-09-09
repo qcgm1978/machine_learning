@@ -68,8 +68,26 @@ class Plot(object):
             x = self.list
         plt.bar(x, height)
         self.show()
-    def pyplot(self, bars=5):
-        plt.hist(self.list, bars)
+    def plotND(self, bars=100,l=None):
+        if l is None:
+            l = self.list
+        if isinstance(l, set):
+            l = list(l)
+        if len(np.array(l).shape) == 1:
+            l = [l]
+        colors=['#535EB2','#FF5252']+plt.rcParams['axes.prop_cycle'].by_key()['color']
+        fig, ax = plt.subplots()
+        for index, val in enumerate(l):
+            # ax = fig.add_subplot(1,1,1)
+            n, bins, rects = ax.hist(val, bars,color=colors[index],alpha=.9)
+            for r in rects:
+                height = r.get_height() / r.get_width()
+                if height>350:
+                    r.set_height(350+np.random.rand() )
+                else:
+                    r.set_height(height )
+        # set the y limit
+        plt.ylim(0,400)
         self.show()
     def polynomialRegressionLine(self):
         x = self.info["x"]

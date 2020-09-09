@@ -1,3 +1,6 @@
+# import logging
+# logger = logging.getLogger(__name__)
+# logging.basicConfig(level=logging.ERROR, format='%(message)s')
 import sys, os
 PACKAGE_PARENT = '..'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
@@ -31,6 +34,7 @@ class TDD_TEST_SD(unittest.TestCase):
         self.assertAlmostEqual(self.d.getSD(mr,ddof=1), 720.6, 1)
         self.assertAlmostEqual(self.d.getSD(mr,ddof='CSSD'), 720.6, 1)
         self.assertAlmostEqual(self.d.getSD(mr,ddof='ND'), 734.9, 1)
+        self.assertAlmostEqual(self.d.getSD(mr,ddof='ACCURATE'), 734.6, 1)
         self.assertAlmostEqual(self.s1, 894.37, 2)
         self.assertAlmostEqual(self.s2, 420.96, 2)
         self.assertIsNone(self.s3)
@@ -87,6 +91,11 @@ class TDD_TEST_SD(unittest.TestCase):
         self.assertEqual(p1,.6827)
         self.assertEqual(p2,.9545)
         self.assertEqual(p3, .9973)
-
+    def test_confidence_level(self):
+        l = [1, 2]
+        sd = self.d.getSD(l)
+        self.assertAlmostEqual(sd,.7,1)
+        f = self.d.getFreedomDegrees(l)
+        self.assertEqual(f,1)
 if __name__ == "__main__":
     unittest.main()
