@@ -6,7 +6,7 @@ from datatype import DataTypes
 import unittest,pandas
 from mysql_data.decorators_func import singleton
 from unum.units import * # Load a number of common units.
-import pint
+import pint,math
 from pint import UnitRegistry
 ureg = UnitRegistry()
 class TDD_TEST_SD(unittest.TestCase):
@@ -21,6 +21,7 @@ class TDD_TEST_SD(unittest.TestCase):
         self.__class__.l2 = self.__class__.d.queryDf('Sex == "Female"')
         self.__class__.s1 = self.__class__.d.getSD(self.__class__.l1)
         self.__class__.s2 = self.__class__.d.getSD(self.__class__.l2)
+        self.__class__.s3 = self.__class__.d.getSD(self.__class__.l1,expected=None)
     def test_test_SD(self):
         self.assertIsInstance(self.d.df, pandas.core.frame.DataFrame)
         mr = self.d.getDfCol()
@@ -28,6 +29,11 @@ class TDD_TEST_SD(unittest.TestCase):
         self.assertAlmostEqual(self.d.getPSD(mr), 694.4, 1)
         self.assertAlmostEqual(self.s1, 894.37, 2)
         self.assertAlmostEqual(self.s2, 420.96, 2)
+        self.assertIsNone(self.s3)
+        p=[[1,.2],[2,.4]]
+        sd = self.d.getSD(p, isEqlProb=False)
+        mean=1*.2+2*.4
+        self.assertEqual(sd,math.sqrt(.2*(1-mean)**2+.4*(2-mean)**2))
     def test_plot(self):
         # self.d.plotGroupedBar(
         #     l1=self.l1,
@@ -76,7 +82,7 @@ class TDD_TEST_SD(unittest.TestCase):
         self.assertEqual(p0,1)
         self.assertEqual(p1,.6827)
         self.assertEqual(p2,.9545)
-        self.assertEqual(p3,.9973)
+        self.assertEqual(p3, .9973)
 
 if __name__ == "__main__":
     unittest.main()
