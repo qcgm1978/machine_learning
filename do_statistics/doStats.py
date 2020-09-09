@@ -71,15 +71,17 @@ class DoStats(object):
         # val = listP[lessIndex-1]
         # return val
         return np.percentile(self.list, percent * 100)
-    def getProbability(self):
-        std = self.getDistance1std()
-        std2decimal = round(std, 2)
-        if std2decimal == 1.00:
-            return 0.683
-        elif std2decimal == 1.87:
-            return 0.015
-        elif std2decimal == 2.00:
-            return 0.954
+    def getProbability(self,percent=None,isNormal=True):
+        if percent is None:
+            std = self.getDistance1std()
+            percent = round(std, 2)
+        if isNormal:
+            if percent == 1.00:
+                return 0.683
+            elif percent == 1.87:
+                return 0.015
+            elif percent == 2.00:
+                return 0.954
     def getVariance(self, l=None):
         if l is None:
             l = [self.list]
