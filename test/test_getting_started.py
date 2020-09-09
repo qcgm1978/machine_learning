@@ -52,8 +52,8 @@ class TDD_GETTING_STARTED(unittest.TestCase):
         s1 = d1.getPSD()
         self.assertAlmostEqual(s, 1.00, 2)
         self.assertAlmostEqual(s1, 2.00, 2)
-        self.assertEqual(d.getProbability(), 0.683)
-        self.assertEqual(d1.getProbability(), 0.954)
+        self.assertEqual(d.getProbability(), 0.6827)
+        self.assertEqual(d1.getProbability(), 0.9545)
     def test_NCEE(self):
         d = DataTypes({"points": [580, 600, 680, 620], "expectation": 690})
         m = d.getMean()
@@ -70,13 +70,13 @@ class TDD_GETTING_STARTED(unittest.TestCase):
             31,
             43,
             48,
-      percent      41,
+            41,
             7,
             11,
             15,
             39,
             80,
-            8percent    32,
+                32,
             2,
             8,
             6,
@@ -89,8 +89,8 @@ class TDD_GETTING_STARTED(unittest.TestCase):
         d = DataTypes({"ages": ages})
         p = d.getPercentile(0.75)
         p1 = d.getPercentile(0.9)
-        self.assertEqual(p, 43)
-        self.assertEqual(p1, 61.0)
+        self.assertEqual(p, 40)
+        self.assertAlmostEqual(p1, 50.6)
     def test_data_distribution(self):
         x = numpy.random.uniform(0.0, 5.0, 250)
         isfloat = all(isinstance(v, float) for v in x)

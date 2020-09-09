@@ -69,8 +69,14 @@ class TDD_TEST_SD(unittest.TestCase):
         m1=self.d.to('inch','cm',num=3)
         self.assertEqual(m.magnitude,177.8)
         self.assertEqual(m1.magnitude, 7.62)
-        p = self.d.getProbability(1)
-        self.assertEqual(p,.683)
+        p0 = self.d.getProbability(0)
+        p1 = self.d.getProbability(1)
+        p2 = self.d.getProbability(2)
+        p3 = self.d.getProbability(3)
+        self.assertEqual(p0,1)
+        self.assertEqual(p1,.6827)
+        self.assertEqual(p2,.9545)
+        self.assertEqual(p3,.9973)
 
 if __name__ == "__main__":
     unittest.main()
