@@ -38,6 +38,19 @@ class DoStats(object):
             summation = sum(l1)
             σ = math.sqrt(summation )
             return σ
+    def getDdof(self, ddof):
+        if isinstance(ddof, int):
+            return ddof
+        elif isinstance(ddof, str):
+            #  corrected sample standard deviation (using N − 1), and this is often referred to as the "sample standard deviation"
+            # the uncorrected estimator (using N) yields lower mean squared error
+            # N − 1.5 (for the normal distribution) almost completely eliminates bias
+            d = {
+                'CSSD': 1,
+                'LMSE': 0,
+                'ND': 1.5
+            }
+            return d.get(ddof,None)
     # Standard deviation may be abbreviated SD,
     def getSD(self, l=None,ddof=1,expected='μ',isEqlProb=True):
         """
@@ -51,6 +64,7 @@ class DoStats(object):
             l = self.list
         if len(np.array(l).shape) == 1 or not isEqlProb:
             l = [l]
+        ddof=self.getDdof(ddof)
         ret = []
         for val in l:
             if isEqlProb:
