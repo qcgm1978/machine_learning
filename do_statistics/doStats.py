@@ -1,6 +1,9 @@
 from scipy import stats
-import math, numpy as np
+import math,warnings, numpy as np
 class DoStats(object):
+    def getND(self, mean, SD,size=1000):
+        x = np.random.normal(loc=mean, scale=SD, size=size)
+        return x
     def getMode(self):
         return stats.mode(self.list)
     def getLinregress(self, x=None):
@@ -13,6 +16,8 @@ class DoStats(object):
         # return sum(self['speed'])/len(self['speed'])
         if l is None:
             l = self.list
+        if isinstance(l, set):
+            l=list(l)
         #μ: the population mean or expected value in probability and statistics
         if len(np.array(l).shape) == 1:
             μ=np.mean(l)
@@ -48,7 +53,9 @@ class DoStats(object):
             d = {
                 'CSSD': 1,
                 'LMSE': 0,
-                'ND': 1.5
+                'ND': 1.5,
+                # A more accurate approximation is to replace N-1.5 with N-1.5+1/(8(N-1)), e.g. N-(1.5-1/(8(N-1)))
+                'ACCURATE':lambda N:1.5-1/(8*(N-1))
             }
             return d.get(ddof,None)
     # Standard deviation may be abbreviated SD,
@@ -62,17 +69,29 @@ class DoStats(object):
             return None
         if l is None:
             l = self.list
-        if len(np.array(l).shape) == 1 or not isEqlProb:
+        if len(np.array(l).shape) == 1 or not isEqlProb or isinstance(l,set):
             l = [l]
         ddof=self.getDdof(ddof)
         ret = []
         for val in l:
+            if isinstance(val, set):
+                val=list(val)
             if isEqlProb:
+                length=len(val)
+                # for N>75 the bias is below 1%
+                if ddof == 0 and length <= 75:
+                    warnings.warn('Uncorrected sample standard deviation, the bias is most significant for small or moderate sample sizes')
+                if callable(ddof):
+                    ddof=ddof(length)
                 σ = np.std(val,ddof=ddof)
             else:
                 σ = self.getSdWithProb(val)
             ret.append(σ)
         return ret if len(ret) > 1 else ret[0]
+    def getFreedomDegrees(self, l=None):
+        if l is None:
+            l = self.list
+        return len(l)-1
     def get1stdProbability(self):
         μ = self.getMean()
         minusSquare = map(lambda x: (x - μ) ** 2, self.list)

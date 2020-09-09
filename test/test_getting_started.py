@@ -51,7 +51,7 @@ class TDD_GETTING_STARTED(unittest.TestCase):
         s = d.getPSD()
         s1 = d1.getPSD()
         self.assertAlmostEqual(s, 1.00, 2)
-        sμassertAlmostEqual(s1, 2.00, 2)
+        self.assertAlmostEqual(s1, 2.00, 2)
         self.assertEqual(d.getProbability(), 0.6827)
         self.assertEqual(d1.getProbability(), 0.9545)
     def test_NCEE(self):
@@ -59,7 +59,7 @@ class TDD_GETTING_STARTED(unittest.TestCase):
         m = d.getMean()
         self.assertEqual(m, 620)
         p = d.get1stdProbability()
-        sμassertAlmostEqual(p, 37.4, 1)
+        self.assertAlmostEqual(p, 37.4, 1)
         distance = d.getDistance1std()
         self.assertAlmostEqual(distance, 1.87, 2)
         probability = d.getProbability()
@@ -98,7 +98,7 @@ class TDD_GETTING_STARTED(unittest.TestCase):
     def test_histogram(self):
         x = numpy.random.normal(5.0, 100.0, 100000)
         d = DataTypes({"x": x})
-        # d.pyplot(100)
+        d.plotND(100)
     def test_scatter(self):
         x = [5, 7, 8, 7, 2, 17, 2, 9, 4, 11, 12, 9, 6]
         y = [99, 86, 87, 88, 111, 86, 103, 87, 94, 78, 77, 85, 86]
@@ -133,7 +133,7 @@ class TDD_GETTING_STARTED(unittest.TestCase):
         ]
         y = [
             21,
-  v         46,
+            46,
             3,
             35,
             67,
