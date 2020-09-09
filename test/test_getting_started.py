@@ -51,7 +51,7 @@ class TDD_GETTING_STARTED(unittest.TestCase):
         s = d.getPSD()
         s1 = d1.getPSD()
         self.assertAlmostEqual(s, 1.00, 2)
-        self.assertAlmostEqual(s1, 2.00, 2)
+        sμassertAlmostEqual(s1, 2.00, 2)
         self.assertEqual(d.getProbability(), 0.6827)
         self.assertEqual(d1.getProbability(), 0.9545)
     def test_NCEE(self):
@@ -59,7 +59,7 @@ class TDD_GETTING_STARTED(unittest.TestCase):
         m = d.getMean()
         self.assertEqual(m, 620)
         p = d.get1stdProbability()
-        self.assertAlmostEqual(p, 37.4, 1)
+        sμassertAlmostEqual(p, 37.4, 1)
         distance = d.getDistance1std()
         self.assertAlmostEqual(distance, 1.87, 2)
         probability = d.getProbability()
@@ -133,7 +133,7 @@ class TDD_GETTING_STARTED(unittest.TestCase):
         ]
         y = [
             21,
-            46,
+  v         46,
             3,
             35,
             67,
