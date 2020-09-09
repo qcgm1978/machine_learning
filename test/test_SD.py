@@ -6,6 +6,7 @@ from datatype import DataTypes
 import unittest,pandas
 from mysql_data.decorators_func import singleton
 from unum.units import * # Load a number of common units.
+import pint
 from pint import UnitRegistry
 ureg = UnitRegistry()
 class TDD_TEST_SD(unittest.TestCase):
@@ -58,8 +59,16 @@ class TDD_TEST_SD(unittest.TestCase):
         p = self.d.getPSD(l)
         self.assertEqual(p, 2)
     def test_average_height(self):
-        m=self.d.ito('inch','m')
+        m=self.d.to('inch','m')
         self.assertEqual(m,0.0254*ureg.m)
+        self.assertEqual(m.magnitude,0.0254)
+        self.assertEqual(m.units,'meter')
+        self.assertIsInstance(m.dimensionality,pint.util.UnitsContainer)
+        self.assertEqual(m.dimensionality,pint.util.UnitsContainer({'[length]':1}))
+        m=self.d.to('inch','cm',num=70)
+        m1=self.d.to('inch','cm',num=3)
+        self.assertEqual(m.magnitude,177.8)
+        self.assertEqual(m1.magnitude,7.62)
 
 if __name__ == "__main__":
     unittest.main()
