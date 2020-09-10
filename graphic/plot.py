@@ -69,51 +69,65 @@ class Plot(object):
             x = self.list
         plt.bar(x, height)
         self.show()
-    def plotND(self, bars=100,l=None,labels=None):
+    def plotND(self,x,y,yLable,mean, bars=100,l=None,labels=None):
         if l is None:
             l = self.list
         if isinstance(l, set):
             l = list(l)
         if len(np.array(l).shape) == 1:
             l = [l]
-        colors=['#FF5252','#535EB2']+plt.rcParams['axes.prop_cycle'].by_key()['color']
         fig, ax = plt.subplots()
-        self.drawGridLines(ax)
-        for index, val in enumerate(l):
-            n, bins, rects = ax.hist(val, bars,color=colors[index],alpha=.8, label='SD = {0}'.format(labels[index]))
-            for r in rects:
-                height = r.get_height() / r.get_width()
-                if height>350:
-                    r.set_height(300+height/10*np.random.rand() )
-                else:
-                    r.set_height(height )
-        # set the y limit
-        plt.ylim(0,400)
-        plt.xlim(0, 230)
-        x=range(0,231,10)
-        ax.set_xticks(x)
-        plt.xticks(fontsize=8)
-        ax.set_ylabel('Number per bin')
-        ax.legend(loc='upper right')
-        x1 = x2 = 100
-        y1, y2 = 0, 360
+        
+        self.drawGridLines(ax,x,y)
+        self.plotHist(ax,l,bars,labels,y)
+        self.setHistAxes(ax,x,y,yLable)
+        self.plotDotLine(ax,mean,y)
+        this_function_name = inspect.currentframe().f_code.co_name
+        self.save(plt,this_function_name)
+        # self.show()
+    def plotDotLine(self,ax,mean,y):
+        x1 = x2 = mean
+        y1, y2 = y[0], y[1]-40
         dashes = [5, 5]  # 10 points on, 5 off, 100 on, 5 off
         line1, = ax.plot([x1,x2],[y1,y2], '--', linewidth=1,color='black')
         line1.set_dashes(dashes)
-        txt='Average = 100'
-        position=(100,370)
+        txt='Average = {0}'.format(mean)
+        position=(mean,y2+10)
         self.drawTxt(ax,position,txt,center=True,color=self.black)
-        plt.savefig("img/SD.png")
-        # self.show()
-    def drawGridLines(self, ax):
-        # ax.set_aspect(.2)
+    def setHistAxes(self,ax,x,y,yLable):
+        # set the y limit
+        plt.xlim(x[0], x[1])
+        plt.ylim(y[0],y[1])
+        x=range(0,x[1]+1,10)
+        ax.set_xticks(x)
+        plt.xticks(fontsize=8)
+        def format_fn(tick_val, tick_pos):
+            if int(tick_val) ==0:
+                return '<{0}'.format(x[0])
+            elif int(tick_val) == 230:
+                return '    {0}+'.format(x[-1])
+            else:
+                return tick_val
+        self.setLables(ax, isMajor=False, format_fn=format_fn)
+        ax.set_ylabel(yLable)
+    def plotHist(self, ax,l,bars,labels,y):
+        colors=['#FF5252','#535EB2']+plt.rcParams['axes.prop_cycle'].by_key()['color']
+        for index, val in enumerate(l):
+            n, bins, rects = ax.hist(val, bars,color=colors[index],alpha=.8, label=labels[index])
+            for r in rects:
+                height = r.get_height() / r.get_width()
+                if height>y[1]-50:
+                    r.set_height(y[1]-100+height/10*np.random.rand() )
+                else:
+                    r.set_height(height)
+        ax.legend(loc='upper right')
+    def drawGridLines(self, ax,x,y):
         wid = 5
         hei = 10
-        nrows = 400
-        ncols = 230
-        xx = np.arange(0, ncols, (wid))
-        yy = np.arange(0, nrows, (hei))
-        pat = []
+        nrows = y[1]
+        ncols = x[1]
+        xx = np.arange(x[0], ncols, wid)
+        yy = np.arange(y[0], nrows, hei)
         for ind,xi in enumerate(xx):
             for index,yi in enumerate(yy):
                 sq = patches.Rectangle((xi, yi), wid, hei, fill=True,color='white' if (index+ind)%2 else '#E6E6E6')
@@ -138,20 +152,24 @@ class Plot(object):
         ax.set_title('\n'.join(title),loc='left')
         ax.set_xlabel(xTxt)
         ax.set_ylabel(yTxt)
-    def setLables(self,ax,l):
+    def setLables(self,ax,format_fn,isMajor=True):
+        if isMajor:
+            locator = ax.xaxis.set_major_locator
+        else:
+            locator = ax.xaxis.set_minor_locator
+        ax.xaxis.set_major_formatter(FuncFormatter(format_fn))
+        locator(MaxNLocator(integer=True))
+    def scatterGrouped(self,l,title='',xTxt='',yTxt=''):
+        fig, ax = plt.subplots()
+        self.setTxt(ax,title,xTxt,yTxt)
+        self.addScatter(ax,l)
+        labels = list(map(lambda item: item[0], l))
         def format_fn(tick_val, tick_pos):
             if int(tick_val) in range(1,3):
                 return labels[int(tick_val)-1]
             else:
                 return ''
-        labels = list(map(lambda item:item[0],l))
-        ax.xaxis.set_major_formatter(FuncFormatter(format_fn))
-        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-    def scatterGrouped(self,l,title='',xTxt='',yTxt=''):
-        fig, ax = plt.subplots()
-        self.setTxt(ax,title,xTxt,yTxt)
-        self.addScatter(ax,l)
-        self.setLables(ax, l)
+        self.setLables(ax, labels,format_fn=format_fn)
         this_function_name = inspect.currentframe().f_code.co_name
         self.save(plt,this_function_name)
         # self.show()
