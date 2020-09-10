@@ -1,7 +1,8 @@
 import math, numpy as np
-import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter, MaxNLocator
+from matplotlib import colors
+import matplotlib.patches as patches
 class Plot(object):
     red='#F11F10'
     white='#fff'
@@ -68,27 +69,50 @@ class Plot(object):
             x = self.list
         plt.bar(x, height)
         self.show()
-    def plotND(self, bars=100,l=None):
+    def plotND(self, bars=100,l=None,labels=None):
         if l is None:
             l = self.list
         if isinstance(l, set):
             l = list(l)
         if len(np.array(l).shape) == 1:
             l = [l]
-        colors=['#535EB2','#FF5252']+plt.rcParams['axes.prop_cycle'].by_key()['color']
+        colors=['#FF5252','#535EB2']+plt.rcParams['axes.prop_cycle'].by_key()['color']
         fig, ax = plt.subplots()
+        self.drawGridLines(ax)
         for index, val in enumerate(l):
-            n, bins, rects = ax.hist(val, bars,color=colors[index],alpha=.8)
+            n, bins, rects = ax.hist(val, bars,color=colors[index],alpha=.8, label='SD = {0}'.format(labels[index]))
             for r in rects:
                 height = r.get_height() / r.get_width()
                 if height>350:
-                    r.set_height(350+np.random.rand() )
+                    r.set_height(300+height/10*np.random.rand() )
                 else:
                     r.set_height(height )
         # set the y limit
         plt.ylim(0,400)
-        plt.xlim(0,230)
-        self.show()
+        plt.xlim(0, 230)
+        # x = np.arange(len(l[0]))  # the label locations
+        x=range(0,231,10)
+        ax.set_xticks(x)
+        ax.set_ylabel('Number per bin')
+        ax.legend(loc='upper right')
+        plt.savefig("img/SD.png")
+        # self.show()
+    def drawGridLines(self, ax):
+        # ax.set_aspect(.2)
+        wid = 10
+        hei = 22
+        nrows = 400
+        ncols = 230
+        inbetween = 10
+        xx = np.arange(0, ncols, (wid))
+        yy = np.arange(0, nrows, (hei))
+        pat = []
+        for ind,xi in enumerate(xx):
+            for index,yi in enumerate(yy):
+                sq = patches.Rectangle((xi, yi), wid, hei, fill=True,color='white' if (index+ind)%2 else 'gray')
+                ax.add_patch(sq)
+        ax.relim()
+        ax.autoscale_view()
     def polynomialRegressionLine(self):
         x = self.info["x"]
         y = self.info["y"]
