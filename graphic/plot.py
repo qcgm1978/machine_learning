@@ -139,7 +139,7 @@ class Plot(object):
         y = self.info["y"]
         mymodel = np.poly1d(np.polyfit(x, y, 3))
         minX = int(min(x))
-        maxX = int(max(x))
+        maxX = int(max(x))  
         maxY = int(max(y))
         myline = np.linspace(minX, maxX, maxY)
         self.scatter()
