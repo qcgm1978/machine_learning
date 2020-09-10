@@ -1,4 +1,4 @@
-import math, numpy as np
+import math,inspect, numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter, MaxNLocator
 from matplotlib import colors
@@ -90,26 +90,33 @@ class Plot(object):
         # set the y limit
         plt.ylim(0,400)
         plt.xlim(0, 230)
-        # x = np.arange(len(l[0]))  # the label locations
         x=range(0,231,10)
         ax.set_xticks(x)
+        plt.xticks(fontsize=8)
         ax.set_ylabel('Number per bin')
         ax.legend(loc='upper right')
+        x1 = x2 = 100
+        y1, y2 = 0, 360
+        dashes = [5, 5]  # 10 points on, 5 off, 100 on, 5 off
+        line1, = ax.plot([x1,x2],[y1,y2], '--', linewidth=1,color='black')
+        line1.set_dashes(dashes)
+        txt='Average = 100'
+        position=(100,370)
+        self.drawTxt(ax,position,txt,center=True,color=self.black)
         plt.savefig("img/SD.png")
         # self.show()
     def drawGridLines(self, ax):
         # ax.set_aspect(.2)
-        wid = 10
-        hei = 22
+        wid = 5
+        hei = 10
         nrows = 400
         ncols = 230
-        inbetween = 10
         xx = np.arange(0, ncols, (wid))
         yy = np.arange(0, nrows, (hei))
         pat = []
         for ind,xi in enumerate(xx):
             for index,yi in enumerate(yy):
-                sq = patches.Rectangle((xi, yi), wid, hei, fill=True,color='white' if (index+ind)%2 else 'gray')
+                sq = patches.Rectangle((xi, yi), wid, hei, fill=True,color='white' if (index+ind)%2 else '#E6E6E6')
                 ax.add_patch(sq)
         ax.relim()
         ax.autoscale_view()
@@ -144,8 +151,12 @@ class Plot(object):
         fig, ax = plt.subplots()
         self.setTxt(ax,title,xTxt,yTxt)
         self.addScatter(ax,l)
-        self.setLables(ax,l)
-        self.show()
+        self.setLables(ax, l)
+        this_function_name = inspect.currentframe().f_code.co_name
+        self.save(plt,this_function_name)
+        # self.show()
+    def save(self,plt,this_function_name):
+        plt.savefig("img/{0}.png".format(this_function_name))
     def addScatter(self,ax,l):
         for ind,i in enumerate(l):
             y=i[1]
@@ -164,23 +175,32 @@ class Plot(object):
         ratio=mean/10**math.ceil(math.log10(mean))
         x1, y1 = x+.1, mean-mean*ratio
         x2, y2 = x+.1, mean+mean*ratio
-        position=(x+.2,mean-300*ratio)
-        ax.plot([x1, x2], [y1, y2])
+        position = (x + .2, mean - 300 * ratio)
+        self.drawArrow(ax,[x1, x2], [y1, y2])
+        self.drawTxt(ax,position,txt)
+    def drawTxt(self, ax, position, txt, center=False, color=None):
+        if color is None:
+            color=self.red
+        if isinstance(txt, str):
+            txt=[txt]
+        strings = [str(item) for item in txt]
+        ax.text(position[0], position[1], "\n".join(strings),
+        horizontalalignment='center' if center else 'left',
+        # verticalalignment='top',
+        # transform=ax.transAxes,
+        color=color)
+    def drawArrow(self,ax,x,y,arrowstyle="<->"):
+        ax.plot(x,y)
         # Axes.annotate(self, text, xy, *args, **kwargs)
         # Annotate the point xy with text 'text'.
         # Optionally, the text can be displayed in another position xytext. An arrow pointing from the text to the annotated point xy can then be added by defining arrowprops.
         ax.annotate("",
-                    xy=(x1, y1), xycoords='data',
-                    xytext=(x2, y2), textcoords='data',
-                    arrowprops=dict(arrowstyle="<->", color=self.red,
+                    xy=(x[0], y[0]), xycoords='data',
+                    xytext=(x[1], y[1]), textcoords='data',
+                    arrowprops=dict(arrowstyle=arrowstyle, color=self.red,
                                     shrinkA=0, shrinkB=0,
-                                    # patchA=None, patchB=None,
-                                    # txt=txt,
                                     ),
                     )
-        strings = [str(item) for item in txt]
-        ax.text(.05, .95, "\n".join(strings),
-                 position=position, va="bottom",color=self.red)
     def scatter(self, x=None, y=None):
         if x is None or y is None:
             x = self.info["x"]
