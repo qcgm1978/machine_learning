@@ -57,17 +57,17 @@ class TDD_TEST_SD(unittest.TestCase):
         fMean = self.d.getMean(self.l2)
         t1 = ['Female', 'Std. Dev.', int(round(self.s1))]
         t2 = ['Male', "Std. Dev", int(round(self.s2))]
-        # self.d.scatterGrouped(
-        #     [
-        #         ("Female", y2.values.tolist()+[fMean],t1),
-        #         ("Male", y1.values.tolist() + [mMean],t2),
-        #         ("Female Mean", [fMean]),
-        #         ("Male Mean", [mMean]),
-        #     ],
-        #     title=['Sample standard deviation of','metabolic rate in male and female fulmars'],
-        #     yTxt="Matabolic rate",
-        #     xTxt="Sex",
-        # )
+        self.d.scatterGrouped(
+            [
+                ("Female", y2.values.tolist()+[fMean],t1),
+                ("Male", y1.values.tolist() + [mMean],t2),
+                ("Female Mean", [fMean]),
+                ("Male Mean", [mMean]),
+            ],
+            title=['Sample standard deviation of','metabolic rate in male and female fulmars'],
+            yTxt="Matabolic rate",
+            xTxt="Sex",
+        )
     def test_PSD(self):
         l = [2, 4, 4, 4, 5, 5, 7, 9]
         p = self.d.getPSD(l)
