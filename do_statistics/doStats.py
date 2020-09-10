@@ -79,8 +79,8 @@ class DoStats(object):
             if isEqlProb:
                 length=len(val)
                 # for N>75 the bias is below 1%
-                if ddof == 0 and length <= 75:
-                    warnings.warn('Uncorrected sample standard deviation, the bias is most significant for small or moderate sample sizes')
+                # if ddof == 0 and length <= 75:
+                #     warnings.warn('Uncorrected sample standard deviation, the bias is most significant for small or moderate sample sizes')
                 if callable(ddof):
                     ddof=ddof(length)
                 σ = np.std(val,ddof=ddof)
