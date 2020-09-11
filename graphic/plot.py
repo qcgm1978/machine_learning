@@ -84,6 +84,25 @@ class Plot(object):
         this_function_name = inspect.currentframe().f_code.co_name
         self.save(plt,this_function_name)
         # self.show()
+    def setBarsCol(self,N, bins, patches):
+        # fig, axs = plt.subplots(1, 2, tight_layout=True)
+        # N is the count in each bin, bins is the lower-limit of the bin
+        # N, bins, patches = ax.hist(x, bins=n_bins)
+        # We'll color code by height, but you could use any scalar
+        # fracs = N / N.max()
+        # we need to normalize the data to 0..1 for the full range of the colormap
+        # norm = colors.Normalize(fracs.min(), fracs.max())
+        # Now, we'll loop through our objects and set the color of each accordingly
+        colors = ['#005792', '#008BC4', '#69A8D4', '#BCC8E4']
+        allCol=list(reversed(colors))+colors
+        i = -3
+        m=0
+        for index,thispatch in enumerate(patches):
+            if thispatch.xy[0]>i:
+                m +=1
+                i+=1
+            color = allCol[m]
+            thispatch.set_facecolor(color)
     def plotDotLine(self, ax, mean, y):
         if y is None or mean is None:
             return
@@ -120,7 +139,8 @@ class Plot(object):
         colors=['#FF5252','#535EB2']+plt.rcParams['axes.prop_cycle'].by_key()['color']
         for index, val in enumerate(l):
             n_bins=20
-            n, bins, rects = ax.hist(val, bins=bars, color=colors[index], alpha=.8,orientation='vertical', density=density, label=labels[index] if labels else '')
+            n, bins, rects = ax.hist(val, bins=bars, color=colors[index], alpha=.8, orientation='vertical', density=density, label=labels[index] if labels else '')
+            self.setBarsCol(n, bins, rects)
             if y is not None and len(l)>1:
                 for r in rects:
                     height = r.get_height() / r.get_width()
