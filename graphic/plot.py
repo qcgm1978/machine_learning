@@ -69,7 +69,7 @@ class Plot(object):
             x = self.list
         plt.bar(x, height)
         self.show()
-    def plotND(self,x,y,yLable,mean, bars=100,l=None,labels=None):
+    def plotND(self,x,y=None,yLable=None,mean=None, bars=100,l=None,labels=None):
         if l is None:
             l = self.list
         if isinstance(l, set):
@@ -85,7 +85,9 @@ class Plot(object):
         this_function_name = inspect.currentframe().f_code.co_name
         self.save(plt,this_function_name)
         # self.show()
-    def plotDotLine(self,ax,mean,y):
+    def plotDotLine(self, ax, mean, y):
+        if y is None:
+            return
         x1 = x2 = mean
         y1, y2 = y[0], y[1]-40
         dashes = [5, 5]  # 10 points on, 5 off, 100 on, 5 off
@@ -94,7 +96,9 @@ class Plot(object):
         txt='Average = {0}'.format(mean)
         position=(mean,y2+10)
         self.drawTxt(ax,position,txt,center=True,color=self.black)
-    def setHistAxes(self,ax,x,y,yLable):
+    def setHistAxes(self, ax, x, y, yLable):
+        if y is None:
+            return
         # set the y limit
         plt.xlim(x[0], x[1])
         plt.ylim(y[0],y[1])
@@ -113,15 +117,18 @@ class Plot(object):
     def plotHist(self, ax,l,bars,labels,y):
         colors=['#FF5252','#535EB2']+plt.rcParams['axes.prop_cycle'].by_key()['color']
         for index, val in enumerate(l):
-            n, bins, rects = ax.hist(val, bars,color=colors[index],alpha=.8, label=labels[index])
-            for r in rects:
-                height = r.get_height() / r.get_width()
-                if height>y[1]-50:
-                    r.set_height(y[1]-100+height/10*np.random.rand() )
-                else:
-                    r.set_height(height)
+            n, bins, rects = ax.hist(val, bars, color=colors[index], alpha=.8, label=labels[index] if labels else '')
+            if y is not None:
+                for r in rects:
+                    height = r.get_height() / r.get_width()
+                    if height>y[1]-50:
+                        r.set_height(y[1]-100+height/10*np.random.rand() )
+                    else:
+                        r.set_height(height)
         ax.legend(loc='upper right')
-    def drawGridLines(self, ax,x,y):
+    def drawGridLines(self, ax, x, y):
+        if y is None:
+            return
         wid = 5
         hei = 10
         nrows = y[1]

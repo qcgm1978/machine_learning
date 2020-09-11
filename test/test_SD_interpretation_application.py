@@ -33,6 +33,9 @@ class TDD_TEST_SD_INTERPRETATION_APPLICATION(unittest.TestCase):
     def test_plot(self):
         l1=self.d.getND(100,10,size=10000)
         l2=self.d.getND(100,50,size=10000)
-        self.d.plotND(l=[l1,l2],bars=100,labels=['SD = 10','SD = 50'],yLable='Number per bin',x=[0,230],y=[0,400],mean=100)
+        # self.d.plotND(l=[l1,l2],bars=100,labels=['SD = 10','SD = 50'],yLable='Number per bin',x=[0,230],y=[0,400],mean=100)
+    def test_hypothesis(self):
+        s = self.d.getParticalPhyStd()
+        self.assertEqual(s,{'σ':5,'randomCount':3.5e6})
 if __name__ == '__main__':
     unittest.main()

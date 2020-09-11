@@ -34,6 +34,9 @@ class DoStats(object):
     def isNormalSD(self, l=None):
         α = self.getSD(l)
         return α < 2
+    # A five-sigma level translates to one chance in 3.5 million that a random fluctuation would yield the result
+    def getParticalPhyStd(self):
+        return {'σ': 5, 'randomCount':3.5e6}
     # In the population standard deviation formula, the denominator is N instead of N − 1.
     def getPSD(self,l=None):
         return self.getSD(l, ddof=0)
