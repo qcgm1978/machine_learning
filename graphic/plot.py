@@ -1,7 +1,6 @@
 import math,inspect, numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter, MaxNLocator,PercentFormatter
-
 from matplotlib import colors
 import matplotlib.patches as patches
 class Plot(object):
@@ -70,7 +69,7 @@ class Plot(object):
             x = self.list
         plt.bar(x, height)
         self.show()
-    def plotND(self,x,y=None,yLable=None,mean=None, bars=100,l=None,labels=None):
+    def plotND(self,x,y=None,yLable=None,mean=None, bars=100,l=None,labels=None,density=False,format_fn=None):
         if l is None:
             l = self.list
         if isinstance(l, set):
@@ -78,17 +77,15 @@ class Plot(object):
         if len(np.array(l).shape) == 1:
             l = [l]
         fig, ax = plt.subplots()
-        self.drawGridLines(ax,x,y)
-        self.plotHist(ax,l,bars,labels,y)
-        self.setHistAxes(ax,x,y,yLable)
+        self.drawGridLines(ax,x,y,density)
+        self.plotHist(ax,l,bars,labels,y,density=density)
+        self.setHistAxes(ax,x,y,yLable,format_fn)
         self.plotDotLine(ax, mean, y)
-        # Now we format the y-axis to display percentage
-        # ax.yaxis.set_major_formatter(PercentFormatter(xmax=1))
         this_function_name = inspect.currentframe().f_code.co_name
-        # self.save(plt,this_function_name)
-        self.show()
+        self.save(plt,this_function_name)
+        # self.show()
     def plotDotLine(self, ax, mean, y):
-        if y is None:
+        if y is None or mean is None:
             return
         x1 = x2 = mean
         y1, y2 = y[0], y[1]-40
@@ -98,29 +95,32 @@ class Plot(object):
         txt='Average = {0}'.format(mean)
         position=(mean,y2+10)
         self.drawTxt(ax,position,txt,center=True,color=self.black)
-    def setHistAxes(self, ax, x, y, yLable):
+    def setHistAxes(self, ax, x, y, yLable,format_fn=None):
         if y is None:
             return
+        if format_fn is None:
+            format_fn=self.format_fn
         # set the y limit
         plt.xlim(x[0], x[1])
-        plt.ylim(y[0],y[1])
-        x=range(0,x[1]+1,10)
-        ax.set_xticks(x)
-        plt.xticks(fontsize=8)
-        def format_fn(tick_val, tick_pos):
-            if int(tick_val) ==0:
-                return '<{0}'.format(x[0])
-            elif int(tick_val) == 230:
-                return '    {0}+'.format(x[-1])
-            else:
-                return tick_val
+        plt.ylim(y[0], y[1])
+        if format_fn is None:
+            x=range(0,x[1]+1,10)
+            ax.set_xticks(x)
+            plt.xticks(fontsize=8)
         self.setLables(ax, isMajor=False, format_fn=format_fn)
         ax.set_ylabel(yLable)
-    def plotHist(self, ax,l,bars,labels,y):
+    def format_fn(self,tick_val, tick_pos):
+            if int(tick_val) ==0:
+                return '<{0}'.format(tick_val)
+            elif int(tick_val) == 230:
+                return '    {0}+'.format(tick_val)
+            else:
+                return tick_val
+    def plotHist(self, ax,l,bars,labels,y,density=False):
         colors=['#FF5252','#535EB2']+plt.rcParams['axes.prop_cycle'].by_key()['color']
         for index, val in enumerate(l):
             n_bins=20
-            n, bins, rects = ax.hist(val, bins=bars, color=colors[index], alpha=.8,orientation='vertical', density=True, label=labels[index] if labels else '')
+            n, bins, rects = ax.hist(val, bins=bars, color=colors[index], alpha=.8,orientation='vertical', density=density, label=labels[index] if labels else '')
             if y is not None and len(l)>1:
                 for r in rects:
                     height = r.get_height() / r.get_width()
@@ -129,8 +129,8 @@ class Plot(object):
                     else:
                         r.set_height(height)
         ax.legend(loc='upper right')
-    def drawGridLines(self, ax, x, y):
-        if y is None:
+    def drawGridLines(self, ax, x, y,density):
+        if y is None or density:
             return
         wid = 5
         hei = 10

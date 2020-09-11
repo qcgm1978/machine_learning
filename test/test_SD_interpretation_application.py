@@ -49,8 +49,14 @@ class TDD_TEST_SD_INTERPRETATION_APPLICATION(unittest.TestCase):
         s1 = self.d.getDistanceByPopulationPercent(.5, sd)
         self.assertAlmostEqual(s1, 14)
     def test_bell_shaped_curve(self):
-        l1=self.d.getND(0,1,size=10000)
-        self.d.plotND(x=[0,4],l=l1,bars=100,labels=['SD = .4'],yLable='Number per bin')
-        # self.d.plotND(l=l1,bars=100,labels=['SD = .4'],yLable='Number per bin',x=[0,4],y=[0,.4],mean=.4)
+        l1 = self.d.getND(0, 1, size=10000)
+        def format_fn(tick_val, tick_pos):
+            if int(tick_val) ==0:
+                return 0
+            elif abs(int(tick_val)) == 4:
+                return ''
+            else:
+                return '{0}σ'.format(int(tick_val))
+        self.d.plotND(x=[-4,4],y=[0,.4],l=[l1],bars=100,labels=['SD = 1'],yLable='probability density',density=True,format_fn=format_fn)
 if __name__ == '__main__':
     unittest.main()
