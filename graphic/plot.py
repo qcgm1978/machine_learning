@@ -69,7 +69,7 @@ class Plot(object):
             x = self.list
         plt.bar(x, height)
         self.show()
-    def plotND(self,x,y=None,yLable=None,mean=None, bars=100,l=None,labels=None,density=False,format_fn=None):
+    def plotND(self,x,y=None,yLable=None,mean=None, bars=100,l=None,labels=None,density=False,format_fn=None,annotation=None):
         if l is None:
             l = self.list
         if isinstance(l, set):
@@ -80,40 +80,36 @@ class Plot(object):
         self.drawGridLines(ax,x,y,density)
         self.plotHist(ax,l,bars,labels,y,density=density)
         self.setHistAxes(ax,x,y,yLable,format_fn)
-        self.plotDotLine(ax, mean, y)
+        self.plotDotLine(ax, mean, y, density)
+        if annotation is None:
+            annotation=[{'txt': 'Average = {0}'.format(mean),
+       'position': (mean, y[1] + 10),
+       'color':self.black}]
+        self.drawTxt(ax,annotation,center=True)
         this_function_name = inspect.currentframe().f_code.co_name
         self.save(plt,this_function_name)
         # self.show()
     def setBarsCol(self,N, bins, patches):
-        # fig, axs = plt.subplots(1, 2, tight_layout=True)
-        # N is the count in each bin, bins is the lower-limit of the bin
-        # N, bins, patches = ax.hist(x, bins=n_bins)
-        # We'll color code by height, but you could use any scalar
-        # fracs = N / N.max()
-        # we need to normalize the data to 0..1 for the full range of the colormap
-        # norm = colors.Normalize(fracs.min(), fracs.max())
-        # Now, we'll loop through our objects and set the color of each accordingly
         colors = ['#005792', '#008BC4', '#69A8D4', '#BCC8E4']
         allCol=list(reversed(colors))+colors
         i = -3
         m=0
         for index,thispatch in enumerate(patches):
-            if thispatch.xy[0]>i:
-                m +=1
+            if thispatch.xy[0] > i:
+                if m<len(allCol)-1:
+                    m +=1
                 i+=1
             color = allCol[m]
             thispatch.set_facecolor(color)
-    def plotDotLine(self, ax, mean, y):
+    def plotDotLine(self, ax, mean, y,density):
         if y is None or mean is None:
             return
         x1 = x2 = mean
-        y1, y2 = y[0], y[1]-40
+        y1, y2 = y[0], y[1] if density else y[1]-40
         dashes = [5, 5]  # 10 points on, 5 off, 100 on, 5 off
-        line1, = ax.plot([x1,x2],[y1,y2], '--', linewidth=1,color='black')
-        line1.set_dashes(dashes)
-        txt='Average = {0}'.format(mean)
-        position=(mean,y2+10)
-        self.drawTxt(ax,position,txt,center=True,color=self.black)
+        line1, = ax.plot([x1,x2],[y1,y2],'-' if density else '--', linewidth=1,color=self.white if density else self.black)
+        not density and line1.set_dashes(dashes)
+        
     def setHistAxes(self, ax, x, y, yLable,format_fn=None):
         if y is None:
             return
@@ -226,17 +222,20 @@ class Plot(object):
         position = (x + .2, mean - 300 * ratio)
         self.drawArrow(ax,[x1, x2], [y1, y2])
         self.drawTxt(ax,position,txt)
-    def drawTxt(self, ax, position, txt, center=False, color=None):
-        if color is None:
-            color=self.red
-        if isinstance(txt, str):
-            txt=[txt]
-        strings = [str(item) for item in txt]
-        ax.text(position[0], position[1], "\n".join(strings),
-        horizontalalignment='center' if center else 'left',
-        # verticalalignment='top',
-        # transform=ax.transAxes,
-        color=color)
+    def drawTxt(self, ax, annotation,center=False):
+        for anno in annotation:
+            position, txt,color=anno.values()
+            if color is None:
+                color=self.red
+            if isinstance(txt, str):
+                txt=[txt]
+            strings = [str(item) for item in txt]
+            ax.text(position[0], position[1], "\n".join(strings),
+            horizontalalignment='center' if center else 'left',
+            fontsize=14,
+            # verticalalignment='top',
+            # transform=ax.transAxes,
+            color=color)
     def drawArrow(self,ax,x,y,arrowstyle="<->"):
         ax.plot(x,y)
         # Axes.annotate(self, text, xy, *args, **kwargs)
