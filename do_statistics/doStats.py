@@ -1,9 +1,16 @@
 from scipy import stats
+from scipy.stats import ttest_ind_from_stats
+
 import math,warnings, numpy as np
 class DoStats(object):
     def getND(self, mean, SD,size=1000):
         x = np.random.normal(loc=mean, scale=SD, size=size)
         return x
+    def getTtest(self):
+        return ttest_ind_from_stats(mean1=15.0, std1=np.sqrt(87.5),
+                     mean2=12.0, std2=np.sqrt(39.0) )
+    def getDistanceByPopulationPercent(self,percent,σ=1):
+        return σ/math.sqrt(1-percent)
     def getMode(self):
         return stats.mode(self.list)
     def getLinregress(self, x=None):

@@ -1,6 +1,7 @@
 import math,inspect, numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.ticker import FuncFormatter, MaxNLocator
+from matplotlib.ticker import FuncFormatter, MaxNLocator,PercentFormatter
+
 from matplotlib import colors
 import matplotlib.patches as patches
 class Plot(object):
@@ -77,14 +78,15 @@ class Plot(object):
         if len(np.array(l).shape) == 1:
             l = [l]
         fig, ax = plt.subplots()
-        
         self.drawGridLines(ax,x,y)
         self.plotHist(ax,l,bars,labels,y)
         self.setHistAxes(ax,x,y,yLable)
-        self.plotDotLine(ax,mean,y)
+        self.plotDotLine(ax, mean, y)
+        # Now we format the y-axis to display percentage
+        # ax.yaxis.set_major_formatter(PercentFormatter(xmax=1))
         this_function_name = inspect.currentframe().f_code.co_name
-        self.save(plt,this_function_name)
-        # self.show()
+        # self.save(plt,this_function_name)
+        self.show()
     def plotDotLine(self, ax, mean, y):
         if y is None:
             return
@@ -117,11 +119,12 @@ class Plot(object):
     def plotHist(self, ax,l,bars,labels,y):
         colors=['#FF5252','#535EB2']+plt.rcParams['axes.prop_cycle'].by_key()['color']
         for index, val in enumerate(l):
-            n, bins, rects = ax.hist(val, bars, color=colors[index], alpha=.8, label=labels[index] if labels else '')
-            if y is not None:
+            n_bins=20
+            n, bins, rects = ax.hist(val, bins=bars, color=colors[index], alpha=.8,orientation='vertical', density=True, label=labels[index] if labels else '')
+            if y is not None and len(l)>1:
                 for r in rects:
                     height = r.get_height() / r.get_width()
-                    if height>y[1]-50:
+                    if height>y[1]-50>0:
                         r.set_height(y[1]-100+height/10*np.random.rand() )
                     else:
                         r.set_height(height)
