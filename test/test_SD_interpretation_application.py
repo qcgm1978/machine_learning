@@ -1,4 +1,4 @@
-import sys, os
+import sys, os,math
 PACKAGE_PARENT = '..'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
@@ -37,5 +37,20 @@ class TDD_TEST_SD_INTERPRETATION_APPLICATION(unittest.TestCase):
     def test_hypothesis(self):
         s = self.d.getParticalPhyStd()
         self.assertEqual(s,{'σ':5,'randomCount':3.5e6})
+    def test_Ttest(self):
+        pass
+        # t = self.d.getTtest()
+        # print(t)
+    def test_distance(self):
+        s = self.d.getDistanceByPopulationPercent(.5)
+        self.assertAlmostEqual(s, math.sqrt(2))
+        sd = self.d.getSD(self.s1)
+        self.assertAlmostEqual(sd, 9.9, 1)
+        s1 = self.d.getDistanceByPopulationPercent(.5, sd)
+        self.assertAlmostEqual(s1, 14)
+    def test_bell_shaped_curve(self):
+        l1=self.d.getND(0,1,size=10000)
+        self.d.plotND(x=[0,4],l=l1,bars=100,labels=['SD = .4'],yLable='Number per bin')
+        # self.d.plotND(l=l1,bars=100,labels=['SD = .4'],yLable='Number per bin',x=[0,4],y=[0,.4],mean=.4)
 if __name__ == '__main__':
     unittest.main()
