@@ -69,16 +69,31 @@ class TDD_TEST_SD_INTERPRETATION_APPLICATION(unittest.TestCase):
                 return ''
             else:
                 return '{0}σ'.format(int(tick_val))
-        oneσ = str(round(self.d.getProbability(σRange=[1, 0])/2*100, 1))+'%'
-        twoσ = str(round(self.d.getProbability(σRange=[2, 1])/2*100, 1))+'%'
-        threeσ = str(round(self.d.getProbability(σRange=[3, 2])/2*100, 1))+'%'
-        fourσ = str(round(self.d.getProbability(σRange=[4, 3]) / 2 * 100, 1)) + '%'
-        def callback(plt,ax,np):
+        one = self.d.getProbability(σRange=[1, 0])/2*100
+        oneσ = str(round(one, 1))+'%'
+        two=self.d.getProbability(σRange=[2, 1])/2*100
+        twoσ = str(round(two, 1))+'%'
+        three=self.d.getProbability(σRange=[3, 2])/2*100
+        threeσ = str(round(three, 1))+'%'
+        four=self.d.getProbability(σRange=[4, 3]) / 2 * 100
+        fourσ = str(round(four, 1)) + '%'
+        self.assertAlmostEqual((one+two+three)*2,self.d.getProbability(3)*100)
+        self.assertAlmostEqual((one+two+three+four)*2,100)
+        def callback(plt,ax,np,bins):
             plt.setp( ax.yaxis.get_majorticklabels(), rotation=90 )
             y=np.linspace(0,.4,5)
             ax.set_yticks(y)
             plt.yticks(fontsize=14)
             plt.xticks(fontsize=14)
+            # add a 'best fit' line
+            sigma = 1
+            mu=0
+            y = ((1 / (np.sqrt(2 * np.pi) * sigma)) *
+                np.exp(-0.5 * (1 / sigma * (bins - mu))**2))
+            ax.plot(bins, y, '--',c='#FF7800',linewidth=3)
+            # ax.set_xlabel('Smarts')
+            # ax.set_ylabel('Probability density')
+            # ax.set_title(r'Histogram of IQ: $\mu=100$, $\sigma=15$')
         self.d.plotND(x=[-4, 4], y=[0, .4], l=[l1],  bars=100, yLable='probability density', density=True,
         format_fn=format_fn,
         callback=callback,

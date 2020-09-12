@@ -78,7 +78,7 @@ class Plot(object):
             l = [l]
         fig, ax = plt.subplots()
         self.drawGridLines(ax,x,y,density)
-        self.plotHist(ax,l,bars,labels,y,density=density)
+        n, bins, rects=self.plotHist(ax,l,bars,labels,y,density=density)
         self.setHistAxes(ax,x,y,yLable,format_fn)
         self.plotLines(ax, mean, y, density)
         if annotation is None:
@@ -89,7 +89,7 @@ class Plot(object):
             }]
         self.drawTxt(ax, annotation, center=True)
         if callable(callback):
-            callback(plt,ax,np)
+            callback(plt,ax,np,bins)
         this_function_name = inspect.currentframe().f_code.co_name
         self.save(plt,this_function_name)
         # self.show()
@@ -144,7 +144,6 @@ class Plot(object):
     def plotHist(self, ax,l,bars,labels,y,density=False):
         colors=['#FF5252','#535EB2']+plt.rcParams['axes.prop_cycle'].by_key()['color']
         for index, val in enumerate(l):
-            n_bins=20
             n, bins, rects = ax.hist(val, bins=bars, color=colors[index], alpha=.8, orientation='vertical', density=density, label=labels[index] if labels else '')
             self.setBarsCol(n, bins, rects)
             if y is not None and len(l)>1:
@@ -155,6 +154,7 @@ class Plot(object):
                     else:
                         r.set_height(height)
         labels and ax.legend(loc='upper right')
+        return n, bins, rects
     def drawGridLines(self, ax, x, y,density):
         if y is None or density:
             return
