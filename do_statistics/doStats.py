@@ -1,6 +1,5 @@
 from scipy import stats
 from scipy.stats import ttest_ind_from_stats
-
 import math,warnings, numpy as np
 class DoStats(object):
     def getND(self, mean, SD,size=1000):
@@ -126,21 +125,29 @@ class DoStats(object):
         # return val
         return np.percentile(self.list, percent * 100)
     # In statistics, the 68–95–99.7 rule, also known as the empirical rule, is a shorthand used to remember the percentage of values that lie within a band around the mean in a normal distribution with a width of two, four and six standard deviations, respectively; more precisely, 68.27%, 95.45% and 99.73% of the values lie within one, two and three standard deviations of the mean, respectively.
-    def getProbability(self,percent=None,isNormal=True):
+    def getProbability(self, percent=None, isNormal=True, σRange=None):
+        if σRange is None:
+            σRange=[]
         if percent is None:
-            std = self.getDistance1std()
-            percent = round(std, 2)
+            if len(σRange):
+                percent=σRange[0]
+            else:
+                std = self.getDistance1std()
+                percent = round(std, 2)
         if isNormal:
             if percent == 0:
-                return 1
+                ret= 0
             elif percent == 1.00:
-                return 0.6827
+                ret= 0.6827
             elif percent == 1.87:
-                return 0.015
+                ret= 0.015
             elif percent == 2.00:
-                return 0.9545
+                ret= 0.9545
             elif percent == 3.00:
-                return 0.9973
+                ret = 0.9973
+            else:
+                ret=1
+            return ret - self.getProbability(σRange[1]) if len(σRange)==2 else ret
     def getVariance(self, l=None):
         if l is None:
             l = [self.list]
