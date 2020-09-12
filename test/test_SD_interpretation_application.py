@@ -78,7 +78,8 @@ class TDD_TEST_SD_INTERPRETATION_APPLICATION(unittest.TestCase):
         four=self.d.getProbability(σRange=[4, 3]) / 2 * 100
         fourσ = str(round(four, 1)) + '%'
         self.assertAlmostEqual((one+two+three)*2,self.d.getProbability(3)*100)
-        self.assertAlmostEqual((one+two+three+four)*2,100)
+        self.assertAlmostEqual((one + two + three + four) * 2, 100)
+        
         def callback(plt,ax,np,bins):
             plt.setp( ax.yaxis.get_majorticklabels(), rotation=90 )
             y=np.linspace(0,.4,5)
@@ -88,8 +89,7 @@ class TDD_TEST_SD_INTERPRETATION_APPLICATION(unittest.TestCase):
             # add a 'best fit' line
             sigma = 1
             mu=0
-            y = ((1 / (np.sqrt(2 * np.pi) * sigma)) *
-                np.exp(-0.5 * (1 / sigma * (bins - mu))**2))
+            y = self.d.getProbabilityDensity(sigma,bins,mu)
             ax.plot(bins, y, '--',c='#FF7800',linewidth=3)
             # ax.set_xlabel('Smarts')
             # ax.set_ylabel('Probability density')

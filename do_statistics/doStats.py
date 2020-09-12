@@ -5,6 +5,9 @@ class DoStats(object):
     def getND(self, mean, SD,size=1000):
         x = np.random.normal(loc=mean, scale=SD, size=size)
         return x
+    def getProbabilityDensity(self,σ,bins,μ):
+        return ((1 / (np.sqrt(2 * np.pi) * σ)) *
+                np.exp(-0.5 * (1 / σ * (bins - μ))**2))
     def getTtest(self):
         return ttest_ind_from_stats(mean1=15.0, std1=np.sqrt(87.5),
                      mean2=12.0, std2=np.sqrt(39.0) )
