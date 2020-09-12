@@ -80,7 +80,7 @@ class Plot(object):
         self.drawGridLines(ax,x,y,density)
         self.plotHist(ax,l,bars,labels,y,density=density)
         self.setHistAxes(ax,x,y,yLable,format_fn)
-        self.plotDotLine(ax, mean, y, density)
+        self.plotLines(ax, mean, y, density)
         if annotation is None:
             annotation=[{'txt': 'Average = {0}'.format(mean),
        'position': (mean, y[1] + 10),
@@ -101,7 +101,7 @@ class Plot(object):
                 i+=1
             color = allCol[m]
             thispatch.set_facecolor(color)
-    def plotDotLine(self, ax, mean, y,density):
+    def plotLines(self, ax, mean, y,density):
         if y is None or mean is None:
             return
         x1 = x2 = mean
