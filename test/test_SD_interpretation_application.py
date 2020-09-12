@@ -73,17 +73,24 @@ class TDD_TEST_SD_INTERPRETATION_APPLICATION(unittest.TestCase):
         twoσ = str(round(self.d.getProbability(σRange=[2, 1])/2*100, 1))+'%'
         threeσ = str(round(self.d.getProbability(σRange=[3, 2])/2*100, 1))+'%'
         fourσ = str(round(self.d.getProbability(σRange=[4, 3]) / 2 * 100, 1)) + '%'
-        self.d.plotND(x=[-4, 4], y=[0, .4], l=[l1], mean=0, bars=100, yLable='probability density', density=True,
-                      format_fn=format_fn,
-                      annotation=[
+        def callback(plt,ax,np):
+            plt.setp( ax.yaxis.get_majorticklabels(), rotation=90 )
+            y=np.linspace(0,.4,5)
+            ax.set_yticks(y)
+            plt.yticks(fontsize=14)
+            plt.xticks(fontsize=14)
+        self.d.plotND(x=[-4, 4], y=[0, .4], l=[l1],  bars=100, yLable='probability density', density=True,
+        format_fn=format_fn,
+        callback=callback,
+        annotation=[
             {'position': (-.5, .2), 'txt': oneσ, 'color': self.d.white},
             {'position': (.5, .2), 'txt': oneσ, 'color': self.d.white},
             {'position': (-1.5, .02), 'txt': twoσ, 'color': self.d.white},
             {'position': (1.5, .02), 'txt': twoσ, 'color': self.d.white},
-            {'position': (-2.5, .03), 'txt': threeσ , 'color': self.d.black},
-            {'position': (2.5, .03), 'txt': threeσ , 'color': self.d.black},
-            {'position': (-3.3, .01), 'txt':fourσ , 'color': self.d.black},
-            {'position': (3.3, .01), 'txt':fourσ , 'color': self.d.black}
+            {'position': (-2.5, .03), 'txt': threeσ , 'color': self.d.black,'hasLine':True},
+            {'position': (2.5, .03), 'txt': threeσ , 'color': self.d.black,'hasLine':True},
+            {'position': (-3.3, .01), 'txt':fourσ , 'color': self.d.black,'hasLine':True},
+            {'position': (3.3, .01), 'txt':fourσ , 'color': self.d.black,'hasLine':True}
         ])
 
 

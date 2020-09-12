@@ -69,7 +69,7 @@ class Plot(object):
             x = self.list
         plt.bar(x, height)
         self.show()
-    def plotND(self,x,y=None,yLable=None,mean=None, bars=100,l=None,labels=None,density=False,format_fn=None,annotation=None):
+    def plotND(self,x,y=None,yLable=None,mean=None, bars=100,l=None,labels=None,density=False,format_fn=None,annotation=None,callback=None):
         if l is None:
             l = self.list
         if isinstance(l, set):
@@ -82,10 +82,14 @@ class Plot(object):
         self.setHistAxes(ax,x,y,yLable,format_fn)
         self.plotLines(ax, mean, y, density)
         if annotation is None:
-            annotation=[{'txt': 'Average = {0}'.format(mean),
-       'position': (mean, y[1] + 10),
-       'color':self.black}]
-        self.drawTxt(ax,annotation,center=True)
+            annotation = [{
+                'txt': 'Average = {0}'.format(mean),
+                'position': (mean, y[1] + 10),
+                'color': self.black
+            }]
+        self.drawTxt(ax, annotation, center=True)
+        if callable(callback):
+            callback(plt,ax,np)
         this_function_name = inspect.currentframe().f_code.co_name
         self.save(plt,this_function_name)
         # self.show()
@@ -93,23 +97,29 @@ class Plot(object):
         colors = ['#005792', '#008BC4', '#69A8D4', '#BCC8E4']
         allCol=list(reversed(colors))+colors
         i = -3
-        m=0
+        m = 0
+        length=len(patches)
         for index,thispatch in enumerate(patches):
             if thispatch.xy[0] > i:
                 if m<len(allCol)-1:
                     m +=1
-                i+=1
+                i += 1
             color = allCol[m]
+            if index<length-1:
+                nextPatch = patches[index + 1]
+                if nextPatch.xy[0] > i:
+                    color=self.white
             thispatch.set_facecolor(color)
-    def plotLines(self, ax, mean, y,density):
+    def plotLines(self, ax, mean, y,notHasOffset,color=None):
         if y is None or mean is None:
             return
+        if color is None:
+            color=self.white if notHasOffset else self.black
         x1 = x2 = mean
-        y1, y2 = y[0], y[1] if density else y[1]-40
+        y1, y2 = y[0], y[1] if notHasOffset else y[1]-40
         dashes = [5, 5]  # 10 points on, 5 off, 100 on, 5 off
-        line1, = ax.plot([x1,x2],[y1,y2],'-' if density else '--', linewidth=1,color=self.white if density else self.black)
-        not density and line1.set_dashes(dashes)
-        
+        line1, = ax.plot([x1,x2],[y1,y2],'-' if notHasOffset else '--', linewidth=1,color=color)
+        not notHasOffset and line1.set_dashes(dashes)
     def setHistAxes(self, ax, x, y, yLable,format_fn=None):
         if y is None:
             return
@@ -144,7 +154,7 @@ class Plot(object):
                         r.set_height(y[1]-100+height/10*np.random.rand() )
                     else:
                         r.set_height(height)
-        ax.legend(loc='upper right')
+        labels and ax.legend(loc='upper right')
     def drawGridLines(self, ax, x, y,density):
         if y is None or density:
             return
@@ -224,7 +234,8 @@ class Plot(object):
         self.drawTxt(ax,position,txt)
     def drawTxt(self, ax, annotation,center=False):
         for anno in annotation:
-            position, txt,color=anno.values()
+            d={'hasLine':False,**anno}
+            hasLine,position, txt,color=d.values()
             if color is None:
                 color=self.red
             if isinstance(txt, str):
@@ -236,6 +247,8 @@ class Plot(object):
             # verticalalignment='top',
             # transform=ax.transAxes,
             color=color)
+            if hasLine:
+                self.plotLines(ax, position[0], (position[1]-.02,position[1]), notHasOffset=True,color=self.black)
     def drawArrow(self,ax,x,y,arrowstyle="<->"):
         ax.plot(x,y)
         # Axes.annotate(self, text, xy, *args, **kwargs)
