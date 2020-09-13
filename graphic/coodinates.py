@@ -75,5 +75,5 @@ ax.text(left, top, 'rotated\nwith newlines',
         transform=ax.transAxes)
 
 #ax.set_axis_off()
-# plt.show()
+plt.show()
 plt.savefig('img/text.png')

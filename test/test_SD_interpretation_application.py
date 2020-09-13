@@ -89,11 +89,7 @@ class TDD_TEST_SD_INTERPRETATION_APPLICATION(unittest.TestCase):
             # add a 'best fit' line
             sigma = 1
             mu=0
-            y = self.d.getProbabilityDensity(sigma,bins,mu)
-            ax.plot(bins, y, '--',c='#FF7800',linewidth=3)
-            # ax.set_xlabel('Smarts')
-            # ax.set_ylabel('Probability density')
-            # ax.set_title(r'Histogram of IQ: $\mu=100$, $\sigma=15$')
+            self.d.drawFunction(ax,x=np.array(sorted(l1)),σ=sigma,μ=mu)
         self.d.plotND(x=[-4, 4], y=[0, .4], l=[l1],  bars=100, yLable='probability density', density=True,
         format_fn=format_fn,
         callback=callback,

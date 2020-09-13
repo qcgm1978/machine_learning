@@ -3,10 +3,34 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter, MaxNLocator,PercentFormatter
 from matplotlib import colors
 import matplotlib.patches as patches
+from matplotlib.patches import Polygon
 class Plot(object):
     red='#F11F10'
     white='#fff'
-    black='#0E0E0E'
+    black = '#0E0E0E'
+    # Make the shaded region
+# a, b = 2, 9  # integral limits
+    def setShadedRegion(self, ax, a, b,ix=None,iy=None,facecolor='red'):
+        def func(x):
+            return (x - 3) * (x - 5) * (x - 7) + 85
+
+        # Make the shaded region
+        if ix is None:
+            ix = np.linspace(a, b)
+        if iy is None:
+            iy = func(ix)
+        verts = [(a, 0)] + list(zip(ix, iy)) + [(b, 0)]
+        poly = Polygon(verts, facecolor=facecolor, edgecolor='0.5')
+        ax.add_patch(poly)
+    def drawFunction(self,ax=None,**kwargs):
+        x=kwargs['x']
+        y = self.getProbabilityDensity(**kwargs)
+        if ax is None:
+            fig, ax = plt.subplots()
+        ax.plot(x, y, '-', c=self.black, linewidth=3)
+        self.this_function_name = inspect.currentframe().f_code.co_name
+        self.ax=ax
+        return plt,ax,y
     def plotGroupedBar(
         self,
         l1,
@@ -91,7 +115,7 @@ class Plot(object):
         if callable(callback):
             callback(plt,ax,np,bins)
         this_function_name = inspect.currentframe().f_code.co_name
-        self.save(plt,this_function_name)
+        self.saveAndShow(this_function_name)
         # self.show()
     def setBarsCol(self,N, bins, patches):
         colors = ['#005792', '#008BC4', '#69A8D4', '#BCC8E4']
@@ -120,7 +144,7 @@ class Plot(object):
         dashes = [5, 5]  # 10 points on, 5 off, 100 on, 5 off
         line1, = ax.plot([x1,x2],[y1,y2],'-' if notHasOffset else '--', linewidth=1,color=color)
         not notHasOffset and line1.set_dashes(dashes)
-    def setHistAxes(self, ax, x, y, yLable,format_fn=None):
+    def setHistAxes(self, ax, x, y, yLable,format_fn=None,plt=None):
         if y is None:
             return
         if format_fn is None:
@@ -208,9 +232,11 @@ class Plot(object):
         self.setLables(ax, labels,format_fn=format_fn)
         this_function_name = inspect.currentframe().f_code.co_name
         self.save(plt,this_function_name)
-        # self.show()
-    def save(self,plt,this_function_name):
+    def saveAndShow(self, this_function_name=None, enableShow=False):
+        if this_function_name is None:
+            this_function_name=self.this_function_name
         plt.savefig("img/{0}.png".format(this_function_name))
+        enableShow and self.show()
     def addScatter(self,ax,l):
         for ind,i in enumerate(l):
             y=i[1]
