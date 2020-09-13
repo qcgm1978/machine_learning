@@ -1,4 +1,3 @@
-from matplotlib.ticker import FuncFormatter, MaxNLocator,PercentFormatter
 import sys
 import os
 import math
@@ -66,22 +65,11 @@ class TDD_TEST_ND_DATA_RULE(unittest.TestCase):
                 return ''
             else:
                 return '{0}σ'.format(int(tick_val))
-        x = [-4, 4]
-        y=[0, .4]
-        self.d.setHistAxes(self.ax,x,y,yLable,format_fn,plt=self.plt)
-        # self.plt.xlim(x[0], x[1])
-        # self.plt.ylim(y[0], y[1])
-        # isMajor=False
-        # if isMajor:
-        #     locator = self.ax.xaxis.set_major_locator
-        # else:
-        #     locator = self.ax.xaxis.set_minor_locator
-        # self.ax.xaxis.set_major_formatter(FuncFormatter(format_fn))
-        # locator(MaxNLocator(integer=True))
-        # self.ax.set_ylabel(yLable)
-
-        y=np.linspace(0,.4,5)
-        self.ax.set_yticks(y)
+        axisX = [-4, 4]
+        axisY=[0, .4]
+        self.d.setAxes(self.ax,axisX,axisY,yLable,format_fn,plt=self.plt)
+        axisY=np.linspace(0,.4,5)
+        self.ax.set_yticks(axisY)
         self.plt.yticks(fontsize=14)
         self.plt.xticks(fontsize=14)
     def test_show(self):

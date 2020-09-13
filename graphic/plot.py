@@ -103,7 +103,7 @@ class Plot(object):
         fig, ax = plt.subplots()
         self.drawGridLines(ax,x,y,density)
         n, bins, rects=self.plotHist(ax,l,bars,labels,y,density=density)
-        self.setHistAxes(ax,x,y,yLable,format_fn)
+        self.setAxes(ax,x,y,yLable,format_fn)
         self.plotLines(ax, mean, y, density)
         if annotation is None:
             annotation = [{
@@ -144,7 +144,7 @@ class Plot(object):
         dashes = [5, 5]  # 10 points on, 5 off, 100 on, 5 off
         line1, = ax.plot([x1,x2],[y1,y2],'-' if notHasOffset else '--', linewidth=1,color=color)
         not notHasOffset and line1.set_dashes(dashes)
-    def setHistAxes(self, ax, x, y, yLable,format_fn=None,plt=None):
+    def setAxes(self, ax, x, y, yLable,format_fn=None,plt=None):
         if y is None:
             return
         if format_fn is None:
