@@ -8,15 +8,14 @@ import unittest,numpy as np
 from graphic.plot import Plot
 from do_statistics.doStats import DoStats
 from mysql_data.decorators_func import singleton
-class TDD_TEST_ND_DATA_RULE(unittest.TestCase):
+class TDD_GRAPHIC_TECH(unittest.TestCase):
     @singleton
     def setUp(self):
         class PlotStat(Plot, DoStats):
             pass
         self.__class__.d = PlotStat()
         l1 = self.d.getND(0, 1, size=8000)
-        sigma = 1
-        mu = 0
+        
         one = self.d.getProbability(σRange=[1, 0])/2*100
         oneσ = str(round(one, 1))+'%'
         two=self.d.getProbability(σRange=[2, 1])/2*100
@@ -36,19 +35,14 @@ class TDD_TEST_ND_DATA_RULE(unittest.TestCase):
             {'position': (3.3, .01), 'txt':fourσ , 'color': self.d.black,'hasLine':True}
         ]
         self.__class__.x = np.array(sorted(l1))
-        self.__class__.plt, self.__class__.ax, self.__class__.y = self.d.drawFunction(x=self.x, σ=sigma, μ=mu)
-    def test_fit_line(self):
-        self.d.drawTxt(self.ax, self.annotation, center=True)
+    def test_fill(self):
+        sigma = 1
+        mu = 0
         colors = ['#005792', '#008BC4', '#69A8D4', '#BCC8E4']
         allCol=list(reversed(colors))+colors
-        oneEighth = 1000
-        self.d.setShadedRegion(self.ax, 0, 2, ix=self.x[ : 2000], iy=self.y[ : 2000], facecolor=allCol[0])
-        for i in range(2,6):
-            oneEighth = 1000
-            self.d.setShadedRegion(self.ax, i-4, i-4 + 1, ix=self.x[i *oneEighth  : i *oneEighth  +oneEighth ], iy=self.y[i *oneEighth  : i *oneEighth  +oneEighth ], facecolor=allCol[i])
-        self.d.setShadedRegion(self.ax, 2, 4, ix=self.x[6000 : ], iy=self.y[6000 : ], facecolor=allCol[0])
-    def test_axis(self):
-        self.plt.setp(self.ax.yaxis.get_majorticklabels(), rotation=90)
+        for i in range(8):
+            self.d.drawFunction(x=self.x[i*1000:i*1000+1000], σ=sigma, μ=mu,isPlot=False,c=allCol[i])
+    def test_graphic_tech(self):
         yLable = 'probability density'
         def format_fn(tick_val, tick_pos):
             if int(tick_val) == 0:
@@ -57,13 +51,12 @@ class TDD_TEST_ND_DATA_RULE(unittest.TestCase):
                 return ''
             else:
                 return '{0}σ'.format(int(tick_val))
-        axisX = [-4, 4]
-        axisY=[0, .4]
-        self.d.setAxes(self.ax,axisX,axisY,yLable,format_fn,plt=self.plt)
-        axisY=np.linspace(0,.4,5)
-        self.ax.set_yticks(axisY)
-        self.plt.yticks(fontsize=14)
-        self.plt.xticks(fontsize=14)
+        x = [-4, 4]
+        y = [0, .4]
+        plt=self.d.getPlt()
+        plt.xlim(x[0], x[1])
+        plt.ylim(y[0], y[1])
+        # self.d.setAxes(self.ax,axisX,axisY,yLable,format_fn,plt=self.plt)
     def test_show(self):
         self.d.saveAndShow()
 if __name__ == '__main__':

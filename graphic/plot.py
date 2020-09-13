@@ -8,12 +8,14 @@ class Plot(object):
     red='#F11F10'
     white='#fff'
     black = '#0E0E0E'
+    ax=None
+    def getPlt(self):
+        return plt
     # Make the shaded region
 # a, b = 2, 9  # integral limits
     def setShadedRegion(self, ax, a, b,ix=None,iy=None,facecolor='red'):
         def func(x):
             return (x - 3) * (x - 5) * (x - 7) + 85
-
         # Make the shaded region
         if ix is None:
             ix = np.linspace(a, b)
@@ -22,15 +24,18 @@ class Plot(object):
         verts = [(a, 0)] + list(zip(ix, iy)) + [(b, 0)]
         poly = Polygon(verts, facecolor=facecolor, edgecolor='0.5')
         ax.add_patch(poly)
-    def drawFunction(self,ax=None,**kwargs):
+    def drawFunction(self,isPlot=True,ax=None,c=None,**kwargs):
         x=kwargs['x']
         y = self.getProbabilityDensity(**kwargs)
-        if ax is None:
+        if self.ax is None:
             fig, ax = plt.subplots()
-        ax.plot(x, y, '-', c=self.black, linewidth=3)
+            self.ax=ax
+        render = self.ax.plot if isPlot else self.ax.fill
+        c=c if c else self.black
+        # render(x, y, '-', c=c, linewidth=3)
+        plt.fill_between(x,y[0],y[-1],interpolate=False,facecolor=c)
         self.this_function_name = inspect.currentframe().f_code.co_name
-        self.ax=ax
-        return plt,ax,y
+        return plt,self.ax,y
     def plotGroupedBar(
         self,
         l1,
