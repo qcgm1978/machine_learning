@@ -10,6 +10,22 @@ class Plot(DoStats):
     white='#fff'
     black = '#0E0E0E'
     ax=None
+    def plts(self,t):
+        length=len(t)
+        fig, axes = plt.subplots(length, 1)
+        # add a big axes, hide frame
+        pltIndex=length*100+11
+        for index,item in enumerate(t):
+            # ax=fig.add_subplot(pltIndex+index, )
+            # ax = plt.subplot(pltIndex+index)
+            if 'isScatter' in item:
+                func=axes[index].scatter
+            else:
+                func=axes[index].plot
+            func(item['x'], item['y'],  c=self.black, linewidth=3)
+            axes[index].set_title(item['title'])
+            axes[index].set_ylabel('PD' if index else 'Val')
+        plt.tight_layout()
     def getPlt(self):
         return plt
     # Make the shaded region

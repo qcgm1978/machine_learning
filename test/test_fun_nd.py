@@ -27,15 +27,7 @@ class TDD_TEST_FUN_ND(unittest.TestCase):
         self.assertAlmostEqual(differ,.45)
     def test_plot(self):
         l=26, 33, 65, 28, 34, 55, 25, 44, 50, 36, 26, 37, 43, 62, 35, 38, 45, 32, 28, 34
-        sortedX = np.array(sorted(l))
-        plt,ax,x,y=self.d.getXyData(x=sortedX)
-        ax1 = plt.subplot(211)
-        ax1.plot(x, y, '-', c=self.d.black, linewidth=3)
-        ax1.set_title('Standardizing')
-        ax2 = plt.subplot(212)
-        ax2.plot(sortedX, y, '-', c=self.d.black, linewidth=3)
-        ax2.set_title('Not standardizing')
-        plt.tight_layout()
+        self.d.plotEvolution(l)
     def test_save(self):
         self.d.saveAndShow()
 if __name__ == '__main__':
