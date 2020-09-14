@@ -40,7 +40,7 @@ class HandleData(DoMath, DoStats, MysqlOp):
     def __getitem__(self, i):
         try:
             return self.info[i]
-        except KeyError:
+        except (KeyError,AttributeError):
             return None
     def getConstants(self):
         return constants

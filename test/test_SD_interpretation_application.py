@@ -6,14 +6,14 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(
     os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 import unittest
-from datatype import DataTypes
+from graphic.plot import Plot
 from mysql_data.decorators_func import singleton
 
 
 class TDD_TEST_SD_INTERPRETATION_APPLICATION(unittest.TestCase):
     @singleton
     def setUp(self):
-        self.__class__.d = DataTypes()
+        self.__class__.d = Plot()
         self.__class__.s1 = {0, 0, 14, 14}
         self.__class__.s2 = {0, 6, 8, 14}
         self.__class__.s3 = {6, 6, 8, 8}
@@ -89,7 +89,8 @@ class TDD_TEST_SD_INTERPRETATION_APPLICATION(unittest.TestCase):
             # add a 'best fit' line
             sigma = 1
             mu=0
-            self.d.drawFunction(ax,x=np.array(sorted(l1)),σ=sigma,μ=mu)
+            plt,ax,x,y=self.d.getXyData(ax=ax,x=np.array(sorted(l1)),σ=sigma,μ=mu)
+            ax.plot(x, y, '-', c=self.d.black, linewidth=3)
         self.d.plotND(x=[-4, 4], y=[0, .4], l=[l1],  bars=100, yLable='probability density', density=True,
         format_fn=format_fn,
         callback=callback,
@@ -103,7 +104,6 @@ class TDD_TEST_SD_INTERPRETATION_APPLICATION(unittest.TestCase):
             {'position': (-3.3, .01), 'txt':fourσ , 'color': self.d.black,'hasLine':True},
             {'position': (3.3, .01), 'txt':fourσ , 'color': self.d.black,'hasLine':True}
         ])
-
 
 if __name__ == '__main__':
     unittest.main()

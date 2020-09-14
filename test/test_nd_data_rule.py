@@ -6,17 +6,14 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 import unittest,numpy as np
 from graphic.plot import Plot
-from do_statistics.doStats import DoStats
 from mysql_data.decorators_func import singleton
 class TDD_TEST_ND_DATA_RULE(unittest.TestCase):
     @singleton
     def setUp(self):
-        class PlotStat(Plot, DoStats):
-            pass
-        self.__class__.d = PlotStat()
-        l1 = self.d.getND(0, 1, size=8000)
+        self.__class__.d = Plot()
+        mu=[1070,950]
+        l1 = self.d.getND(mu, 1, size=8000)
         sigma = 1
-        mu = 0
         one = self.d.getProbability(σRange=[1, 0])/2*100
         oneσ = str(round(one, 1))+'%'
         two=self.d.getProbability(σRange=[2, 1])/2*100
@@ -35,8 +32,8 @@ class TDD_TEST_ND_DATA_RULE(unittest.TestCase):
             {'position': (-3.3, .01), 'txt':fourσ , 'color': self.d.black,'hasLine':True},
             {'position': (3.3, .01), 'txt':fourσ , 'color': self.d.black,'hasLine':True}
         ]
-        self.__class__.x = np.array(sorted(l1))
-        self.__class__.plt, self.__class__.ax, self.__class__.y = self.d.drawFunction(x=self.x, σ=sigma, μ=mu)
+        x = np.array(sorted(l1))
+        self.__class__.plt, self.__class__.ax,self.__class__.x, self.__class__.y = self.d.getXyData(x=x, σ=sigma, μ=mu)
     def test_fit_line(self):
         self.d.drawTxt(self.ax, self.annotation, center=True)
         colors = ['#005792', '#008BC4', '#69A8D4', '#BCC8E4']
