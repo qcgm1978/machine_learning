@@ -16,6 +16,14 @@ class TDD_TEST_FUN_ND(unittest.TestCase):
         larger=filter(lambda item:item>0,nd)
         smaller=filter(lambda item:item<0,nd)
         self.assertAlmostEqual(len(list(larger)),len(list(smaller)),-3)
+        mean,sd=d.getMeanSdByRange([1.1,1.7],.95)
+        self.assertEqual(mean,1.4)
+        self.assertAlmostEqual(sd,.15,2)
+        name=d.getSdName()
+        self.assertTrue( "z-score" in name)
+        count,differ=d.standardizing(1.85,mean,sd)
+        self.assertAlmostEqual(count,3)
+        self.assertAlmostEqual(differ,.45)
 if __name__ == '__main__':
     unittest.main()
 

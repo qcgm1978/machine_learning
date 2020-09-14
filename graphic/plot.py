@@ -4,7 +4,8 @@ from matplotlib.ticker import FuncFormatter, MaxNLocator,PercentFormatter
 from matplotlib import colors
 import matplotlib.patches as patches
 from matplotlib.patches import Polygon
-class Plot(object):
+from do_statistics.doStats import DoStats
+class Plot(DoStats):
     red='#F11F10'
     white='#fff'
     black = '#0E0E0E'
@@ -24,18 +25,16 @@ class Plot(object):
         verts = [(a, 0)] + list(zip(ix, iy)) + [(b, 0)]
         poly = Polygon(verts, facecolor=facecolor, edgecolor='0.5')
         ax.add_patch(poly)
-    def drawFunction(self,isPlot=True,ax=None,c=None,**kwargs):
-        x=kwargs['x']
-        y = self.getProbabilityDensity(**kwargs)
+    def getXyData(self,isPlot=True,ax=None,c=None,**kwargs):
+        x,y = self.getProbabilityDensity(**kwargs)
         if self.ax is None:
-            fig, ax = plt.subplots()
+            if ax is None:
+                fig, ax = plt.subplots()
             self.ax=ax
-        render = self.ax.plot if isPlot else self.ax.fill
         c=c if c else self.black
-        # render(x, y, '-', c=c, linewidth=3)
-        plt.fill_between(x,y[0],y[-1],interpolate=False,facecolor=c)
-        self.this_function_name = inspect.currentframe().f_code.co_name
-        return plt,self.ax,y
+        # plt.fill_between(x,y[0],y[-1],interpolate=False,facecolor=c)
+        # self.this_function_name = inspect.currentframe().f_code.co_name
+        return plt,self.ax,x,y
     def plotGroupedBar(
         self,
         l1,
@@ -108,7 +107,7 @@ class Plot(object):
         fig, ax = plt.subplots()
         self.drawGridLines(ax,x,y,density)
         n, bins, rects=self.plotHist(ax,l,bars,labels,y,density=density)
-        self.setAxes(ax,x,y,yLable,format_fn)
+        self.setAxes(ax,x,y,yLable,format_fn,plt)
         self.plotLines(ax, mean, y, density)
         if annotation is None:
             annotation = [{
@@ -239,7 +238,10 @@ class Plot(object):
         self.save(plt,this_function_name)
     def saveAndShow(self, this_function_name=None, enableShow=False):
         if this_function_name is None:
-            this_function_name=self.this_function_name
+            if hasattr(self,'this_function_name'):
+                this_function_name=self.this_function_name
+            else:
+                this_function_name='drawFunction'
         plt.savefig("img/{0}.png".format(this_function_name))
         enableShow and self.show()
     def addScatter(self,ax,l):
