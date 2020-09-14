@@ -41,7 +41,8 @@ class TDD_GRAPHIC_TECH(unittest.TestCase):
         colors = ['#005792', '#008BC4', '#69A8D4', '#BCC8E4']
         allCol=list(reversed(colors))+colors
         for i in range(8):
-            self.d.drawFunction(x=self.x[i*1000:i*1000+1000], σ=sigma, μ=mu,isPlot=False,c=allCol[i])
+            plt,ax,x,y=self.d.getXyData(x=self.x[i*1000:i*1000+1000], σ=sigma, μ=mu)
+            plt.fill_between(x,y[0],y[-1],interpolate=False,facecolor=allCol[i])
     def test_graphic_tech(self):
         yLable = 'probability density'
         def format_fn(tick_val, tick_pos):
@@ -51,12 +52,12 @@ class TDD_GRAPHIC_TECH(unittest.TestCase):
                 return ''
             else:
                 return '{0}σ'.format(int(tick_val))
-        x = [-4, 4]
-        y = [0, .4]
+        axisX = [-4, 4]
+        axisY = [0, .4]
         plt=self.d.getPlt()
-        plt.xlim(x[0], x[1])
-        plt.ylim(y[0], y[1])
-        # self.d.setAxes(self.ax,axisX,axisY,yLable,format_fn,plt=self.plt)
+        plt.xlim(axisX[0], axisX[1])
+        plt.ylim(axisY[0], axisY[1])
+        # self.d.setAxes(ax,axisX,axisY,yLable,format_fn,plt=plt)
     def test_show(self):
         self.d.saveAndShow()
 if __name__ == '__main__':

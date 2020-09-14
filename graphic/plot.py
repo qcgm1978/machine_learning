@@ -25,15 +25,12 @@ class Plot(DoStats):
         verts = [(a, 0)] + list(zip(ix, iy)) + [(b, 0)]
         poly = Polygon(verts, facecolor=facecolor, edgecolor='0.5')
         ax.add_patch(poly)
-    def getXyData(self,isPlot=True,ax=None,c=None,**kwargs):
+    def getXyData(self,ax=None,**kwargs):
         x,y = self.getProbabilityDensity(**kwargs)
         if self.ax is None:
             if ax is None:
                 fig, ax = plt.subplots()
             self.ax=ax
-        c=c if c else self.black
-        # plt.fill_between(x,y[0],y[-1],interpolate=False,facecolor=c)
-        # self.this_function_name = inspect.currentframe().f_code.co_name
         return plt,self.ax,x,y
     def plotGroupedBar(
         self,
@@ -97,19 +94,21 @@ class Plot(DoStats):
             x = self.list
         plt.bar(x, height)
         self.show()
-    def plotND(self,x,y=None,yLable=None,mean=None, bars=100,l=None,labels=None,density=False,format_fn=None,annotation=None,callback=None):
+    def getFigAx(self):
+        return plt.subplots()
+    def plotND(self,x=None,y=None,yLable=None,mean=None, bars=100,l=None,labels=None,density=False,format_fn=None,annotation=None,callback=None):
         if l is None:
             l = self.list
         if isinstance(l, set):
             l = list(l)
         if len(np.array(l).shape) == 1:
             l = [l]
-        fig, ax = plt.subplots()
+        fig, ax = self.getFigAx()
         self.drawGridLines(ax,x,y,density)
         n, bins, rects=self.plotHist(ax,l,bars,labels,y,density=density)
         self.setAxes(ax,x,y,yLable,format_fn,plt)
         self.plotLines(ax, mean, y, density)
-        if annotation is None:
+        if annotation is None and y:
             annotation = [{
                 'txt': 'Average = {0}'.format(mean),
                 'position': (mean, y[1] + 10),
@@ -266,6 +265,8 @@ class Plot(DoStats):
         self.drawArrow(ax,[x1, x2], [y1, y2])
         self.drawTxt(ax,position,txt)
     def drawTxt(self, ax, annotation,center=False):
+        if annotation is None:
+            return
         for anno in annotation:
             d={'hasLine':False,**anno}
             hasLine,position, txt,color=d.values()
