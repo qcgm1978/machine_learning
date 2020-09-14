@@ -24,9 +24,12 @@ class DoStats(object):
         x = np.random.normal(loc=mean, scale=SD, size=size)
         return x
     # μ is the expected value of the random variables, σ equals their distribution's standard deviation divided by n**(1/2), and n is the number of random variables
-    def getProbabilityDensity(self,σ,x,μ):
+    def getProbabilityDensity(self,x,σ=None,μ=None):
+        if μ is None:
+            μ=self.getMean(x)
+        if σ is None:
+            σ = self.getPSD(x)
         zScore,differ=self.standardizing(x,self.getMean(μ),σ)
-        # zScore=x
         μ=0
         y=((1 / (np.sqrt(2 * np.pi) * σ)) *
                 np.exp(-0.5 * (1 / σ * (zScore - μ))**2))
@@ -48,7 +51,7 @@ class DoStats(object):
         # return sum(self['speed'])/len(self['speed'])
         if l is None:
             l = self.list
-        if isinstance(l,int):
+        if isinstance(l,(int,float)):
             return l
         if isinstance(l, set):
             l=list(l)
