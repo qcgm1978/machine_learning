@@ -2,6 +2,16 @@ from scipy import stats
 from scipy.stats import ttest_ind_from_stats
 import math,warnings, numpy as np
 class DoStats(object):
+    def plotEvolution(self,l):
+        t=self.getEvolutiveData(l)
+        self.plts(t)
+    def getEvolutiveData(self,l):
+        sortedX = sorted(l)
+        plt,ax,x,y=self.getXyData(x=l)
+        firstTrimester=x[:3]
+        plt,ax,x1,y1=self.getXyData(x=sortedX)
+        t = ( {'x':range(len(l)),'y':l,'title':'Values and its Index','isScatter':True}, {'x':l,'y':y,'title':'Not Standardizing unsorted Line chart'}, {'x':l,'y':y,'title':'Not Standardizing unsorted Scatter chart','isScatter':True}, {'x':sortedX,'y':y1,'title':'Not Standardizing sorted'}, {'x':x1,'y':y1,'title':'Standardizing sorted'}, )
+        return t
     def getSdName(self):
         l=['standard deviations', "Standard Score", "sigma" , "z-score"]
         return l
