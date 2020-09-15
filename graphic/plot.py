@@ -10,14 +10,14 @@ class Plot(DoStats):
     white='#fff'
     black = '#0E0E0E'
     ax=None
+    def plotEvolution(self,l):
+        t=self.getEvolutiveData(l)
+        self.plts(t)
     def plts(self,t):
         length=len(t)
         fig, axes = plt.subplots(length, 1)
         # add a big axes, hide frame
-        pltIndex=length*100+11
         for index,item in enumerate(t):
-            # ax=fig.add_subplot(pltIndex+index, )
-            # ax = plt.subplot(pltIndex+index)
             if 'isScatter' in item:
                 func=axes[index].scatter
             else:
@@ -29,7 +29,7 @@ class Plot(DoStats):
     def getPlt(self):
         return plt
     # Make the shaded region
-# a, b = 2, 9  # integral limits
+    # a, b = 2, 9  # integral limits
     def setShadedRegion(self, ax, a, b,ix=None,iy=None,facecolor='red'):
         def func(x):
             return (x - 3) * (x - 5) * (x - 7) + 85
@@ -43,11 +43,12 @@ class Plot(DoStats):
         ax.add_patch(poly)
     def getXyData(self,ax=None,**kwargs):
         x,y = self.getProbabilityDensity(**kwargs)
-        if self.ax is None:
-            if ax is None:
+        if ax is None:
+            if self.ax is None:
                 fig, ax = plt.subplots()
-            self.ax=ax
-        return plt,self.ax,x,y
+            else:
+                ax=self.ax
+        return plt,ax,x,y
     def plotGroupedBar(
         self,
         l1,
@@ -189,7 +190,6 @@ class Plot(DoStats):
         for index, val in enumerate(l):
             n, bins, rects = ax.hist(val, bins=bars, color=colors[index], alpha=.8, orientation='vertical', density=density, label=labels[index] if labels else '')
             facecolor and ax.set_facecolor(facecolor)
-
             self.setBarsCol(n, bins, rects)
             if y is not None and len(l)>1:
                 for r in rects:
@@ -326,3 +326,44 @@ class Plot(DoStats):
         self.scatter()
         plt.plot(self.info["x"], mymodel)
         self.show()
+    def plotStdND(self):
+        l = self.getND(0, 1, size=10000)
+        def format_fn(tick_val, tick_pos):
+            if int(tick_val) == 0:
+                return 0
+            elif abs(int(tick_val)) == 4:
+                return ''
+            else:
+                return '{0}σ'.format(int(tick_val))
+        one = self.getProbability(σRange=[1, 0])/2*100
+        oneσ = str(round(one, 1))+'%'
+        two=self.getProbability(σRange=[2, 1])/2*100
+        twoσ = str(round(two, 1))+'%'
+        three=self.getProbability(σRange=[3, 2])/2*100
+        threeσ = str(round(three, 1))+'%'
+        four=self.getProbability(σRange=[4, 3]) / 2 * 100
+        fourσ = str(round(four, 1)) + '%'
+        def callback(plt,ax,np,bins):
+            plt.setp( ax.yaxis.get_majorticklabels(), rotation=90 )
+            y=np.linspace(0,.4,5)
+            ax.set_yticks(y)
+            plt.yticks(fontsize=14)
+            plt.xticks(fontsize=14)
+            # add a 'best fit' line
+            sigma = 1
+            mu=0
+            plt,ax,x,y=self.getXyData(ax=ax,x=np.array(sorted(l)),σ=sigma,μ=mu)
+            ax.plot(x, y, '-', c=self.black, linewidth=3)
+        self.plotND(x=[-4, 4], y=[0, .4], l=[l],  bars=100, yLable='probability density', density=True,
+        format_fn=format_fn,
+        callback=callback,
+        annotation=[
+            {'position': (-.5, .2), 'txt': oneσ, 'color': self.white},
+            {'position': (.5, .2), 'txt': oneσ, 'color': self.white},
+            {'position': (-1.5, .02), 'txt': twoσ, 'color': self.white},
+            {'position': (1.5, .02), 'txt': twoσ, 'color': self.white},
+            {'position': (-2.5, .03), 'txt': threeσ , 'color': self.black,'hasLine':True},
+            {'position': (2.5, .03), 'txt': threeσ , 'color': self.black,'hasLine':True},
+            {'position': (-3.3, .01), 'txt':fourσ , 'color': self.black,'hasLine':True},
+            {'position': (3.3, .01), 'txt':fourσ , 'color': self.black,'hasLine':True}
+        ])
