@@ -362,6 +362,6 @@ class Plot(DoStats):
         if annotation is not None:
             annos+=annotation
         self.plotND(x=[-4, 4], y=[0, .4], l=[l],  bars=100, yLable='probability density', density=True,
-        format_fn=self.format_fn,
+        format_fn=True,
         callback=callback,
         annotation=annos)

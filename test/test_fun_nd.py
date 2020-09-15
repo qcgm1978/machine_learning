@@ -57,20 +57,48 @@ class TDD_TEST_FUN_ND(unittest.TestCase):
             self.d.drawArrow(ax,( -1.2,-3), [ .01,.09],arrowstyle='->')
             self.d.drawArrow(ax,( -.5,-1.9), [ .01,.17],arrowstyle='->')
             self.d.drawArrow(ax,( 2.3,2.3), [ .01,.09],arrowstyle='->')
+        # self.d.plotStdND(
+        #     x_format_fn=x_format_fn,
+        #     func=func,
+        #     annotation=[
+        #         {'position':[-3,.1],'txt':data[0],'color':'black'},
+        #         {'position':[-1.9,.18],'txt':data[1],'color':'black'},
+        #         {'position':[2.3,.1],'txt':data[2],'color':'black'},
+        #     ]
+        # )
+    def test_standardizing(self):
+        l=[20, 15, 26, 32, 18, 28, 35, 14, 26, 22, 17]
+        l1=self.d.getSdLowerThan(l=l,limitSD=-1)
+        l1=map(lambda item:(item[0],round(item[1],2)),l1)
+        self.assertEqual(list(l1),[(15, -1.21), (14, -1.36)])
+    def test_half_std(self):
+        def x_format_fn(tick_val, tick_pos):
+            tick = tick_val
+            if tick == 0:
+                return 0
+            else:
+                sign = '+' if tick>0 else ''
+                num=sign+str(int(tick))
+                isInt=int(tick)==tick 
+                return '{0}\n{1}σ\n{2}'.format(int(tick),num,'' if  abs(tick)==4 else '2%') if isInt else tick
+        def func(ax,plt):
+            x=np.linspace(-4,4,17)
+            ax.set_xticks(x)
+            # plt.xticks(fontsize=10)
+            # line = plt.plot(roundScore,[0,0,0],'o',c='red',markersize=8)[0]
+            # line.set_clip_on(False)
+            # self.d.drawArrow(ax,( -1.2,-3), [ .01,.09],arrowstyle='->')
+            # self.d.drawArrow(ax,( -.5,-1.9), [ .01,.17],arrowstyle='->')
+            # self.d.drawArrow(ax,( 2.3,2.3), [ .01,.09],arrowstyle='->')
         self.d.plotStdND(
             x_format_fn=x_format_fn,
             func=func,
-            annotation=[
-                {'position':[-3,.1],'txt':data[0],'color':'black'},
-                {'position':[-1.9,.18],'txt':data[1],'color':'black'},
-                {'position':[2.3,.1],'txt':data[2],'color':'black'},
-            ]
+            # annotation=[
+            #     {'position':[-3,.1],'txt':data[0],'color':'black'},
+            #     {'position':[-1.9,.18],'txt':data[1],'color':'black'},
+            #     {'position':[2.3,.1],'txt':data[2],'color':'black'},
+            # ]
         )
-    def test_standardizing(self):
-        l=[20, 15, 26, 32, 18, 28, 35, 14, 26, 22, 17]
-        l1=self.d.getSdLowerThan(l=l,countSD=-1)
-        l1=map(lambda item:(item[0],round(item[1],2)),l1)
-        self.assertEqual(list(l1),[(15, -1.21), (14, -1.36)])
     def test_save(self):
         self.d.saveAndShow()
 if __name__ == '__main__':

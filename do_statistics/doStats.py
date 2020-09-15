@@ -47,9 +47,9 @@ class DoStats(object):
         return (zScore[0],differ[0]) if isSingle else (zScore,differ)
     def isPSD(self,l):
         return len(l)<= 75
-    def getSdLowerThan(self,l=None,countSD=None):
+    def getSdLowerThan(self,l=None,limitSD=None):
         zScore,differ=self.standardizing(l=l,isPSD=self.isPSD(l))
-        f=[(l[idx],score) for idx,score in enumerate(zScore) if score<countSD]
+        f=[(l[idx],score) for idx,score in enumerate(zScore) if score<limitSD]
         return f
     def getND(self, mean, SD,size=1000):
         mean=self.getMean(mean)
