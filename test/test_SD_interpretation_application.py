@@ -60,50 +60,7 @@ class TDD_TEST_SD_INTERPRETATION_APPLICATION(unittest.TestCase):
         self.assertAlmostEqual(s1, 14)
 
     def test_bell_shaped_curve(self):
-        l1 = self.d.getND(0, 1, size=10000)
-
-        def format_fn(tick_val, tick_pos):
-            if int(tick_val) == 0:
-                return 0
-            elif abs(int(tick_val)) == 4:
-                return ''
-            else:
-                return '{0}σ'.format(int(tick_val))
-        one = self.d.getProbability(σRange=[1, 0])/2*100
-        oneσ = str(round(one, 1))+'%'
-        two=self.d.getProbability(σRange=[2, 1])/2*100
-        twoσ = str(round(two, 1))+'%'
-        three=self.d.getProbability(σRange=[3, 2])/2*100
-        threeσ = str(round(three, 1))+'%'
-        four=self.d.getProbability(σRange=[4, 3]) / 2 * 100
-        fourσ = str(round(four, 1)) + '%'
-        self.assertAlmostEqual((one+two+three)*2,self.d.getProbability(3)*100)
-        self.assertAlmostEqual((one + two + three + four) * 2, 100)
-        
-        def callback(plt,ax,np,bins):
-            plt.setp( ax.yaxis.get_majorticklabels(), rotation=90 )
-            y=np.linspace(0,.4,5)
-            ax.set_yticks(y)
-            plt.yticks(fontsize=14)
-            plt.xticks(fontsize=14)
-            # add a 'best fit' line
-            sigma = 1
-            mu=0
-            plt,ax,x,y=self.d.getXyData(ax=ax,x=np.array(sorted(l1)),σ=sigma,μ=mu)
-            ax.plot(x, y, '-', c=self.d.black, linewidth=3)
-        self.d.plotND(x=[-4, 4], y=[0, .4], l=[l1],  bars=100, yLable='probability density', density=True,
-        format_fn=format_fn,
-        callback=callback,
-        annotation=[
-            {'position': (-.5, .2), 'txt': oneσ, 'color': self.d.white},
-            {'position': (.5, .2), 'txt': oneσ, 'color': self.d.white},
-            {'position': (-1.5, .02), 'txt': twoσ, 'color': self.d.white},
-            {'position': (1.5, .02), 'txt': twoσ, 'color': self.d.white},
-            {'position': (-2.5, .03), 'txt': threeσ , 'color': self.d.black,'hasLine':True},
-            {'position': (2.5, .03), 'txt': threeσ , 'color': self.d.black,'hasLine':True},
-            {'position': (-3.3, .01), 'txt':fourσ , 'color': self.d.black,'hasLine':True},
-            {'position': (3.3, .01), 'txt':fourσ , 'color': self.d.black,'hasLine':True}
-        ])
+        self.d.plotStdND()
 
 if __name__ == '__main__':
     unittest.main()
