@@ -112,7 +112,7 @@ class Plot(DoStats):
         self.show()
     def getFigAx(self):
         return plt.subplots()
-    def plotND(self,x=None,y=None,yLable=None,mean=None, bars=100,l=None,labels=None,density=False,format_fn=None,annotation=None,callback=None):
+    def plotND(self,x=None,y=None,yLable=None,mean=None, bars=100,l=None,labels=None,density=False,format_fn=None,annotation=None,callback=None,facecolor=None):
         if l is None:
             l = self.list
         if isinstance(l, set):
@@ -121,7 +121,7 @@ class Plot(DoStats):
             l = [l]
         fig, ax = self.getFigAx()
         self.drawGridLines(ax,x,y,density)
-        n, bins, rects=self.plotHist(ax,l,bars,labels,y,density=density)
+        n, bins, rects=self.plotHist(ax,l,bars,labels,y,density=density,facecolor=facecolor)
         self.setAxes(ax,x,y,yLable,format_fn,plt)
         self.plotLines(ax, mean, y, density)
         if annotation is None and y:
@@ -184,10 +184,12 @@ class Plot(DoStats):
                 return '    {0}+'.format(tick_val)
             else:
                 return tick_val
-    def plotHist(self, ax,l,bars,labels,y,density=False):
+    def plotHist(self, ax,l,bars,labels,y,density=False,facecolor=None):
         colors=['#FF5252','#535EB2']+plt.rcParams['axes.prop_cycle'].by_key()['color']
         for index, val in enumerate(l):
             n, bins, rects = ax.hist(val, bins=bars, color=colors[index], alpha=.8, orientation='vertical', density=density, label=labels[index] if labels else '')
+            facecolor and ax.set_facecolor(facecolor)
+
             self.setBarsCol(n, bins, rects)
             if y is not None and len(l)>1:
                 for r in rects:
