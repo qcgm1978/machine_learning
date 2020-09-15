@@ -29,19 +29,28 @@ class DoStats(object):
     # first subtract the mean,
     # then divide by the Standard Deviation
     # And doing that is called "Standardizing":
-    def standardizing(self,val,μ=None,σ=None,l=None,isPSD=False):
+    def standardizing(self,x=None,μ=None,σ=None,l=None,isPSD=False):
         if isinstance(l,list):
             μ=self.getMean(l)
             func=self.getPSD if isPSD else self.getSD
             σ=func(l)
+        if x is None:
+            x=l
         isSingle=False
-        if isinstance(val,(float,int)):
+        if isinstance(x,(float,int)):
             isSingle=True
-            val=[val]
-        val=np.array(val)
-        differ=val-μ
+            x=[x]
+        x=np.array(x)
+        # formula=(x-μ)/σ
+        differ=x-μ
         zScore=differ/σ
         return (zScore[0],differ[0]) if isSingle else (zScore,differ)
+    def isPSD(self,l):
+        return len(l)<= 75
+    def getSdLowerThan(self,l=None,countSD=None):
+        zScore,differ=self.standardizing(l=l,isPSD=self.isPSD(l))
+        f=[(l[idx],score) for idx,score in enumerate(zScore) if score<countSD]
+        return f
     def getND(self, mean, SD,size=1000):
         mean=self.getMean(mean)
         x = np.random.normal(loc=mean, scale=SD, size=size)
