@@ -326,7 +326,7 @@ class Plot(DoStats):
                 return '    {0}+'.format(tick_val)
             else:
                 return tick_val
-    def plotStdND(self,x_format_fn=None,func=None):
+    def plotStdND(self,x_format_fn=None,func=None,annotation=None):
         self.x_format_fn=x_format_fn
         l = self.getND(0, 1, size=10000)
         one = self.getProbability(σRange=[1, 0])/2*100
@@ -349,10 +349,7 @@ class Plot(DoStats):
             plt,ax,x,y=self.getXyData(ax=ax,x=np.array(sorted(l)),σ=sigma,μ=mu)
             ax.plot(x, y, '-', c=self.black, linewidth=3)
             callable(func) and func(ax,plt)
-        self.plotND(x=[-4, 4], y=[0, .4], l=[l],  bars=100, yLable='probability density', density=True,
-        format_fn=self.format_fn,
-        callback=callback,
-        annotation=[
+        annos=[
             {'position': (-.5, .2), 'txt': oneσ, 'color': self.white},
             {'position': (.5, .2), 'txt': oneσ, 'color': self.white},
             {'position': (-1.5, .02), 'txt': twoσ, 'color': self.white},
@@ -361,4 +358,10 @@ class Plot(DoStats):
             {'position': (2.5, .03), 'txt': threeσ , 'color': self.black,'hasLine':True},
             {'position': (-3.3, .01), 'txt':fourσ , 'color': self.black,'hasLine':True},
             {'position': (3.3, .01), 'txt':fourσ , 'color': self.black,'hasLine':True}
-        ])
+        ]
+        if annotation is not None:
+            annos+=annotation
+        self.plotND(x=[-4, 4], y=[0, .4], l=[l],  bars=100, yLable='probability density', density=True,
+        format_fn=self.format_fn,
+        callback=callback,
+        annotation=annos)
