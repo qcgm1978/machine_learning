@@ -47,14 +47,26 @@ class TDD_TEST_FUN_ND(unittest.TestCase):
                 return ''
             else:
                 return '{1}{0}\n{2}'.format(tick,'+' if tick>0 else '',round(sd*tick+mean,1))
+        firstTrimester=l[:3]
+        l1=self.d.standardizing(firstTrimester,l=l,isPSD=True)
+        roundScore = list(map(lambda item:round(item,2),l1[0]))
+        data=list(zip(firstTrimester,roundScore))
         def func(ax,plt):
-            # ax.tick_params(axis='x', colors='red')
-            firstTrimester=l[:3]
-            l1=self.d.standardizing(firstTrimester,l=l,isPSD=True)
-            line = plt.plot(l1[0],[0,0,0],'o',c='red',markersize=8)[0]
+            line = plt.plot(roundScore,[0,0,0],'o',c='red',markersize=8)[0]
             line.set_clip_on(False)
-            print(l1,'\n',xticks,'\n',l1[0][0])
-        self.d.plotStdND(x_format_fn=x_format_fn,func=func)
+            self.d.drawArrow(ax,( -1.2,-3), [ .01,.09],arrowstyle='->')
+            self.d.drawArrow(ax,( -.5,-1.9), [ .01,.17],arrowstyle='->')
+            self.d.drawArrow(ax,( 2.3,2.3), [ .01,.09],arrowstyle='->')
+            print(l1,'\n',xticks,'\n',roundScore[0])
+        self.d.plotStdND(
+            x_format_fn=x_format_fn,
+            func=func,
+            annotation=[
+                {'position':[-3,.1],'txt':data[0],'color':'black'},
+                {'position':[-1.9,.18],'txt':data[1],'color':'black'},
+                {'position':[2.3,.1],'txt':data[2],'color':'black'},
+            ]
+        )
     def test_save(self):
         self.d.saveAndShow()
 if __name__ == '__main__':
