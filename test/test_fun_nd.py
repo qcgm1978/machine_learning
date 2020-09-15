@@ -1,6 +1,8 @@
 # https://www.mathsisfun.com/data/standard-normal-distribution.html
 import sys
 import os
+
+from matplotlib.pyplot import xticks
 PACKAGE_PARENT = '..'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(
     os.path.join(os.getcwd(), os.path.expanduser(__file__))))
@@ -34,7 +36,25 @@ class TDD_TEST_FUN_ND(unittest.TestCase):
         #     l=l,  
         #     callback=callback,
         # )
-        self.d.plotStdND()
+        mean=self.d.getMean(l)
+        sd=self.d.getPSD(l)
+        self.assertAlmostEqual(sd,11.4)
+        def x_format_fn(tick_val, tick_pos):
+            tick = int(tick_val)
+            if tick == 0:
+                return mean
+            elif abs(tick) == 4:
+                return ''
+            else:
+                return '{1}{0}\n{2}'.format(tick,'+' if tick>0 else '',round(sd*tick+mean,1))
+        def func(ax,plt):
+            # ax.tick_params(axis='x', colors='red')
+            firstTrimester=l[:3]
+            l1=self.d.standardizing(firstTrimester,l=l,isPSD=True)
+            line = plt.plot(l1[0],[0,0,0],'o',c='red',markersize=8)[0]
+            line.set_clip_on(False)
+            print(l1,'\n',xticks,'\n',l1[0][0])
+        self.d.plotStdND(x_format_fn=x_format_fn,func=func)
     def test_save(self):
         self.d.saveAndShow()
 if __name__ == '__main__':

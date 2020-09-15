@@ -167,8 +167,7 @@ class Plot(DoStats):
     def setAxes(self, ax, x, y, yLable,format_fn=None,plt=None):
         if y is None:
             return
-        if format_fn is None:
-            format_fn=self.format_fn
+        
         # set the y limit
         plt.xlim(x[0], x[1])
         plt.ylim(y[0], y[1])
@@ -176,15 +175,8 @@ class Plot(DoStats):
             x=range(0,x[1]+1,10)
             ax.set_xticks(x)
             plt.xticks(fontsize=8)
-        self.setLables(ax, isMajor=False, format_fn=format_fn)
+        self.setLables(ax, isMajor=False, )
         ax.set_ylabel(yLable)
-    def format_fn(self,tick_val, tick_pos):
-            if int(tick_val) ==0:
-                return '<{0}'.format(tick_val)
-            elif int(tick_val) == 230:
-                return '    {0}+'.format(tick_val)
-            else:
-                return tick_val
     def plotHist(self, ax,l,bars,labels,y,density=False,facecolor=None):
         colors=['#FF5252','#535EB2']+plt.rcParams['axes.prop_cycle'].by_key()['color']
         for index, val in enumerate(l):
@@ -233,12 +225,12 @@ class Plot(DoStats):
         ax.set_title('\n'.join(title),loc='left')
         ax.set_xlabel(xTxt)
         ax.set_ylabel(yTxt)
-    def setLables(self,ax,format_fn,isMajor=True):
+    def setLables(self,ax,isMajor=True):
         if isMajor:
             locator = ax.xaxis.set_major_locator
         else:
             locator = ax.xaxis.set_minor_locator
-        ax.xaxis.set_major_formatter(FuncFormatter(format_fn))
+        self.x_format_fn and ax.xaxis.set_major_formatter(FuncFormatter(self.x_format_fn))
         locator(MaxNLocator(integer=True))
     def scatterGrouped(self,l,title='',xTxt='',yTxt=''):
         fig, ax = plt.subplots()
@@ -259,6 +251,7 @@ class Plot(DoStats):
                 this_function_name=self.this_function_name
             else:
                 this_function_name='drawFunction'
+        plt.tight_layout()
         plt.savefig("img/{0}.png".format(this_function_name))
         enableShow and self.show()
     def addScatter(self,ax,l):
@@ -326,15 +319,16 @@ class Plot(DoStats):
         self.scatter()
         plt.plot(self.info["x"], mymodel)
         self.show()
-    def plotStdND(self):
-        l = self.getND(0, 1, size=10000)
-        def format_fn(tick_val, tick_pos):
-            if int(tick_val) == 0:
-                return 0
-            elif abs(int(tick_val)) == 4:
-                return ''
+    def format_fn(tick_val, tick_pos):
+            if int(tick_val) ==0:
+                return '<{0}'.format(tick_val)
+            elif int(tick_val) == 230:
+                return '    {0}+'.format(tick_val)
             else:
-                return '{0}σ'.format(int(tick_val))
+                return tick_val
+    def plotStdND(self,x_format_fn=None,func=None):
+        self.x_format_fn=x_format_fn
+        l = self.getND(0, 1, size=10000)
         one = self.getProbability(σRange=[1, 0])/2*100
         oneσ = str(round(one, 1))+'%'
         two=self.getProbability(σRange=[2, 1])/2*100
@@ -354,8 +348,9 @@ class Plot(DoStats):
             mu=0
             plt,ax,x,y=self.getXyData(ax=ax,x=np.array(sorted(l)),σ=sigma,μ=mu)
             ax.plot(x, y, '-', c=self.black, linewidth=3)
+            callable(func) and func(ax,plt)
         self.plotND(x=[-4, 4], y=[0, .4], l=[l],  bars=100, yLable='probability density', density=True,
-        format_fn=format_fn,
+        format_fn=self.format_fn,
         callback=callback,
         annotation=[
             {'position': (-.5, .2), 'txt': oneσ, 'color': self.white},
