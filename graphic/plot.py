@@ -10,6 +10,7 @@ class Plot(DoStats):
     white='#fff'
     black = '#0E0E0E'
     ax=None
+    xInterval=1
     def plotEvolution(self,l):
         t=self.getEvolutiveData(l)
         self.plts(t)
@@ -138,21 +139,24 @@ class Plot(DoStats):
         self.saveAndShow(this_function_name)
         # self.show()
     def setBarsCol(self,N, bins, patches):
-        colors = ['#005792', '#008BC4', '#69A8D4', '#BCC8E4']
-        allCol=list(reversed(colors))+colors
+        length=len(patches)
+        if self.barCol:
+            allCol=[self.barCol]*length
+        else:
+            colors = ['#005792', '#008BC4', '#69A8D4', '#BCC8E4']
+            allCol=list(reversed(colors))+colors
         i = -3
         m = 0
-        length=len(patches)
         for index,thispatch in enumerate(patches):
             if thispatch.xy[0] > i:
                 if m<len(allCol)-1:
                     m +=1
-                i += 1
+                i += self.xInterval
             color = allCol[m]
             if index<length-1:
                 nextPatch = patches[index + 1]
                 if nextPatch.xy[0] > i:
-                    color=self.white
+                    color=self.cutLineCol if hasattr(self,'cutLineCol') else self.white
             thispatch.set_facecolor(color)
     def plotLines(self, ax, mean, y,notHasOffset,color=None):
         if y is None or mean is None:
@@ -279,16 +283,16 @@ class Plot(DoStats):
         if annotation is None:
             return
         for anno in annotation:
-            d={'hasLine':False,**anno}
-            hasLine,position, txt,color=d.values()
+            d={'hasLine':False,'fontsize':14,**anno}
+            hasLine,fontsize,position, txt,color,center=d.values()
             if color is None:
                 color=self.red
             if isinstance(txt, str):
                 txt=[txt]
             strings = [str(item) for item in txt]
             ax.text(position[0], position[1], "\n".join(strings),
-            horizontalalignment='center' if center else 'left',
-            fontsize=14,
+            horizontalalignment=center,
+            fontsize=fontsize,
             # verticalalignment='top',
             # transform=ax.transAxes,
             color=color)
@@ -326,17 +330,33 @@ class Plot(DoStats):
                 return '    {0}+'.format(tick_val)
             else:
                 return tick_val
-    def plotStdND(self,x_format_fn=None,func=None,annotation=None):
+    def getPercentage(self,percentages):
+        annos=[]
+        for index,item in enumerate(percentages):
+            val = self.getProbability(σRange=item)/2*100
+            percent = str(round(val, 1))+'%'
+            y= .3-.075*index
+            hasLine=False
+            color='#BCF54C'
+            x=item[0]-.5
+            if y<0:
+                y=.03
+                x+=.04
+                hasLine=True
+                color='#FA9805'
+            annos.append({'position': (x,y), 'txt': percent, 'color': color,'fontsize':10,'hasLine':hasLine,'center':'left'})
+            annos.append({'position': (-x,y), 'txt': percent, 'color': color,'fontsize':10,'hasLine':hasLine,'center':'right'})
+        return annos
+    def plotStdND(self,x_format_fn=None,func=None,annotation=None,xInterval=None,barCol=None,cutLineCol=None):
         self.x_format_fn=x_format_fn
+        if xInterval is not None:
+            self.xInterval=xInterval
+        if barCol is not None:
+            self.barCol=barCol
+        if cutLineCol is not None:
+            self.cutLineCol=cutLineCol
         l = self.getND(0, 1, size=10000)
-        one = self.getProbability(σRange=[1, 0])/2*100
-        oneσ = str(round(one, 1))+'%'
-        two=self.getProbability(σRange=[2, 1])/2*100
-        twoσ = str(round(two, 1))+'%'
-        three=self.getProbability(σRange=[3, 2])/2*100
-        threeσ = str(round(three, 1))+'%'
-        four=self.getProbability(σRange=[4, 3]) / 2 * 100
-        fourσ = str(round(four, 1)) + '%'
+        
         def callback(plt,ax,np,bins):
             plt.setp( ax.yaxis.get_majorticklabels(), rotation=90 )
             y=np.linspace(0,.4,5)
@@ -349,19 +369,21 @@ class Plot(DoStats):
             plt,ax,x,y=self.getXyData(ax=ax,x=np.array(sorted(l)),σ=sigma,μ=mu)
             ax.plot(x, y, '-', c=self.black, linewidth=3)
             callable(func) and func(ax,plt)
-        annos=[
-            {'position': (-.5, .2), 'txt': oneσ, 'color': self.white},
-            {'position': (.5, .2), 'txt': oneσ, 'color': self.white},
-            {'position': (-1.5, .02), 'txt': twoσ, 'color': self.white},
-            {'position': (1.5, .02), 'txt': twoσ, 'color': self.white},
-            {'position': (-2.5, .03), 'txt': threeσ , 'color': self.black,'hasLine':True},
-            {'position': (2.5, .03), 'txt': threeσ , 'color': self.black,'hasLine':True},
-            {'position': (-3.3, .01), 'txt':fourσ , 'color': self.black,'hasLine':True},
-            {'position': (3.3, .01), 'txt':fourσ , 'color': self.black,'hasLine':True}
-        ]
+        # annos=[
+        #     {'position': (-.25, .3), 'txt': cumulative[0], 'color': '#9FE45F'},
+        #     {'position': (.25, .3), 'txt': cumulative[0], 'color': '#9FE45F'},
+        #      {'position': (-.5, .2), 'txt': cumulative[1], 'color': self.white},
+        #     {'position': (.5, .2), 'txt': cumulative[1], 'color': self.white},
+        #     {'position': (-1.5, .02), 'txt': cumulative[2], 'color': self.white},
+        #     {'position': (1.5, .02), 'txt': cumulative[2], 'color': self.white},
+        #     {'position': (-2.5, .03), 'txt': cumulative[3] , 'color': self.black,'hasLine':True},
+        #     {'position': (2.5, .03), 'txt': cumulative[3] , 'color': self.black,'hasLine':True},
+        #     {'position': (-3.3, .01), 'txt':cumulative[4] , 'color': self.black,'hasLine':True},
+        #     {'position': (3.3, .01), 'txt':cumulative[4] , 'color': self.black,'hasLine':True}
+        # ]
         if annotation is not None:
-            annos+=annotation
+            annotation=annotation
         self.plotND(x=[-4, 4], y=[0, .4], l=[l],  bars=100, yLable='probability density', density=True,
         format_fn=True,
         callback=callback,
-        annotation=annos)
+        annotation=annotation)

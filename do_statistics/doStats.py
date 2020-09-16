@@ -200,12 +200,18 @@ class DoStats(object):
         if isNormal:
             if σ == 0:
                 ret= 0
+            elif σ == .5:
+                ret= 0.382
             elif σ == 1.00:
                 ret= 0.6827
+            elif σ == 1.5:
+                ret= 0.866
             elif σ == 1.87:
                 ret= 0.015
             elif σ == 2.00:
                 ret= 0.9545
+            elif σ == 2.5:
+                ret= 0.988
             elif σ == 3.00:
                 ret = 0.9973
             else:
