@@ -90,9 +90,15 @@ class TDD_TEST_FUN_ND(unittest.TestCase):
             # self.d.drawArrow(ax,( -1.2,-3), [ .01,.09],arrowstyle='->')
             # self.d.drawArrow(ax,( -.5,-1.9), [ .01,.17],arrowstyle='->')
             # self.d.drawArrow(ax,( 2.3,2.3), [ .01,.09],arrowstyle='->')
+        percentages=[[.5, 0],[1, .5],[1.5, 1],[2,1.5],[2.5, 2],[3, 2.5],[3.5,3]]
+        annos=self.d.getPercentage(percentages)
         self.d.plotStdND(
             x_format_fn=x_format_fn,
             func=func,
+            xInterval=.5,
+            barCol='#0084C8',
+            cutLineCol='#14A5F4',
+            annotation=annos,
             # annotation=[
             #     {'position':[-3,.1],'txt':data[0],'color':'black'},
             #     {'position':[-1.9,.18],'txt':data[1],'color':'black'},
