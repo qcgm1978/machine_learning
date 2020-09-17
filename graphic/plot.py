@@ -1,6 +1,6 @@
 import math,inspect, numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.ticker import FuncFormatter, MaxNLocator,PercentFormatter
+from matplotlib.ticker import FuncFormatter, MaxNLocator
 from matplotlib import colors
 import matplotlib.patches as patches
 from matplotlib.patches import Polygon
@@ -9,6 +9,7 @@ class Plot(DoStats):
     red='#F11F10'
     white='#fff'
     black = '#0E0E0E'
+    barCol=''
     ax=None
     xInterval=1
     def plotEvolution(self,l):
@@ -332,8 +333,12 @@ class Plot(DoStats):
                 return tick_val
     def getPercentage(self,percentages):
         annos=[]
+        cumulative={}
         for index,item in enumerate(percentages):
             val = self.getProbability(σRange=item)/2*100
+            cumu=self.getProbability(item[0])/2+.5
+            cumulative[item[0]]=round(cumu*100,1)
+            cumulative[-item[0]]=round(100-cumu*100,1)
             percent = str(round(val, 1))+'%'
             y= .3-.075*index
             hasLine=False
@@ -346,7 +351,7 @@ class Plot(DoStats):
                 color='#FA9805'
             annos.append({'position': (x,y), 'txt': percent, 'color': color,'fontsize':10,'hasLine':hasLine,'center':'left'})
             annos.append({'position': (-x,y), 'txt': percent, 'color': color,'fontsize':10,'hasLine':hasLine,'center':'right'})
-        return annos
+        return annos,cumulative
     def plotStdND(self,x_format_fn=None,func=None,annotation=None,xInterval=None,barCol=None,cutLineCol=None):
         self.x_format_fn=x_format_fn
         if xInterval is not None:
@@ -369,18 +374,6 @@ class Plot(DoStats):
             plt,ax,x,y=self.getXyData(ax=ax,x=np.array(sorted(l)),σ=sigma,μ=mu)
             ax.plot(x, y, '-', c=self.black, linewidth=3)
             callable(func) and func(ax,plt)
-        # annos=[
-        #     {'position': (-.25, .3), 'txt': cumulative[0], 'color': '#9FE45F'},
-        #     {'position': (.25, .3), 'txt': cumulative[0], 'color': '#9FE45F'},
-        #      {'position': (-.5, .2), 'txt': cumulative[1], 'color': self.white},
-        #     {'position': (.5, .2), 'txt': cumulative[1], 'color': self.white},
-        #     {'position': (-1.5, .02), 'txt': cumulative[2], 'color': self.white},
-        #     {'position': (1.5, .02), 'txt': cumulative[2], 'color': self.white},
-        #     {'position': (-2.5, .03), 'txt': cumulative[3] , 'color': self.black,'hasLine':True},
-        #     {'position': (2.5, .03), 'txt': cumulative[3] , 'color': self.black,'hasLine':True},
-        #     {'position': (-3.3, .01), 'txt':cumulative[4] , 'color': self.black,'hasLine':True},
-        #     {'position': (3.3, .01), 'txt':cumulative[4] , 'color': self.black,'hasLine':True}
-        # ]
         if annotation is not None:
             annotation=annotation
         self.plotND(x=[-4, 4], y=[0, .4], l=[l],  bars=100, yLable='probability density', density=True,

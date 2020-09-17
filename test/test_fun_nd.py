@@ -80,31 +80,44 @@ class TDD_TEST_FUN_ND(unittest.TestCase):
                 sign = '+' if tick>0 else ''
                 num=sign+str(int(tick))
                 isInt=int(tick)==tick 
-                return '{0}\n{1}σ\n{2}'.format(int(tick),num,'' if  abs(tick)==4 else '2%') if isInt else tick
+                if  abs(tick)==4:
+                    cumu=''
+                elif isInt:
+                    cumu=str(cumulative[(int(tick))])+'%'
+                return '{0}\n{1}σ\n{2}'.format(int(tick),num,cumu) if isInt else tick
         def func(ax,plt):
             x=np.linspace(-4,4,17)
             ax.set_xticks(x)
-            # plt.xticks(fontsize=10)
-            # line = plt.plot(roundScore,[0,0,0],'o',c='red',markersize=8)[0]
-            # line.set_clip_on(False)
-            # self.d.drawArrow(ax,( -1.2,-3), [ .01,.09],arrowstyle='->')
-            # self.d.drawArrow(ax,( -.5,-1.9), [ .01,.17],arrowstyle='->')
-            # self.d.drawArrow(ax,( 2.3,2.3), [ .01,.09],arrowstyle='->')
+            ax.set_xlabel('Z-Score\nStandard\nDeviation',loc='left')
+            ax.set_title('"Bell Curve"\nStandard Normal\nDistribution',loc='left')
+            ax.set_facecolor('darkgray')
         percentages=[[.5, 0],[1, .5],[1.5, 1],[2,1.5],[2.5, 2],[3, 2.5],[3.5,3]]
-        annos=self.d.getPercentage(percentages)
-        self.d.plotStdND(
-            x_format_fn=x_format_fn,
-            func=func,
-            xInterval=.5,
-            barCol='#0084C8',
-            cutLineCol='#14A5F4',
-            annotation=annos,
-            # annotation=[
-            #     {'position':[-3,.1],'txt':data[0],'color':'black'},
-            #     {'position':[-1.9,.18],'txt':data[1],'color':'black'},
-            #     {'position':[2.3,.1],'txt':data[2],'color':'black'},
-            # ]
-        )
+        annos,cumulative=self.d.getPercentage(percentages)
+        # self.d.plotStdND(
+        #     x_format_fn=x_format_fn,
+        #     func=func,
+        #     xInterval=.5,
+        #     barCol='#0084C8',
+        #     cutLineCol='#14A5F4',
+        #     annotation=annos,
+        # )
+    def test_lower_percent(self):
+        p=self.d.getLowerPercent(SD=.5)
+        p1=self.d.getLowerPercent(SD=-.5)
+        p2=self.d.getLowerPercent(-3)
+        p3=self.d.getLowerPercent(-2.5)
+        self.assertAlmostEqual(p,.691)
+        self.assertAlmostEqual(p1,.309)
+        self.assertAlmostEqual(p2,.001,3)
+        self.assertAlmostEqual(p3,.006,3)
+        self.assertFalse(self.d.isAppropriate(p2))
+        self.assertTrue(self.d.isAppropriate(p3))
+        m=self.d.getDistanceBySD(standard=1000,SD=-2.5,oneSD=20)
+        d=self.d.getDistanceBySD(standard=1010,oneSD=20,SD=-2.5,isActual=False)
+        self.assertEqual(m,1050)
+        self.assertEqual(d,960)
+        sd=self.d.getTargetSD(mean=1010,boundary=1000,sd=2.5)
+        self.assertEqual(sd,4)
     def test_save(self):
         self.d.saveAndShow()
 if __name__ == '__main__':

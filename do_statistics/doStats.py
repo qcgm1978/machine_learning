@@ -1,3 +1,4 @@
+from math import dist
 from numpy import random
 from scipy import stats
 from scipy.stats import ttest_ind_from_stats
@@ -47,6 +48,21 @@ class DoStats(object):
         return (zScore[0],differ[0]) if isSingle else (zScore,differ)
     def isPSD(self,l):
         return len(l)<= 75
+    def isAppropriate(self,percent):
+        return .002<percent<=.007
+    def getDistanceBySD(self,standard=None,SD=None,oneSD=None,isActual=True):
+        distance=SD*oneSD
+        distance=abs(distance) if isActual else distance
+        μ=standard+distance
+        return μ
+    def getTargetSD(self,mean=None,boundary=None,sd=None):
+        distance=abs(boundary-mean)
+        oneSD=distance/sd
+        return oneSD
+    def getLowerPercent(self,SD=None):
+        meanDiff=self.getProbability(abs(SD))
+        areaPercent=meanDiff/2
+        return areaPercent+.5 if SD>0 else .5-areaPercent
     def getSdLowerThan(self,l=None,limitSD=None):
         zScore,differ=self.standardizing(l=l,isPSD=self.isPSD(l))
         f=[(l[idx],score) for idx,score in enumerate(zScore) if score<limitSD]
