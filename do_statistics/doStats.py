@@ -2,7 +2,7 @@ from math import dist
 from numpy import random
 from scipy import stats
 from scipy.stats import ttest_ind_from_stats
-import math,warnings, numpy as np
+import re, math,warnings, numpy as np
 class DoStats(object):
     
     def getEvolutiveData(self,l):
@@ -95,15 +95,22 @@ class DoStats(object):
         return stats.linregress(x, self.info["y"])
     def getBenfordLaw(self, n=1):
         return math.log10((n + 1) / n)
+    def strToL(self,l):
+        s=re.sub(r'\D+',',',l)
+        l=s.split(',')
+        l=[int(item) for item in l if len(item)]
+        return l
     def getMean(self, l=None):
-        # return sum(self['speed'])/len(self['speed'])
         if l is None:
             l = self.list
-        if isinstance(l,(int,float)):
+        if isinstance(l,str):
+            l=self.strToL(l)
+        elif isinstance(l,(int,float)):
             return l
         if isinstance(l, set):
             l=list(l)
         #μ: the population mean or expected value in probability and statistics
+        # return sum(self['speed'])/len(self['speed'])
         if len(np.array(l).shape) == 1:
             μ=np.mean(l)
         else:
@@ -157,6 +164,8 @@ class DoStats(object):
             return None
         if l is None:
             l = self.list
+        if isinstance(l,str):
+            l=self.strToL(l)
         if len(np.array(l).shape) == 1 or not isEqlProb or isinstance(l,set):
             l = [l]
         ddof=self.getDdof(ddof)
@@ -250,6 +259,8 @@ class DoStats(object):
     def getVariance(self, l=None):
         if l is None:
             l = [self.list]
+        if isinstance(l,str):
+            l=[self.strToL(l)]
         ret = []
         for val in l:
             """Algorithm
@@ -261,8 +272,8 @@ class DoStats(object):
             or the square root of its variance
             σ=self.getSD([val])**2
             """
-            v = np.var(val)
-            ret.append(v)
+            σ2 = np.var(val)
+            ret.append(σ2)
         return ret if len(ret) > 1 else ret[0]
     def compareByVariance(self, l):
         # If the two variances are not significantly different, then their ratio will be close to 1.

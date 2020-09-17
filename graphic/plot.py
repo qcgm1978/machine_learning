@@ -12,6 +12,28 @@ class Plot(DoStats):
     barCol=''
     ax=None
     xInterval=1
+    def plotGrid(self,l):
+        if isinstance(l,str):
+            l=self.strToL(l)
+        m=self.getMean(l)
+        sd=self.getPSD(l)
+        fig, ax = self.getFigAx()
+        ax.set_facecolor('darkgray')
+        ax.yaxis.grid(c='#7F1299')
+        for index,item in enumerate(l):
+            ax.plot([index,index+1,index+.7,index+.7],[item,item,item+40,item],c='red',linewidth=3)
+            self.drawArrow([index+1,index+1],[item,m],arrowstyle='<-',c='#760093',linewidth=3)
+            diff=item-m
+            self.drawTxt({'fontsize':18,'center':'left','color':'#7F1299','position':[index+1+.1,diff/2+m],'txt':int(diff)})
+        ax.plot([.1,5],[m+sd,m+sd],linewidth=3,c='#3700FF')
+        self.drawArrow([.5,.5],[m+sd,m],arrowstyle='<->',c='#fff',linewidth=3)
+        ax.plot([.1,5],[m,m],linewidth=3,c='#00FF00')
+        ax.plot([.1,5],[m-sd,m-sd],linewidth=3,c='#3700FF')
+        y=np.linspace(0,600,4)
+        ax.set_yticks(y)
+        ax.tick_params(axis='y', colors='#7F1299',labelsize=20)
+        self.this_function_name = inspect.currentframe().f_code.co_name
+        self.saveAndShow()
     def plotEvolution(self,l):
         t=self.getEvolutiveData(l)
         self.plts(t)
@@ -114,7 +136,8 @@ class Plot(DoStats):
         plt.bar(x, height)
         self.show()
     def getFigAx(self):
-        return plt.subplots()
+        self.fig,self.ax=plt.subplots()
+        return self.fig,self.ax
     def plotND(self,x=None,y=None,yLable=None,mean=None, bars=100,l=None,labels=None,density=False,format_fn=None,annotation=None,callback=None,facecolor=None):
         if l is None:
             l = self.list
@@ -133,12 +156,10 @@ class Plot(DoStats):
                 'position': (mean, y[1] + 10),
                 'color': self.black
             }]
-        self.drawTxt(ax, annotation, center=True)
+        self.drawTxt(ax, annotation)
         if callable(callback):
             callback(plt,ax,np,bins)
-        this_function_name = inspect.currentframe().f_code.co_name
-        self.saveAndShow(this_function_name)
-        # self.show()
+        self.this_function_name = inspect.currentframe().f_code.co_name
     def setBarsCol(self,N, bins, patches):
         length=len(patches)
         if self.barCol:
@@ -280,17 +301,19 @@ class Plot(DoStats):
         position = (x + .2, mean - 300 * ratio)
         self.drawArrow(ax,[x1, x2], [y1, y2])
         self.drawTxt(ax,position,txt)
-    def drawTxt(self, ax, annotation,center=False):
+    def drawTxt(self,  annotation,ax=None):
+        if ax is None:
+            ax=self.ax
         if annotation is None:
             return
+        if not isinstance(annotation,(list,tuple)):
+            annotation=[annotation]
         for anno in annotation:
-            d={'hasLine':False,'fontsize':14,**anno}
-            hasLine,fontsize,position, txt,color,center=d.values()
-            if color is None:
-                color=self.red
+            d={'hasLine':False,'fontsize':14,'center':'center','color':'red',**anno}
+            hasLine,fontsize,center,color,position, txt=d.values()
             if isinstance(txt, str):
                 txt=[txt]
-            strings = [str(item) for item in txt]
+            strings = [str(item) for item in txt] if isinstance(txt,list) else [str(txt)]
             ax.text(position[0], position[1], "\n".join(strings),
             horizontalalignment=center,
             fontsize=fontsize,
@@ -299,18 +322,27 @@ class Plot(DoStats):
             color=color)
             if hasLine:
                 self.plotLines(ax, position[0], (position[1]-.02,position[1]), notHasOffset=True,color=self.black)
-    def drawArrow(self,ax,x,y,arrowstyle="<->"):
+    def drawArrow(self,x,y,c='red',ax=None,arrowstyle="<->",linewidth=1):
+        if ax is None:
+            ax=self.ax
         ax.plot(x,y)
         # Axes.annotate(self, text, xy, *args, **kwargs)
         # Annotate the point xy with text 'text'.
         # Optionally, the text can be displayed in another position xytext. An arrow pointing from the text to the annotated point xy can then be added by defining arrowprops.
         ax.annotate("",
-                    xy=(x[0], y[0]), xycoords='data',
-                    xytext=(x[1], y[1]), textcoords='data',
-                    arrowprops=dict(arrowstyle=arrowstyle, color=self.red,
-                                    shrinkA=0, shrinkB=0,
-                                    ),
-                    )
+                    xy=(x[0], y[0]), 
+                    xycoords='data',
+                    xytext=(x[1], y[1]),        
+                    textcoords='data',
+                    arrowprops=dict
+                    (
+                        arrowstyle=arrowstyle, 
+                        color=c,
+                        shrinkA=0, 
+                        shrinkB=0,
+                        linewidth=linewidth
+                    ),
+        )
     def scatter(self, x=None, y=None):
         if x is None or y is None:
             x = self.info["x"]

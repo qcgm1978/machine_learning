@@ -2,8 +2,7 @@
 import sys
 import os
 
-from matplotlib.pyplot import xticks
-PACKAGE_PARENT = '..'
+PACKAGE_PARENT = '../..'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(
     os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
@@ -30,7 +29,7 @@ class TDD_TEST_FUN_ND(unittest.TestCase):
     def test_plot(self):
         l=[26, 33, 65, 28, 34, 55, 25, 44, 50, 36, 26, 37, 43, 62, 35, 38, 45, 32, 28, 34]
         self.d.plotEvolution(l)
-        self.d.saveAndShow('debug')
+        # self.d.saveAndShow('debug')
         # self.d.plotND(
         #     facecolor='pink', 
         #     l=l,  
@@ -93,14 +92,15 @@ class TDD_TEST_FUN_ND(unittest.TestCase):
             ax.set_facecolor('darkgray')
         percentages=[[.5, 0],[1, .5],[1.5, 1],[2,1.5],[2.5, 2],[3, 2.5],[3.5,3]]
         annos,cumulative=self.d.getPercentage(percentages)
-        # self.d.plotStdND(
-        #     x_format_fn=x_format_fn,
-        #     func=func,
-        #     xInterval=.5,
-        #     barCol='#0084C8',
-        #     cutLineCol='#14A5F4',
-        #     annotation=annos,
-        # )
+        self.d.plotStdND(
+            x_format_fn=x_format_fn,
+            func=func,
+            xInterval=.5,
+            barCol='#0084C8',
+            cutLineCol='#14A5F4',
+            annotation=annos,
+        )
+        self.d.saveAndShow()
     def test_lower_percent(self):
         p=self.d.getLowerPercent(SD=.5)
         p1=self.d.getLowerPercent(SD=-.5)
@@ -118,7 +118,5 @@ class TDD_TEST_FUN_ND(unittest.TestCase):
         self.assertEqual(d,960)
         sd=self.d.getTargetSD(mean=1010,boundary=1000,sd=2.5)
         self.assertEqual(sd,4)
-    def test_save(self):
-        self.d.saveAndShow()
 if __name__ == '__main__':
     unittest.main()
