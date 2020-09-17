@@ -2,7 +2,8 @@
 
 switch pip source:
 
-pip install -i https://pypi.douban.com/simple <需要安装的包>
+pip installpython -m ensurepip
+ <需要安装的包>
 比如：
 pip install -i https://pypi.douban.com/simple requests
 
