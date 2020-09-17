@@ -23,9 +23,18 @@ class TDD_TEST_SD_VAR(unittest.TestCase):
     def test_using(self):
         p=self.p.getProbability(1,isPercent=True)
         self.assertEqual(p,'68%')
+        def func(ax,plt):
+            x,y = [-.95,.04],[.2,.2]
+            self.p.drawArrow(x,y,s=r"$\}$",fontsize=47,rotation=90,isScatter=True)
+            self.p.drawTxt({'fontsize':18,'center':'right','color':'red','position':[-.45,.23],'txt':1})
+            self.p.drawTxt({'fontsize':18,'center':'right','color':'red','position':[.55,.23],'txt':1})
+            self.p.drawTxt({'fontsize':22,'center':'left','color':'red','position':[-1,.3],'txt':'Standard Deviations'})
+            self.p.drawTxt({'fontsize':32,'center':'left','color':'white','position':[-.7,.1],'txt':'68%'})
+            
         self.p.plotStdND(
-            barCol='#0084C8',
-            cutLineCol='#14A5F4',
+            func=func,
+            barCol='#0080CF',
+            cutLineCol='black',
         ).saveAndShow()
 if __name__ == '__main__':
     unittest.main()

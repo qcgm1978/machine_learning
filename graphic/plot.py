@@ -327,19 +327,24 @@ class Plot(DoStats):
             color=d['color'])
             if d['hasLine']:
                 self.plotLines(ax, d['position'][0], (d['position'][1]-.02,d['position'][1]), notHasOffset=True,color=self.black)
-    def drawArrow(self,x,y,c='red',ax=None,arrowstyle="<->",linewidth=1):
+    def drawArrow(self,x,y,c='red',ax=None,arrowstyle="<->",linewidth=1,s='',fontsize=None,rotation=None,isScatter=False):
         if ax is None:
             ax=self.ax
-        ax.plot(x,y)
+        ax.scatter(x,y) if isScatter else ax.plot(x,y)
         # Axes.annotate(self, text, xy, *args, **kwargs)
         # Annotate the point xy with text 'text'.
         # Optionally, the text can be displayed in another position xytext. An arrow pointing from the text to the annotated point xy can then be added by defining arrowprops.
-        ax.annotate("",
-                    xy=(x[0], y[0]), 
+        length=len(x) if isScatter else 1
+        for i in range(length):
+            ax.annotate(s,
+                    xy=(x[i], y[i]), 
+                    rotation=rotation,
+                    fontsize=fontsize,
                     xycoords='data',
-                    xytext=(x[1], y[1]),        
+                    xytext=(x[i], y[i]),  
+                    color='red',      
                     textcoords='data',
-                    arrowprops=dict
+                    arrowprops=None if isScatter else dict
                     (
                         arrowstyle=arrowstyle, 
                         color=c,
