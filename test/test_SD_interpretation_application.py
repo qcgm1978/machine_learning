@@ -59,7 +59,10 @@ class TDD_TEST_SD_INTERPRETATION_APPLICATION(unittest.TestCase):
                 return ''
             else:
                 return '{0}σ'.format(int(tick_val))
-        
-        self.d.plotStdND(x_format_fn=x_format_fn)
+        percentages=[[1, 0],[2, 1],[3, 2]]
+        annos,cumulative=self.d.getPercentage(percentages)
+        self.d.plotStdND(x_format_fn=x_format_fn,
+            annotation=annos,
+        )
 if __name__ == '__main__':
     unittest.main()

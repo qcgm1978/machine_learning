@@ -5,19 +5,18 @@ sys.executable
 import pandas, pydotplus, math, numpy as np, matplotlib.image as pltimg, matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from mathMethods.doMath import DoMath
-from do_statistics.doStats import DoStats
 from mysql_data.mysqlOp import MysqlOp
 from pint import UnitRegistry
 from scipy import  constants
-class HandleData(DoMath, DoStats, MysqlOp):
+class HandleData(DoMath, MysqlOp):
     def __init__(self, n=None):
         if isinstance(n, dict):
             unique = n["unique"] if "unique" in n else None
-            sqlData = n["sqlData"] if "sqlData" in n else None
-            MysqlOp.__init__(
-                self, "data", sqlData, db="machine_learning", unique=unique
-            )
             if "sqlData" in n:
+                sqlData = n["sqlData"] 
+                MysqlOp.__init__(
+                    self, "data", sqlData, db="machine_learning", unique=unique
+                )
                 n = sqlData[0]
             self.info = n
             listProp = list(

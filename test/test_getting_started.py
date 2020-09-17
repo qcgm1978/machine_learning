@@ -4,23 +4,32 @@ PACKAGE_PARENT = '..'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 import unittest, math
-from datatype import DataTypes
+from data.handle_data import HandleData
+from graphic.plot import Plot
+from AI import DoAI
+from predict import Predict
 import numpy
+from mysql_data.decorators_func import singleton
 class TDD_GETTING_STARTED(unittest.TestCase):
+    @singleton
+    def setUp(self):
+        class PlotAI(HandleData,Plot,DoAI,Predict):
+            pass
+        self.__class__.PlotAI=PlotAI
     def test_getting_started(self):
         l = [99, 86, 87, 88, 111, 86, 103, 87, 94, 78, 77, 85, 86]
         self.assertIsInstance(l, list)
     def test_datatypes(self):
-        d = DataTypes(5)
+        d = self.PlotAI(5)
         self.assertTrue(d.Numerical())
         self.assertTrue(d.Discrete())
         self.assertFalse(d.Continuous())
-        d = DataTypes(5.0)
+        d = self.PlotAI(5.0)
         self.assertTrue(d.Numerical())
         self.assertFalse(d.Discrete())
         self.assertTrue(d.Continuous())
-        d = DataTypes({"speed": [99, 86, 87, 88, 111, 86, 103, 87, 94, 78, 77, 85, 86]})
-        d1 = DataTypes({"speed": [99, 86, 87, 88, 86, 103, 87, 94, 78, 77, 85, 86]})
+        d = self.PlotAI({"speed": [99, 86, 87, 88, 111, 86, 103, 87, 94, 78, 77, 85, 86]})
+        d1 = self.PlotAI({"speed": [99, 86, 87, 88, 86, 103, 87, 94, 78, 77, 85, 86]})
         m = d.getMean()
         self.assertAlmostEqual(m, 89.77, 1)
         median = d.getMedian()
@@ -34,8 +43,8 @@ class TDD_GETTING_STARTED(unittest.TestCase):
         self.assertEqual(mode[1], 3)
         self.assertEqual(mode.count, 3)
     def test_standard_deviation(self):
-        d = DataTypes({"speed": [86, 87, 88, 86, 87, 85, 86]})
-        d1 = DataTypes({"speed": [32, 111, 138, 28, 59, 77, 97]})
+        d = self.PlotAI({"speed": [86, 87, 88, 86, 87, 85, 86]})
+        d1 = self.PlotAI({"speed": [32, 111, 138, 28, 59, 77, 97]})
         s = d.getPSD()
         s1 = d1.getPSD()
         self.assertAlmostEqual(s, 0.9, 2)
@@ -46,8 +55,8 @@ class TDD_GETTING_STARTED(unittest.TestCase):
         self.assertEqual(s1, math.sqrt(v))
         self.assertEqual(s1 ** 2, (v))
     def test_uniform(self):
-        d = DataTypes({"speed": [86, 87.7, 88, 86, 87, 85, 86]})
-        d1 = DataTypes({"speed": [91.6, 87.7, 88, 86, 87, 85, 86]})
+        d = self.PlotAI({"speed": [86, 87.7, 88, 86, 87, 85, 86]})
+        d1 = self.PlotAI({"speed": [91.6, 87.7, 88, 86, 87, 85, 86]})
         s = d.getPSD()
         s1 = d1.getPSD()
         self.assertAlmostEqual(s, 1.00, 2)
@@ -55,7 +64,7 @@ class TDD_GETTING_STARTED(unittest.TestCase):
         self.assertEqual(d.getProbability(), 0.6827)
         self.assertEqual(d1.getProbability(), 0.9545)
     def test_NCEE(self):
-        d = DataTypes({"points": [580, 600, 680, 620], "expectation": 690})
+        d = self.PlotAI({"points": [580, 600, 680, 620], "expectation": 690})
         m = d.getMean()
         self.assertEqual(m, 620)
         p = d.get1stdProbability()
@@ -86,7 +95,7 @@ class TDD_GETTING_STARTED(unittest.TestCase):
             61,
             31,
         ]
-        d = DataTypes({"ages": ages})
+        d = self.PlotAI({"ages": ages})
         p = d.getPercentile(0.75)
         p1 = d.getPercentile(0.9)
         self.assertEqual(p, 40)
@@ -96,15 +105,15 @@ class TDD_GETTING_STARTED(unittest.TestCase):
         isfloat = all(isinstance(v, float) for v in x)
         self.assertTrue(isfloat)
     def test_histogram(self):
-        d=DataTypes()
+        d=self.PlotAI()
         x = numpy.random.normal(5.0, 100.0, 100000)
         x = d.getND(.4,4,size=10000)
-        # d = DataTypes({"x": x})
+        # d = self.PlotAI({"x": x})
         d.plotND(100,l=x)
     def test_scatter(self):
         x = [5, 7, 8, 7, 2, 17, 2, 9, 4, 11, 12, 9, 6]
         y = [99, 86, 87, 88, 111, 86, 103, 87, 94, 78, 77, 85, 86]
-        d = DataTypes({"x": x, "y": y})
+        d = self.PlotAI({"x": x, "y": y})
         # d.scatterLine()
         r = d.getR()
         self.assertAlmostEqual(r, -0.76, 2)
@@ -155,14 +164,14 @@ class TDD_GETTING_STARTED(unittest.TestCase):
             47,
             15,
         ]
-        d = DataTypes({"x": x, "y": y})
+        d = self.PlotAI({"x": x, "y": y})
         # d.scatterLine()
         r = d.getR()
         self.assertAlmostEqual(r, 0.01, 2)
     def test_random_data(self):
         x = numpy.random.normal(5.0, 1.0, 1000)
         y = numpy.random.normal(10.0, 5.0, 1000)
-        d = DataTypes({'x': x, 'y': y})
+        d = self.PlotAI({'x': x, 'y': y})
         d.scatter()
 if __name__ == "__main__":
     unittest.main()
