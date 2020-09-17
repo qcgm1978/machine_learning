@@ -10,6 +10,13 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal"
+        },
+        {
+            "name": "Some File",
+            "type": "python",
+            "request": "launch",
+            "program": "test/fun/test_SD_VAR.py",
+            "console": "integratedTerminal"
         }
     ]
 }
