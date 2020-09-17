@@ -19,12 +19,14 @@ class Plot(DoStats):
         sd=self.getPSD(l)
         fig, ax = self.getFigAx()
         ax.set_facecolor('darkgray')
+        fig.set_facecolor('darkgray')
         ax.yaxis.grid(c='#7F1299')
         for index,item in enumerate(l):
             ax.plot([index,index+1,index+.7,index+.7],[item,item,item+40,item],c='red',linewidth=3)
             self.drawArrow([index+1,index+1],[item,m],arrowstyle='<-',c='#760093',linewidth=3)
             diff=item-m
-            self.drawTxt({'fontsize':18,'center':'left','color':'#7F1299','position':[index+1+.1,diff/2+m],'txt':int(diff)})
+            x=index+1+(.1 if index<4 else -.5)
+            self.drawTxt({'fontsize':18,'center':'left','color':'#7F1299','position':[x,diff/2+m],'txt':int(diff)})
         ax.plot([.1,5],[m+sd,m+sd],linewidth=3,c='#3700FF')
         self.drawArrow([.5,.5],[m+sd,m],arrowstyle='<->',c='#fff',linewidth=3)
         self.drawArrow([.5,.5],[m-sd,m],arrowstyle='<->',c='#fff',linewidth=3)
@@ -153,16 +155,17 @@ class Plot(DoStats):
         n, bins, rects=self.plotHist(ax,l,bars,labels,y,density=density,facecolor=facecolor)
         self.setAxes(ax,x,y,yLable,format_fn,plt)
         self.plotLines(ax, mean, y, density)
-        if annotation is None and y:
+        if annotation is None and y and mean:
             annotation = [{
                 'txt': 'Average = {0}'.format(mean),
                 'position': (mean, y[1] + 10),
                 'color': self.black
             }]
-        self.drawTxt(ax, annotation)
+        self.drawTxt(annotation)
         if callable(callback):
             callback(plt,ax,np,bins)
         self.this_function_name = inspect.currentframe().f_code.co_name
+        return self
     def setBarsCol(self,N, bins, patches):
         length=len(patches)
         if self.barCol:
@@ -196,7 +199,6 @@ class Plot(DoStats):
     def setAxes(self, ax, x, y, yLable,format_fn=None,plt=None):
         if y is None:
             return
-        
         # set the y limit
         plt.xlim(x[0], x[1])
         plt.ylim(y[0], y[1])
@@ -313,18 +315,18 @@ class Plot(DoStats):
             annotation=[annotation]
         for anno in annotation:
             d={'hasLine':False,'fontsize':14,'center':'center','color':'red',**anno}
-            hasLine,fontsize,center,color,position, txt=d.values()
-            if isinstance(txt, str):
-                txt=[txt]
+            txt=d['txt']
+            if isinstance(d['txt'], str):
+                txt=[d['txt']]
             strings = [str(item) for item in txt] if isinstance(txt,list) else [str(txt)]
-            ax.text(position[0], position[1], "\n".join(strings),
-            horizontalalignment=center,
-            fontsize=fontsize,
+            ax.text(d['position'][0], d['position'][1], "\n".join(strings),
+            horizontalalignment=d['center'],
+            fontsize=d['fontsize'],
             # verticalalignment='top',
             # transform=ax.transAxes,
-            color=color)
-            if hasLine:
-                self.plotLines(ax, position[0], (position[1]-.02,position[1]), notHasOffset=True,color=self.black)
+            color=d['color'])
+            if d['hasLine']:
+                self.plotLines(ax, d['position'][0], (d['position'][1]-.02,d['position'][1]), notHasOffset=True,color=self.black)
     def drawArrow(self,x,y,c='red',ax=None,arrowstyle="<->",linewidth=1):
         if ax is None:
             ax=self.ax
@@ -387,7 +389,7 @@ class Plot(DoStats):
             annos.append({'position': (x,y), 'txt': percent, 'color': color,'fontsize':10,'hasLine':hasLine,'center':'left'})
             annos.append({'position': (-x,y), 'txt': percent, 'color': color,'fontsize':10,'hasLine':hasLine,'center':'right'})
         return annos,cumulative
-    def plotStdND(self,x_format_fn=None,func=None,annotation=None,xInterval=None,barCol=None,cutLineCol=None):
+    def plotStdND(self,x_format_fn=None,func=None,annotation=None,xInterval=None,barCol=None,cutLineCol=None,l=None):
         self.x_format_fn=x_format_fn
         if xInterval is not None:
             self.xInterval=xInterval
@@ -395,8 +397,8 @@ class Plot(DoStats):
             self.barCol=barCol
         if cutLineCol is not None:
             self.cutLineCol=cutLineCol
-        l = self.getND(0, 1, size=10000)
-        
+        if l is None:
+            l = self.getND(0, 1, size=10000)
         def callback(plt,ax,np,bins):
             plt.setp( ax.yaxis.get_majorticklabels(), rotation=90 )
             y=np.linspace(0,.4,5)
@@ -415,3 +417,4 @@ class Plot(DoStats):
         format_fn=True,
         callback=callback,
         annotation=annotation)
+        return self

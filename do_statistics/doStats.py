@@ -213,7 +213,7 @@ class DoStats(object):
         # return val
         return np.percentile(self.list, percent * 100)
     # In statistics, the 68–95–99.7 rule, also known as the empirical rule, is a shorthand used to remember the percentage of values that lie within a band around the mean in a normal distribution with a width of two, four and six standard deviations, respectively; more precisely, 68.27%, 95.45% and 99.73% of the values lie within one, two and three standard deviations of the mean, respectively.
-    def getProbability(self, σ=None, isNormal=True, σRange=None):
+    def getProbability(self, σ=None, isNormal=True, σRange=None,isPercent=False):
         if σRange is None:
             σRange=[]
         if σ is None:
@@ -241,7 +241,8 @@ class DoStats(object):
                 ret = 0.9973
             else:
                 ret=1
-            return ret - self.getProbability(σRange[1]) if len(σRange)==2 else ret
+            ret =ret- self.getProbability(σRange[1]) if len(σRange)==2 else ret
+            return str(round(ret*100))+'%' if isPercent else ret
     def getSdCountByPercent(self,percent):
         if percent == 0:
             σ= None
