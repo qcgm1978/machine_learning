@@ -21,21 +21,22 @@ class TDD_TEST_SD_VAR(unittest.TestCase):
         sd=self.p.getPSD(l)
         self.assertAlmostEqual(sd,147,0)
     def test_using(self):
-        p=self.p.getProbability(1,isPercent=True)
+        sd = 1
+        p=self.p.getProbability(sd,isPercent=True)
         self.assertEqual(p,'68%')
         def func(ax,plt):
-            yVal=self.p.getPdf(-1,0,1)
-            x,y = [-1,0],[yVal,yVal]
+            yVal=self.p.getPdf(-sd,0,sd)
+            x,y = [-sd,0],[yVal,yVal]
             self.p.annotate(x,y,s=r"$\}$",fontsize=47,rotation=90,isScatter=True)
             self.p.drawTxt({'fontsize':18,'center':'center','color':'red','position':[-.55,.28],'txt':1})
             self.p.drawTxt({'fontsize':18,'center':'center','color':'red','position':[.45,.28],'txt':1})
             self.p.drawTxt({'fontsize':22,'center':'center','color':'red','position':[0,.33],'txt':'Standard Deviations'})
-            self.p.drawTxt({'fontsize':32,'center':'center','color':'white','position':[0,.1],'txt':'68%'})
+            self.p.drawTxt({'fontsize':32,'center':'center','color':'white','position':[0,.1],'txt':p})
         # self.p.plotStdND(
         #     # func=func,
         #     barCol='#0080CF',
         #     cutLineCol='black',
         # ).saveAndShow()
-        self.p.pltNdLine(callback=func,clip=(-1,1)).saveAndShow()
+        self.p.pltNdLine(callback=func,clip=(-sd,sd)).saveAndShow()
 if __name__ == '__main__':
     unittest.main()
