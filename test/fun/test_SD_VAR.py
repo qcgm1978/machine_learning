@@ -17,9 +17,13 @@ class TDD_TEST_SD_VAR(unittest.TestCase):
         self.assertEqual(m,394)
         # self.p.plotGrid(l)
         v=self.p.getVariance(l)
+        v1=self.p.getVariance(l,ddof=1)
         self.assertEqual(v,21704)
+        self.assertEqual(v1,27130)
         sd=self.p.getPSD(l)
+        sd1=self.p.getSD(l)
         self.assertAlmostEqual(sd,147,0)
+        self.assertAlmostEqual(sd1,165,0)
     def test_using(self):
         sd = 1
         p=self.p.getProbability(sd,isPercent=True)
@@ -38,5 +42,7 @@ class TDD_TEST_SD_VAR(unittest.TestCase):
         #     cutLineCol='black',
         # ).saveAndShow()
         self.p.pltNdLine(callback=func,clip=(-sd,sd)).saveAndShow()
+    def test_sample_data(self):
+        pass
 if __name__ == '__main__':
     unittest.main()

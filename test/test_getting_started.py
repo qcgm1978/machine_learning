@@ -1,5 +1,6 @@
 import sys
 import os
+
 PACKAGE_PARENT = '..'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
@@ -10,15 +11,21 @@ from AI import DoAI
 from predict import Predict
 import numpy
 from mysql_data.decorators_func import singleton
+
+
 class TDD_GETTING_STARTED(unittest.TestCase):
     @singleton
     def setUp(self):
-        class PlotAI(HandleData,Plot,DoAI,Predict):
+        class PlotAI(HandleData, Plot, DoAI, Predict):
             pass
-        self.__class__.PlotAI=PlotAI
+
+        self.__class__.PlotAI = PlotAI
+        self.__class__.p = PlotAI()
+
     def test_getting_started(self):
         l = [99, 86, 87, 88, 111, 86, 103, 87, 94, 78, 77, 85, 86]
         self.assertIsInstance(l, list)
+
     def test_datatypes(self):
         d = self.PlotAI(5)
         self.assertTrue(d.Numerical())
@@ -42,22 +49,24 @@ class TDD_GETTING_STARTED(unittest.TestCase):
         self.assertEqual(mode.mode, 86)
         self.assertEqual(mode[1], 3)
         self.assertEqual(mode.count, 3)
+
     def test_standard_deviation(self):
         d = self.PlotAI({"speed": [86, 87, 88, 86, 87, 85, 86]})
         d1 = self.PlotAI({"speed": [32, 111, 138, 28, 59, 77, 97]})
         s = d.getPSD()
         s1 = d1.getPSD()
         self.assertAlmostEqual(s, 0.9, 2)
-        m=d.getMean()
-        m1=d1.getMean()
-        self.assertAlmostEqual(m,86.4,1)
-        self.assertAlmostEqual(m1,77.4,1)
+        m = d.getMean()
+        m1 = d1.getMean()
+        self.assertAlmostEqual(m, 86.4, 1)
+        self.assertAlmostEqual(m1, 77.4, 1)
         self.assertAlmostEqual(s1, 37.85, 2)
         v = d1.getVariance()
         self.assertAlmostEqual(v, 1432.2, 1)
         # the formula to find the standard deviation is the square root of the variance:
         self.assertEqual(s1, math.sqrt(v))
         self.assertEqual(s1 ** 2, (v))
+
     def test_uniform(self):
         d = self.PlotAI({"speed": [86, 87.7, 88, 86, 87, 85, 86]})
         d1 = self.PlotAI({"speed": [91.6, 87.7, 88, 86, 87, 85, 86]})
@@ -67,6 +76,7 @@ class TDD_GETTING_STARTED(unittest.TestCase):
         self.assertAlmostEqual(s1, 2.00, 2)
         self.assertEqual(d.getProbability(), 0.6827)
         self.assertEqual(d1.getProbability(), 0.9545)
+
     def test_NCEE(self):
         d = self.PlotAI({"points": [580, 600, 680, 620], "expectation": 690})
         m = d.getMean()
@@ -77,43 +87,44 @@ class TDD_GETTING_STARTED(unittest.TestCase):
         self.assertAlmostEqual(distance, 1.87, 2)
         probability = d.getProbability()
         self.assertEqual(probability, 0.015)
+
     def test_percentile(self):
         ages = [
-            5,
-            31,
-            43,
-            48,
-            41,
-            7,
-            11,
-            15,
-            39,
-            80,
-                32,
-            2,
-            8,
-            6,
-            25,
-            36,
-            27,
-            61,
-            31,
+            5,31,43,48,50,41,7,11,15,39,80,82,32,2,8,6,25,36,27,61,31
         ]
         d = self.PlotAI({"ages": ages})
         p = d.getPercentile(0.75)
         p1 = d.getPercentile(0.9)
-        self.assertEqual(p, 40)
-        self.assertAlmostEqual(p1, 50.6)
+        self.assertEqual(p, 43)
+        self.assertAlmostEqual(p1, 61.0)
+    def test_grouped_percentile(self):
+#         When the data is grouped:
+#
+# Add up all percentages below the score,
+# plus half the percentage at the score.
+        l=[.12,.5,.3,.08]
+        p=self.p.getPercentile(.77,l=l)
+        self.assertEqual(p,.362)
+    def test_decile(self):
+        ages = [
+            5, 31, 43, 48, 50, 41, 7, 11, 15, 39, 80, 82, 32, 2, 8, 6, 25, 36, 27, 61, 31
+        ]
+        d=self.p.getDecile(ages,5)
+        d1=self.p.getDecile(ages,31)
+        self.assertEqual(d,0)
+        self.assertAlmostEqual(d1,.048,3)
     def test_data_distribution(self):
         x = numpy.random.uniform(0.0, 5.0, 250)
         isfloat = all(isinstance(v, float) for v in x)
         self.assertTrue(isfloat)
+
     def test_histogram(self):
-        d=self.PlotAI()
+        d = self.PlotAI()
         x = numpy.random.normal(5.0, 100.0, 100000)
-        x = d.getND(.4,4,size=10000)
+        x = d.getND(.4, 4, size=10000)
         # d = self.PlotAI({"x": x})
-        d.plotND(100,l=x)
+        d.plotND(100, l=x)
+
     def test_scatter(self):
         x = [5, 7, 8, 7, 2, 17, 2, 9, 4, 11, 12, 9, 6]
         y = [99, 86, 87, 88, 111, 86, 103, 87, 94, 78, 77, 85, 86]
@@ -123,6 +134,7 @@ class TDD_GETTING_STARTED(unittest.TestCase):
         self.assertAlmostEqual(r, -0.76, 2)
         p = d.predict(10)
         self.assertEqual(p, 85.59308314937454)
+
     def test_bad_fit(self):
         x = [
             89,
@@ -172,10 +184,13 @@ class TDD_GETTING_STARTED(unittest.TestCase):
         # d.scatterLine()
         r = d.getR()
         self.assertAlmostEqual(r, 0.01, 2)
+
     def test_random_data(self):
         x = numpy.random.normal(5.0, 1.0, 1000)
         y = numpy.random.normal(10.0, 5.0, 1000)
         d = self.PlotAI({'x': x, 'y': y})
         d.scatter()
+
+
 if __name__ == "__main__":
     unittest.main()

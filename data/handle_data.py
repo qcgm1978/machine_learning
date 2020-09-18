@@ -6,7 +6,6 @@ import pandas, pydotplus, math, numpy as np, matplotlib.image as pltimg, matplot
 from sklearn.preprocessing import StandardScaler
 from mathMethods.doMath import DoMath
 from mysql_data.mysqlOp import MysqlOp
-from pint import UnitRegistry
 from scipy import  constants
 class HandleData(DoMath, MysqlOp):
     def __init__(self, n=None):
