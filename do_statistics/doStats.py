@@ -4,7 +4,8 @@ from scipy import stats
 from scipy.stats import ttest_ind_from_stats
 import re, math,warnings, numpy as np
 class DoStats(object):
-    
+    def getPdf(self,x, mu, sigma):
+        return stats.norm.pdf(x, mu, sigma)
     def getEvolutiveData(self,l):
         sortedX = sorted(l)
         plt,ax,x,y=self.getXyData(x=l)
