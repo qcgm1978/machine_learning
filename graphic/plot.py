@@ -23,13 +23,13 @@ class Plot(DoStats):
         ax.yaxis.grid(c='#7F1299')
         for index,item in enumerate(l):
             ax.plot([index,index+1,index+.7,index+.7],[item,item,item+40,item],c='red',linewidth=3)
-            self.drawArrow([index+1,index+1],[item,m],arrowstyle='<-',c='#760093',linewidth=3)
+            self.annotate([index+1,index+1],[item,m],arrowstyle='<-',c='#760093',linewidth=3)
             diff=item-m
             x=index+1+(.1 if index<4 else -.5)
             self.drawTxt({'fontsize':18,'center':'left','color':'#7F1299','position':[x,diff/2+m],'txt':int(diff)})
         ax.plot([.1,5],[m+sd,m+sd],linewidth=3,c='#3700FF')
-        self.drawArrow([.5,.5],[m+sd,m],arrowstyle='<->',c='#fff',linewidth=3)
-        self.drawArrow([.5,.5],[m-sd,m],arrowstyle='<->',c='#fff',linewidth=3)
+        self.annotate([.5,.5],[m+sd,m],arrowstyle='<->',c='#fff',linewidth=3)
+        self.annotate([.5,.5],[m-sd,m],arrowstyle='<->',c='#fff',linewidth=3)
         self.drawTxt({'fontsize':18,'center':'right','color':'#fff','position':[.4,(m+sd+m)/2],'txt':int(sd)})
         self.drawTxt({'fontsize':18,'center':'right','color':'#fff','position':[.4,(m-sd+m)/2],'txt':int(sd)})
         ax.plot([.1,5],[m,m],linewidth=3,c='#00FF00')
@@ -304,7 +304,7 @@ class Plot(DoStats):
         x1, y1 = x+.1, mean-mean*ratio
         x2, y2 = x+.1, mean+mean*ratio
         position = (x + .2, mean - 300 * ratio)
-        self.drawArrow(ax,[x1, x2], [y1, y2])
+        self.annotate(ax,[x1, x2], [y1, y2])
         self.drawTxt(ax,position,txt)
     def drawTxt(self,  annotation,ax=None):
         if ax is None:
@@ -327,10 +327,10 @@ class Plot(DoStats):
             color=d['color'])
             if d['hasLine']:
                 self.plotLines(ax, d['position'][0], (d['position'][1]-.02,d['position'][1]), notHasOffset=True,color=self.black)
-    def drawArrow(self,x,y,c='red',ax=None,arrowstyle="<->",linewidth=1,s='',fontsize=None,rotation=None,isScatter=False):
+    def annotate(self,x,y,c='red',ax=None,arrowstyle="<->",linewidth=1,s='',fontsize=None,rotation=None,isScatter=False):
         if ax is None:
             ax=self.ax
-        ax.scatter(x,y) if isScatter else ax.plot(x,y)
+        ax.scatter(x,y,s=0) if isScatter else ax.plot(x,y)
         # Axes.annotate(self, text, xy, *args, **kwargs)
         # Annotate the point xy with text 'text'.
         # Optionally, the text can be displayed in another position xytext. An arrow pointing from the text to the annotated point xy can then be added by defining arrowprops.
@@ -422,4 +422,22 @@ class Plot(DoStats):
         format_fn=True,
         callback=callback,
         annotation=annotation)
+        return self
+    def pltNdLine(self,callback=None,clip=0):
+        mu = 0
+        variance = 1
+        limit=4
+        count=80
+        sigma = math.sqrt(variance)
+        x = np.linspace(mu - limit*sigma, mu + limit*sigma, count)
+        x1 = np.linspace(-limit, limit, count)
+        y = self.getPdf(x, mu, sigma)
+        fig, ax = self.getFigAx()
+        ax.plot(x, y,c='black',linewidth=.5)
+        ax.fill_between(x, y, color='#0080CF', alpha=1)
+        if clip:
+            ax.fill_between(x[:clip], y[:clip], color='white', alpha=1)
+            ax.fill_between(x[count-clip:], y[count-clip:], color='white', alpha=1)
+        callable(callback) and callback(ax,plt)
+        self.this_function_name = inspect.currentframe().f_code.co_name
         return self

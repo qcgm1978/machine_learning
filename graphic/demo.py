@@ -1,20 +1,16 @@
-import matplotlib
-from matplotlib.backends.backend_pgf import FigureCanvasPgf
-matplotlib.backend_bases.register_backend('pdf', FigureCanvasPgf)
-
 import matplotlib.pyplot as plt
+import numpy as np
+import scipy.stats as stats
+import math
 
-pgf_with_latex = {
-    "text.usetex": True,            # use LaTeX to write all text
-    "pgf.rcfonts": False,           # Ignore Matplotlibrc
-    "pgf.preamble": [
-        r'\usepackage{color}'     # xcolor for colours
-    ]
-}
-matplotlib.rcParams.update(pgf_with_latex)
+mu = 0
+variance = 1
+limit=4
+sigma = math.sqrt(variance)
+x = np.linspace(mu - limit*sigma, mu + limit*sigma, 100)
+x1 = np.linspace(-limit, limit, 100)
+y = stats.norm.pdf(x, mu, sigma)
+plt.plot(x, y,c='black',linewidth=.5)
+plt.fill_between(x, y, color='#0080CF', alpha=0.3)
 
-plt.figure()
-plt.ylabel(r'\textcolor{red}{Today} '+
-           r'\textcolor{green}{is} '+
-           r'\textcolor{blue}{cloudy.}')
-plt.savefig("/Users/zhanghongliang/Documents/machine_learning/img/demo.pdf")
+plt.savefig("/Users/zhanghongliang/Documents/machine_learning/img/demo.png")

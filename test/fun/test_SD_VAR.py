@@ -15,7 +15,7 @@ class TDD_TEST_SD_VAR(unittest.TestCase):
         l='600mm, 470mm, 170mm, 430mm and 300mm'
         m=self.p.getMean(l)
         self.assertEqual(m,394)
-        self.p.plotGrid(l)
+        # self.p.plotGrid(l)
         v=self.p.getVariance(l)
         self.assertEqual(v,21704)
         sd=self.p.getPSD(l)
@@ -24,17 +24,19 @@ class TDD_TEST_SD_VAR(unittest.TestCase):
         p=self.p.getProbability(1,isPercent=True)
         self.assertEqual(p,'68%')
         def func(ax,plt):
-            x,y = [-.95,.04],[.2,.2]
-            self.p.drawArrow(x,y,s=r"$\}$",fontsize=47,rotation=90,isScatter=True)
-            self.p.drawTxt({'fontsize':18,'center':'right','color':'red','position':[-.45,.23],'txt':1})
-            self.p.drawTxt({'fontsize':18,'center':'right','color':'red','position':[.55,.23],'txt':1})
-            self.p.drawTxt({'fontsize':22,'center':'left','color':'red','position':[-1,.3],'txt':'Standard Deviations'})
-            self.p.drawTxt({'fontsize':32,'center':'left','color':'white','position':[-.7,.1],'txt':'68%'})
+            yVal=self.p.getPdf(-1,0,1)
+            x,y = [-1,0],[yVal,yVal]
+            self.p.annotate(x,y,s=r"$\}$",fontsize=47,rotation=90,isScatter=True)
+            self.p.drawTxt({'fontsize':18,'center':'center','color':'red','position':[-.55,.28],'txt':1})
+            self.p.drawTxt({'fontsize':18,'center':'center','color':'red','position':[.45,.28],'txt':1})
+            self.p.drawTxt({'fontsize':22,'center':'center','color':'red','position':[0,.33],'txt':'Standard Deviations'})
+            self.p.drawTxt({'fontsize':32,'center':'center','color':'white','position':[0,.1],'txt':'68%'})
             
-        self.p.plotStdND(
-            func=func,
-            barCol='#0080CF',
-            cutLineCol='black',
-        ).saveAndShow()
+        # self.p.plotStdND(
+        #     func=func,
+        #     barCol='#0080CF',
+        #     cutLineCol='black',
+        # ).saveAndShow()
+        self.p.pltNdLine(callback=func,clip=30).saveAndShow()
 if __name__ == '__main__':
     unittest.main()
