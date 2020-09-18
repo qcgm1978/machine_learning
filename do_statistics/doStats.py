@@ -5,6 +5,7 @@ from scipy.stats import ttest_ind_from_stats
 import re, math,warnings, numpy as np
 class DoStats(object):
     def getPdf(self,x, mu, sigma):
+        # y=((1 / (np.sqrt(2 * np.pi) * σ)) * np.exp(-0.5 * (1 / σ * (zScore - μ))**2))
         return stats.norm.pdf(x, mu, sigma)
     def getEvolutiveData(self,l):
         sortedX = sorted(l)
@@ -80,8 +81,7 @@ class DoStats(object):
             σ = self.getPSD(x)
         zScore,differ=self.standardizing(x,self.getMean(μ),σ)
         μ=0
-        y=((1 / (np.sqrt(2 * np.pi) * σ)) *
-                np.exp(-0.5 * (1 / σ * (zScore - μ))**2))
+        y=self.getPdf(x,μ,σ)
         return zScore,y
     def getTtest(self):
         return ttest_ind_from_stats(mean1=15.0, std1=np.sqrt(87.5),
