@@ -31,15 +31,11 @@ class TDD_TEST_SD_VAR(unittest.TestCase):
             self.p.drawTxt({'fontsize':18,'center':'center','color':'red','position':[.45,.28],'txt':1})
             self.p.drawTxt({'fontsize':22,'center':'center','color':'red','position':[0,.33],'txt':'Standard Deviations'})
             self.p.drawTxt({'fontsize':32,'center':'center','color':'white','position':[0,.1],'txt':'68%'})
-            # Hide the right and top spines
-            ax.spines['right'].set_visible(False)
-            ax.spines['top'].set_visible(False)
-            
         # self.p.plotStdND(
         #     # func=func,
         #     barCol='#0080CF',
         #     cutLineCol='black',
         # ).saveAndShow()
-        self.p.pltNdLine(callback=func,clip=30).saveAndShow()
+        self.p.pltNdLine(callback=func,clip=(-1,1)).saveAndShow()
 if __name__ == '__main__':
     unittest.main()

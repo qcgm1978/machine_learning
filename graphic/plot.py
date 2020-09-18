@@ -282,6 +282,9 @@ class Plot(DoStats):
                 this_function_name=self.this_function_name
             else:
                 this_function_name='drawFunction'
+        # Hide the right and top spines
+        self.ax.spines['right'].set_visible(False)
+        self.ax.spines['top'].set_visible(False)
         plt.tight_layout()
         plt.savefig("img/{0}.png".format(this_function_name))
         enableShow and self.show()
@@ -423,21 +426,24 @@ class Plot(DoStats):
         callback=callback,
         annotation=annotation)
         return self
-    def pltNdLine(self,callback=None,clip=0):
+    def pltNdLine(self,callback=None,clip=None):
         mu = 0
         variance = 1
         limit=4
-        count=80
+        times=10
+        count=2*limit*times
         sigma = math.sqrt(variance)
         x = np.linspace(mu - limit*sigma, mu + limit*sigma, count)
-        x1 = np.linspace(-limit, limit, count)
         y = self.getPdf(x, mu, sigma)
-        fig, ax = self.getFigAx()
+        _, ax = self.getFigAx()
         ax.plot(x, y,c='black',linewidth=.5)
-        ax.fill_between(x, y, color='#0080CF', alpha=1)
-        if clip:
-            ax.fill_between(x[:clip], y[:clip], color='white', alpha=1)
-            ax.fill_between(x[count-clip:], y[count-clip:], color='white', alpha=1)
+        if isinstance(clip,(list,tuple)):
+            x1 = np.linspace(-limit, limit, limit*2+1)
+            start=np.where(x1==clip[0])[0][0]*times
+            end=np.where(x1==clip[1])[0][0]*times
+            ax.fill_between(x[start:end], y[start:end], color='#0080CF', alpha=1)
+        else:
+            ax.fill_between(x, y, color='#0080CF', alpha=1)
         callable(callback) and callback(ax,plt)
         self.this_function_name = inspect.currentframe().f_code.co_name
         return self
