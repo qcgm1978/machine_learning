@@ -206,13 +206,21 @@ class DoStats(object):
             return differenceStd
         else:
             return self.getPSD()
-    def getPercentile(self, percent):
+    def getDecile(self,l,val):
+
+        listP = l.copy()
+        listP.sort()
+        index=l.index(val)
+        return index/len(listP)
+    def getPercentile(self, percent,l=None):
+        if l is None:
+            l=self.list
         # listP = self.list.copy()
         # listP.sort()
         # lessIndex=round(self.len*percent)
         # val = listP[lessIndex-1]
         # return val
-        return np.percentile(self.list, percent * 100)
+        return np.percentile(l, percent * 100)
     # In statistics, the 68–95–99.7 rule, also known as the empirical rule, is a shorthand used to remember the percentage of values that lie within a band around the mean in a normal distribution with a width of two, four and six standard deviations, respectively; more precisely, 68.27%, 95.45% and 99.73% of the values lie within one, two and three standard deviations of the mean, respectively.
     def getProbability(self, σ=None, isNormal=True, σRange=None,isPercent=False):
         if σRange is None:
@@ -258,7 +266,7 @@ class DoStats(object):
         else:
             σ=0
         return σ
-    def getVariance(self, l=None):
+    def getVariance(self, l=None,ddof=0):
         if l is None:
             l = [self.list]
         if isinstance(l,str):
@@ -274,7 +282,7 @@ class DoStats(object):
             or the square root of its variance
             σ=self.getSD([val])**2
             """
-            σ2 = np.var(val)
+            σ2 = np.var(val,ddof=ddof)
             ret.append(σ2)
         return ret if len(ret) > 1 else ret[0]
     def compareByVariance(self, l):
