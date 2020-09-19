@@ -4,7 +4,7 @@ import os
 PACKAGE_PARENT = '..'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
-import unittest, math
+import unittest, math,matplotlib
 from data.handle_data import HandleData
 from graphic.plot import Plot
 from AI import DoAI
@@ -144,12 +144,19 @@ class TDD_GETTING_STARTED(unittest.TestCase):
         per=self.p.getPercentile(l=l,percent='30%')
         self.assertAlmostEqual(per,950)
     def test_data_distribution(self):
-        x = numpy.random.uniform(0.0, 5.0, 250)
+        valCount=250
+        x = numpy.random.uniform(0.0, 5.0, valCount)
         isfloat = all(isinstance(v, float) for v in x)
         self.assertTrue(isfloat)
         fig,ax=self.p.getFigAx()
-        self.p.plotHist(x,5,ax=ax,insertBar=False,barCol='#2877b4')
+        bars=5
+        n, bins, patches=self.p.plotHist(x,bars,ax=ax,insertBar=False,barCol='#2877b4')
         self.p.saveAndShow()
+        print(n,bins,patches)
+        self.assertEqual(len(n),bars)
+        self.assertEqual(sum(n),valCount)
+        self.assertEqual(len(n)+1,len(bins))
+        self.assertIsInstance(patches,matplotlib.container.BarContainer)
     def test_histogram(self):
         d = self.PlotAI()
         x = numpy.random.normal(5.0, 100.0, 100000)
