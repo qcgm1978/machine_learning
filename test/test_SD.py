@@ -16,7 +16,7 @@ class TDD_TEST_SD(unittest.TestCase):
     @singleton
     def setUp(self):
         file = "data/metabolic.csv"
-        file = getPath(file,isUpperLevel=True)
+        file = getPath(file,chdir='..')
         X = ["Sex", "Metabolic rate"]
         y = "CO2"
         predictVals = [2300, 1300]

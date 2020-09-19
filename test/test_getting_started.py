@@ -123,8 +123,7 @@ class TDD_GETTING_STARTED(unittest.TestCase):
         self.assertEqual(q1,3)
         self.assertEqual(q3,7)
         self.assertEqual(q4,7)
-    def test_Estimating_Percentiles(self):
-        pass
+
     def test_data_distribution(self):
         x = numpy.random.uniform(0.0, 5.0, 250)
         isfloat = all(isinstance(v, float) for v in x)

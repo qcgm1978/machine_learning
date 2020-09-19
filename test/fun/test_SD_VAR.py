@@ -7,10 +7,14 @@ sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 import unittest,numpy as np
 from mysql_data.decorators_func import singleton
 from graphic.plot import Plot
+from data.handle_data import HandleData
+from utilities import getPath
 class TDD_TEST_SD_VAR(unittest.TestCase):
     @singleton
     def setUp(self):
-        self.__class__.p=Plot()
+        class PH(HandleData,Plot):
+            pass
+        self.__class__.p=PH()
     def test_test_SD_VAR(self):
         l='600mm, 470mm, 170mm, 430mm and 300mm'
         m=self.p.getMean(l)
@@ -42,7 +46,12 @@ class TDD_TEST_SD_VAR(unittest.TestCase):
         #     cutLineCol='black',
         # ).saveAndShow()
         self.p.pltNdLine(callback=func,clip=(-sd,sd)).saveAndShow()
-    def test_sample_data(self):
-        pass
+
+    def test_Estimating_Percentiles(self):
+        filePath = "data/shopping.csv"
+        path = getPath(filePath, chdir='../..')
+        df=self.p.readCsv(path)
+        p=df['People']
+        self.assertEqual(len(p),7)
 if __name__ == '__main__':
     unittest.main()
