@@ -4,6 +4,7 @@ from AI import DoAI
 from graphic.plot import Plot
 from graphic.decision_tree import DecisionTree
 class DataTypes(HandleData, Predict, DoAI, Plot, DecisionTree):
+
     def getGini(self, getSample=None):
         if callable(getSample):
             samples = getSample(self.df)

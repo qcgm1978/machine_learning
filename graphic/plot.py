@@ -5,6 +5,7 @@ from matplotlib import colors
 import matplotlib.patches as patches
 from matplotlib.patches import Polygon
 from do_statistics.doStats import DoStats
+from utilities import getPath
 class Plot(DoStats):
     red='#F11F10'
     white='#fff'
@@ -264,7 +265,7 @@ class Plot(DoStats):
         self.x_format_fn and ax.xaxis.set_major_formatter(FuncFormatter(self.x_format_fn))
         locator(MaxNLocator(integer=True))
     def scatterGrouped(self,l,title='',xTxt='',yTxt=''):
-        fig, ax = plt.subplots()
+        fig, ax = self.getFigAx()
         self.setTxt(ax,title,xTxt,yTxt)
         self.addScatter(ax,l)
         labels = list(map(lambda item: item[0], l))
@@ -273,9 +274,11 @@ class Plot(DoStats):
                 return labels[int(tick_val)-1]
             else:
                 return ''
-        self.setLables(ax, labels,format_fn=format_fn)
+
+        self.x_format_fn=format_fn
+        self.setLables(ax, labels)
         this_function_name = inspect.currentframe().f_code.co_name
-        self.save(plt,this_function_name)
+        self.saveAndShow(this_function_name)
     def saveAndShow(self, this_function_name=None, enableShow=False):
         if this_function_name is None:
             if hasattr(self,'this_function_name'):
@@ -286,7 +289,9 @@ class Plot(DoStats):
         self.ax.spines['right'].set_visible(False)
         self.ax.spines['top'].set_visible(False)
         plt.tight_layout()
-        plt.savefig("img/{0}.png".format(this_function_name))
+        fname = "img/{0}.png".format(this_function_name)
+        file=getPath(fname)
+        plt.savefig(file)
         enableShow and self.show()
     def addScatter(self,ax,l):
         for ind,i in enumerate(l):
@@ -307,9 +312,9 @@ class Plot(DoStats):
         x1, y1 = x+.1, mean-mean*ratio
         x2, y2 = x+.1, mean+mean*ratio
         position = (x + .2, mean - 300 * ratio)
-        self.annotate(ax,[x1, x2], [y1, y2])
-        self.drawTxt(ax,position,txt)
-    def drawTxt(self,  annotation,ax=None):
+        self.annotate([x1, x2], [y1, y2],ax=ax)
+        self.drawTxt({'position':position,'txt':txt})
+    def drawTxt(self,  annotation,ax=None,position=None):
         if ax is None:
             ax=self.ax
         if annotation is None:

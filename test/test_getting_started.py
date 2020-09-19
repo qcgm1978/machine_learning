@@ -113,6 +113,18 @@ class TDD_GETTING_STARTED(unittest.TestCase):
         d1=self.p.getDecile(ages,31)
         self.assertEqual(d,0)
         self.assertAlmostEqual(d1,.048,3)
+    def test_Quartile(self):
+        l=1, 3, 3, 4, 5, 6, 6, 7, 8, 8
+        q=self.p.getQuartile(l,2)
+        q1=self.p.getQuartile(l,1)
+        q3=self.p.getQuartile(l,3)
+        q4=self.p.getQuartile(l,percentile=75)
+        self.assertEqual(q,5.5)
+        self.assertEqual(q1,3)
+        self.assertEqual(q3,7)
+        self.assertEqual(q4,7)
+    def test_Estimating_Percentiles(self):
+        pass
     def test_data_distribution(self):
         x = numpy.random.uniform(0.0, 5.0, 250)
         isfloat = all(isinstance(v, float) for v in x)
