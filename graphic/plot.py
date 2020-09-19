@@ -16,7 +16,6 @@ class Plot(DoStats):
     xInterval=1
     def __init__(self):
         self.fig, self.ax = self.getFigAx()
-
     def plotGrid(self,l):
         if isinstance(l,str):
             l=self.strToL(l)
@@ -148,8 +147,7 @@ class Plot(DoStats):
         self.fig,self.ax=plt.subplots()
         return self.fig,self.ax
     def plotND(self,x=None,y=None,yLable=None,mean=None, bars=100,l=None,labels=None,density=False,format_fn=None,annotation=None,callback=None,facecolor=None):
-        
-        fig, ax = self.getFigAx()
+        fig, ax = self.fig,self.ax
         self.drawGridLines(ax,x,y,density)
         n, bins, rects=self.plotHist(l,bars,labels,y,density=density,facecolor=facecolor)
         self.setAxes(ax,x,y,yLable,format_fn,plt)
@@ -285,7 +283,6 @@ class Plot(DoStats):
                 return labels[int(tick_val)-1]
             else:
                 return ''
-
         self.x_format_fn=format_fn
         self.setLables(ax, labels)
         this_function_name = inspect.currentframe().f_code.co_name
@@ -304,6 +301,7 @@ class Plot(DoStats):
         file=getPath(fname)
         plt.savefig(file)
         enableShow and self.show()
+        self.getFigAx()
     def addScatter(self,ax,l):
         for ind,i in enumerate(l):
             y=i[1]
