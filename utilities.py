@@ -1,6 +1,6 @@
 import  os
-def getPath(file,isUpperLevel=False):
-    isUpperLevel and os.chdir('..')
+def getPath(file,chdir=None):
+    os.chdir(chdir)
     pre = os.getcwd()
     file = os.path.join(pre, file)
     return file
