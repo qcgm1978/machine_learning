@@ -152,17 +152,17 @@ class TDD_GETTING_STARTED(unittest.TestCase):
         bars=5
         n, bins, patches=self.p.plotHist(x,bars,ax=ax,insertBar=False,barCol='#2877b4')
         self.p.saveAndShow()
-        print(n,bins,patches)
         self.assertEqual(len(n),bars)
         self.assertEqual(sum(n),valCount)
         self.assertEqual(len(n)+1,len(bins))
         self.assertIsInstance(patches,matplotlib.container.BarContainer)
     def test_histogram(self):
         d = self.PlotAI()
-        x = numpy.random.normal(5.0, 100.0, 100000)
-        x = d.getND(.4, 4, size=10000)
+        x = numpy.random.normal(5.0, 1.0, 100000)
+        # x = d.getND(.4, 4, size=10000)
         # d = self.PlotAI({"x": x})
-        d.plotND(100, l=x)
+        d.plotHist(bars=100, l=x,insertBar=False,barCol='#2877b4')
+        self.p.saveAndShow('demo')
 
     def test_scatter(self):
         x = [5, 7, 8, 7, 2, 17, 2, 9, 4, 11, 12, 9, 6]
