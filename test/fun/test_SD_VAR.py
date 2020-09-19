@@ -47,11 +47,6 @@ class TDD_TEST_SD_VAR(unittest.TestCase):
         # ).saveAndShow()
         self.p.pltNdLine(callback=func,clip=(-sd,sd)).saveAndShow()
 
-    def test_Estimating_Percentiles(self):
-        filePath = "data/shopping.csv"
-        path = getPath(filePath, chdir='../..')
-        df=self.p.readCsv(path)
-        p=df['People']
-        self.assertEqual(len(p),7)
+
 if __name__ == '__main__':
     unittest.main()
