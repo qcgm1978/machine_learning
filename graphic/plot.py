@@ -1,4 +1,5 @@
 import math,inspect, numpy as np
+from PIL.Image import NONE
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter, MaxNLocator
 from matplotlib import colors
@@ -13,31 +14,33 @@ class Plot(DoStats):
     barCol=''
     ax=None
     xInterval=1
+    def __init__(self):
+        self.fig, self.ax = self.getFigAx()
+
     def plotGrid(self,l):
         if isinstance(l,str):
             l=self.strToL(l)
         m=self.getMean(l)
         sd=self.getPSD(l)
-        fig, ax = self.getFigAx()
-        ax.set_facecolor('darkgray')
-        fig.set_facecolor('darkgray')
-        ax.yaxis.grid(c='#7F1299')
+        self.ax.set_facecolor('darkgray')
+        self.fig.set_facecolor('darkgray')
+        self.ax.yaxis.grid(c='#7F1299')
         for index,item in enumerate(l):
-            ax.plot([index,index+1,index+.7,index+.7],[item,item,item+40,item],c='red',linewidth=3)
+            self.ax.plot([index,index+1,index+.7,index+.7],[item,item,item+40,item],c='red',linewidth=3)
             self.annotate([index+1,index+1],[item,m],arrowstyle='<-',c='#760093',linewidth=3)
             diff=item-m
             x=index+1+(.1 if index<4 else -.5)
             self.drawTxt({'fontsize':18,'center':'left','color':'#7F1299','position':[x,diff/2+m],'txt':int(diff)})
-        ax.plot([.1,5],[m+sd,m+sd],linewidth=3,c='#3700FF')
+        self.ax.plot([.1,5],[m+sd,m+sd],linewidth=3,c='#3700FF')
         self.annotate([.5,.5],[m+sd,m],arrowstyle='<->',c='#fff',linewidth=3)
         self.annotate([.5,.5],[m-sd,m],arrowstyle='<->',c='#fff',linewidth=3)
         self.drawTxt({'fontsize':18,'center':'right','color':'#fff','position':[.4,(m+sd+m)/2],'txt':int(sd)})
         self.drawTxt({'fontsize':18,'center':'right','color':'#fff','position':[.4,(m-sd+m)/2],'txt':int(sd)})
-        ax.plot([.1,5],[m,m],linewidth=3,c='#00FF00')
-        ax.plot([.1,5],[m-sd,m-sd],linewidth=3,c='#3700FF')
+        self.ax.plot([.1,5],[m,m],linewidth=3,c='#00FF00')
+        self.ax.plot([.1,5],[m-sd,m-sd],linewidth=3,c='#3700FF')
         y=np.linspace(0,600,4)
-        ax.set_yticks(y)
-        ax.tick_params(axis='y', colors='#7F1299',labelsize=20)
+        self.ax.set_yticks(y)
+        self.ax.tick_params(axis='y', colors='#7F1299',labelsize=20)
         self.this_function_name = inspect.currentframe().f_code.co_name
         self.saveAndShow()
     def plotEvolution(self,l):
@@ -145,15 +148,10 @@ class Plot(DoStats):
         self.fig,self.ax=plt.subplots()
         return self.fig,self.ax
     def plotND(self,x=None,y=None,yLable=None,mean=None, bars=100,l=None,labels=None,density=False,format_fn=None,annotation=None,callback=None,facecolor=None):
-        if l is None:
-            l = self.list
-        if isinstance(l, set):
-            l = list(l)
-        if len(np.array(l).shape) == 1:
-            l = [l]
+        
         fig, ax = self.getFigAx()
         self.drawGridLines(ax,x,y,density)
-        n, bins, rects=self.plotHist(ax,l,bars,labels,y,density=density,facecolor=facecolor)
+        n, bins, rects=self.plotHist(l,bars,labels,y,density=density,facecolor=facecolor)
         self.setAxes(ax,x,y,yLable,format_fn,plt)
         self.plotLines(ax, mean, y, density)
         if annotation is None and y and mean:
@@ -209,12 +207,24 @@ class Plot(DoStats):
             plt.xticks(fontsize=8)
         self.setLables(ax, isMajor=False, )
         ax.set_ylabel(yLable)
-    def plotHist(self, ax,l,bars,labels,y,density=False,facecolor=None):
+    def plotHist(self, l,bars,labels=None,y=None,density=False,facecolor=None,ax=None,insertBar=True,barCol=None):
+        if l is None:
+            l = self.list
+        if isinstance(l, set):
+            l = list(l)
+        if len(np.array(l).shape) == 1:
+            l = [l]
+        if ax is None:
+            ax=self.ax
         colors=['#FF5252','#535EB2']+plt.rcParams['axes.prop_cycle'].by_key()['color']
         for index, val in enumerate(l):
-            n, bins, rects = ax.hist(val, bins=bars, color=colors[index], alpha=.8, orientation='vertical', density=density, label=labels[index] if labels else '')
+            if labels:
+                label=labels[index] if labels else ''
+            else:
+                label=''
+            n, bins, rects = ax.hist(val, bins=bars, color=barCol if barCol else colors[index], alpha=.8, orientation='vertical', density=density, label=label)
             facecolor and ax.set_facecolor(facecolor)
-            self.setBarsCol(n, bins, rects)
+            insertBar and self.setBarsCol(n, bins, rects)
             if y is not None and len(l)>1:
                 for r in rects:
                     height = r.get_height() / r.get_width()
@@ -223,6 +233,7 @@ class Plot(DoStats):
                     else:
                         r.set_height(height)
         labels and ax.legend(loc='upper right')
+        self.this_function_name = inspect.currentframe().f_code.co_name
         return n, bins, rects
     def drawGridLines(self, ax, x, y,density):
         if y is None or density:

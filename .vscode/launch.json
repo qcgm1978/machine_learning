@@ -15,7 +15,7 @@
             "name": "Some File",
             "type": "python",
             "request": "launch",
-            "program": "test/fun/test_SD_VAR.py",
+            "program": "test/test_getting_started.py",
             "console": "integratedTerminal"
         }
     ]

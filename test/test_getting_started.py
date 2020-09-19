@@ -11,13 +11,16 @@ from AI import DoAI
 from predict import Predict
 import numpy
 from mysql_data.decorators_func import singleton
+from utilities import getPath,parseNumber
 
 
 class TDD_GETTING_STARTED(unittest.TestCase):
     @singleton
     def setUp(self):
         class PlotAI(HandleData, Plot, DoAI, Predict):
-            pass
+            def __init__(self,arg=None):
+                HandleData.__init__(self,arg)
+                Plot.__init__(self)
 
         self.__class__.PlotAI = PlotAI
         self.__class__.p = PlotAI()
@@ -102,9 +105,9 @@ class TDD_GETTING_STARTED(unittest.TestCase):
 #
 # Add up all percentages below the score,
 # plus half the percentage at the score.
-        l=[.12,.5,.3,.08]
-        p=self.p.getPercentile(.77,l=l)
-        self.assertEqual(p,.362)
+        l=({'D':.12},{'C':.5},{'B':.3},{'A':.08})
+        p=self.p.getPercentile('B',l=l)
+        self.assertEqual(p,.77)
     def test_decile(self):
         ages = [
             5, 31, 43, 48, 50, 41, 7, 11, 15, 39, 80, 82, 32, 2, 8, 6, 25, 36, 27, 61, 31
@@ -113,6 +116,7 @@ class TDD_GETTING_STARTED(unittest.TestCase):
         d1=self.p.getDecile(ages,31)
         self.assertEqual(d,0)
         self.assertAlmostEqual(d1,.048,3)
+
     def test_Quartile(self):
         l=1, 3, 3, 4, 5, 6, 6, 7, 8, 8
         q=self.p.getQuartile(l,2)
@@ -123,12 +127,29 @@ class TDD_GETTING_STARTED(unittest.TestCase):
         self.assertEqual(q1,3)
         self.assertEqual(q3,7)
         self.assertEqual(q4,7)
-
+    def test_Estimating_Percentiles(self):
+        filePath = "data/shopping.csv"
+        path = getPath(filePath)
+        df=self.p.readCsv(path)
+        p=df['People']
+        t=df['Time (hours)']
+        self.assertEqual(len(p),7)
+        l = list(map(parseNumber,p.tolist()))
+        poly=self.p.polyfit(t.tolist(),l)
+        # print(poly)
+        self.assertEqual(sum(l)*.3,8760)
+        self.assertEqual(sum(l[:4]),3850)
+        self.assertEqual(sum(l[:5]),10350)
+        self.assertAlmostEqual((8760-3850)/l[4],.755,3)
+        per=self.p.getPercentile(l=l,percent='30%')
+        self.assertAlmostEqual(per,950)
     def test_data_distribution(self):
         x = numpy.random.uniform(0.0, 5.0, 250)
         isfloat = all(isinstance(v, float) for v in x)
         self.assertTrue(isfloat)
-
+        fig,ax=self.p.getFigAx()
+        self.p.plotHist(x,5,ax=ax,insertBar=False,barCol='#2877b4')
+        self.p.saveAndShow()
     def test_histogram(self):
         d = self.PlotAI()
         x = numpy.random.normal(5.0, 100.0, 100000)

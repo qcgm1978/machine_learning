@@ -3,7 +3,10 @@ from numpy import random
 from scipy import stats
 from scipy.stats import ttest_ind_from_stats
 import re, math,warnings, numpy as np
+from functools import reduce
 class DoStats(object):
+    def polyfit(self,x,y):
+        return np.polyfit(x,y,2)
     def getPdf(self,x, mu, sigma):
         # y=((1 / (np.sqrt(2 * np.pi) * σ)) * np.exp(-0.5 * (1 / σ * (zScore - μ))**2))
         return stats.norm.pdf(x, mu, sigma)
@@ -225,15 +228,24 @@ class DoStats(object):
         else:
             ret=listP[math.floor(i)]
         return ret
-    def getPercentile(self, percent,l=None):
+    def getPercentile(self, percent=None,l=None,axis=0):
         if l is None:
             l=self.list
-        # listP = self.list.copy()
-        # listP.sort()
-        # lessIndex=round(self.len*percent)
-        # val = listP[lessIndex-1]
-        # return val
-        return np.percentile(l, percent * 100)
+        if isinstance(l,tuple):
+            l1=list(filter(lambda item:list(item.keys())[0]>=percent,l))
+            def getTotal(acc,item):
+                key=list(item.keys())[0]
+                val=list(item.values())[0]
+                return acc+val/2 if key==percent else acc+val
+            total=reduce(getTotal,l1,0)
+            return total
+        else:
+            if isinstance(percent,str):
+                if '%' in percent:
+                    percent=float(percent.strip('%'))
+            else:
+                percent*=100
+            return np.percentile(l, percent,axis=axis)
     # In statistics, the 68–95–99.7 rule, also known as the empirical rule, is a shorthand used to remember the percentage of values that lie within a band around the mean in a normal distribution with a width of two, four and six standard deviations, respectively; more precisely, 68.27%, 95.45% and 99.73% of the values lie within one, two and three standard deviations of the mean, respectively.
     def getProbability(self, σ=None, isNormal=True, σRange=None,isPercent=False):
         if σRange is None:
