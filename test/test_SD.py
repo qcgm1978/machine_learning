@@ -8,14 +8,15 @@ sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 from datatype import DataTypes
 import unittest,pandas
 from mysql_data.decorators_func import singleton
-from unum.units import * # Load a number of common units.
 import pint,math
+from utilities import getPath
 from pint import UnitRegistry
 ureg = UnitRegistry()
 class TDD_TEST_SD(unittest.TestCase):
     @singleton
     def setUp(self):
         file = "data/metabolic.csv"
+        file = getPath(file,isUpperLevel=True)
         X = ["Sex", "Metabolic rate"]
         y = "CO2"
         predictVals = [2300, 1300]
@@ -25,6 +26,9 @@ class TDD_TEST_SD(unittest.TestCase):
         self.__class__.s1 = self.__class__.d.getSD(self.__class__.l1)
         self.__class__.s2 = self.__class__.d.getSD(self.__class__.l2)
         self.__class__.s3 = self.__class__.d.getSD(self.__class__.l1,expected=None)
+
+
+
     def test_test_SD(self):
         self.assertIsInstance(self.d.df, pandas.core.frame.DataFrame)
         mr = self.d.getDfCol()
@@ -87,7 +91,7 @@ class TDD_TEST_SD(unittest.TestCase):
         p1 = self.d.getProbability(1)
         p2 = self.d.getProbability(2)
         p3 = self.d.getProbability(3)
-        self.assertEqual(p0,1)
+        self.assertEqual(p0,0)
         self.assertEqual(p1,.6827)
         self.assertEqual(p2,.9545)
         self.assertEqual(p3, .9973)

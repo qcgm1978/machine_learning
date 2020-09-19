@@ -3,6 +3,7 @@ import sys
 sys.path
 sys.executable
 import pandas, pydotplus, math, numpy as np, matplotlib.image as pltimg, matplotlib.pyplot as plt
+from pint import UnitRegistry
 from sklearn.preprocessing import StandardScaler
 from mathMethods.doMath import DoMath
 from mysql_data.mysqlOp import MysqlOp

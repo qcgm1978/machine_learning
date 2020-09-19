@@ -212,6 +212,19 @@ class DoStats(object):
         listP.sort()
         index=l.index(val)
         return index/len(listP)
+    def getQuartile(self,l,ordinal=None,percentile=None):
+        if percentile is not None:
+            ordinal=int(percentile/25)
+        listP = list(l).copy()
+        listP.sort()
+        unit=len(listP)/4
+        index=unit*ordinal
+        i = int(index)
+        if i ==index:
+            ret=(listP[i-1]+listP[i])/2
+        else:
+            ret=listP[math.floor(i)]
+        return ret
     def getPercentile(self, percent,l=None):
         if l is None:
             l=self.list
