@@ -31,12 +31,27 @@ class TDD_TEST_LEASTSQUARESREGRESSION(unittest.TestCase):
                 yFormat=lambda v,_:'$'+str(int(v))
             )\
             .activate()\
-            .saveAndShow()\
-            .freeze()
+            .saveAndShow()
         r = self.p.getR()
         self.assertAlmostEqual(r, .96, 2)
-        p = self.p.predict(10)
-        self.assertAlmostEqual(p, 80.1,1)
-        # self.p.scatter(10,85.6)
+        x=19
+        p = self.p.predict(x)
+        self.assertAlmostEqual(p, 418.7,1)
+        self.p.scatter(x,p).saveAndShow()
+        m,b,lineEquation=self.p.leastSquaresRegression()
+        self.assertAlmostEqual(m,37.6,1)
+        self.assertAlmostEqual(b,-296.1,1)
+    def test_m_b(self):
+        filePath = "data/sun_ice.csv"
+        path = getPath(filePath)
+        df=self.p.readCsv(path)
+        print(df)
+        x=df['"x"\nHours of Sunshine']
+        y=df['"y"\nIce Creams Sold']
+        self.assertEqual(len(x),5)
+        m,b,lineEquation=self.p.leastSquaresRegression(x,y)
+        self.assertAlmostEqual(m,1.5,1)
+        self.assertAlmostEqual(b,.3,1)
+        self.assertEqual(lineEquation,'y=1.5x+0.3')
 if __name__ == '__main__':
     unittest.main()

@@ -31,8 +31,29 @@ class Predict(DoStats,DecisionTree,DoAI):
         mymodel = self.getPolynomialModel()
         return mymodel(predictX)
     def predict(self, predictX):
-        slope, intercept, r, p, std_err = self.getLinregress()
+        # slope, intercept, r, p, std_err = self.getLinregress()
+        slope, intercept,lineEquation = self.leastSquaresRegression()
         return slope * predictX + intercept
+    def leastSquaresRegression(self,x=None,y=None):
+        if x is None or y is None:
+            if hasattr(self,'info'):
+                if x is None:
+                    x = self.info["x"]
+                if y is None:
+                    y=self.info["y"]
+        xSquares=map(lambda x:x**2,x)
+        xy=map(lambda t:t[0]*t[1],zip(x,y))
+        sumX=sum(x)
+        sumY=sum(y)
+        sumSquares=sum(xSquares)
+        sumXy=sum(xy)
+        N=len(x)
+        # m =  (N * Σ(xy) − Σx Σy) / (N * Σ(x2) − (Σx)2)
+        m=(N*sumXy-sumX*sumY)/(N*sumSquares-sumX**2)
+        # b =  (Σy − m Σx) / N
+        b=(sumY-m*sumX)/N
+        lineEquation='y={0}x+{1}'.format(round(m,1),round(b,1))
+        return m,b,lineEquation
     def getModel(self):
         x = self.info["x"]
         y = list(map(self.predict, x))
