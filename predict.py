@@ -3,7 +3,8 @@ from sklearn import linear_model
 from sklearn.preprocessing import StandardScaler
 from do_statistics.doStats import DoStats
 from graphic.decision_tree import DecisionTree
-class Predict(DoStats,DecisionTree):
+from AI import DoAI
+class Predict(DoStats,DecisionTree,DoAI):
     def predictbyDecisionTree(self,features,condition, y=None):
         dtree=self.getDtree(features,y)
         return dtree.predict([condition])
