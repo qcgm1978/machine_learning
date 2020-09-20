@@ -5,7 +5,7 @@ PACKAGE_PARENT = '..'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 import unittest, math,matplotlib
-from data.handle_data import HandleData
+from data.handle_data import HandleData     
 from graphic.plot import Plot
 from AI import DoAI
 from predict import Predict
