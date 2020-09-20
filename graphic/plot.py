@@ -383,6 +383,8 @@ class Plot(DoStats):
                     ),
         )
     def scatter(self, x=None, y=None):
+        if isinstance(x,dict):
+            self.info=x
         if x is None or y is None:
             x = self.info["x"]
             y = self.info["y"]

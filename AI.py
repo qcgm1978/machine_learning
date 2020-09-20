@@ -2,7 +2,7 @@
 from sklearn.metrics import r2_score
 from do_statistics.doStats import DoStats
 from mathMethods.doMath import DoMath
-class DoAI(DoStats):
+class DoAI(object):
     def getRSquared(self, dataType="All"):
         x = self.info["x"]
         y = self.info["y"]

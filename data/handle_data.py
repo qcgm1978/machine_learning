@@ -41,6 +41,13 @@ class HandleData(DoMath, MysqlOp):
             return self.info[i]
         except (KeyError,AttributeError):
             return None
+    def getSortedXyInt(self,t1,t2):
+        rs = np.random.seed(42)
+        x=np.random.randint(*t1)
+        y=np.random.randint(*t2)
+        x.sort()
+        y.sort()
+        return x, y
     def getConstants(self):
         return constants
     def to(self, unit, toUnit, num=1):

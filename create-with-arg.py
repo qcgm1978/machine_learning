@@ -23,7 +23,13 @@ def main():
         f = open(sys.argv[1] + ".py", "w+")
         # for i in range(10):
         #      f.write("This is line %d\r\n" % (i+1))
-        content = """import unittest{2}
+        content = """import sys
+import os
+PACKAGE_PARENT = '../..'
+SCRIPT_DIR = os.path.dirname(os.path.realpath(
+    os.path.join(os.getcwd(), os.path.expanduser(__file__))))
+sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
+import unittest{2}
 from graphic.plot import Plot
 from mysql_data.decorators_func import singleton
 from utilities import getPath,parseNumber
