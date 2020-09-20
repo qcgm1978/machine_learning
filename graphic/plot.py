@@ -1,4 +1,5 @@
 import math,inspect,traceback, numpy as np
+from matplotlib.pyplot import ylabel
 from PIL.Image import NONE
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter, MaxNLocator
@@ -16,6 +17,10 @@ class Plot(DoStats):
     xInterval=1
     def __init__(self):
         self.fig, self.ax = self.getFigAx()
+    def grid(self,x=False,y=False,color='#7F1299'):
+        y and self.ax.yaxis.grid(c=color)        
+        x and self.ax.xaxis.grid(c=color)        
+        return self
     def plotGrid(self,l):
         if isinstance(l,str):
             l=self.strToL(l)
@@ -23,7 +28,7 @@ class Plot(DoStats):
         sd=self.getPSD(l)
         self.ax.set_facecolor('darkgray')
         self.fig.set_facecolor('darkgray')
-        self.ax.yaxis.grid(c='#7F1299')
+        self.grid(y=True)
         for index,item in enumerate(l):
             self.ax.plot([index,index+1,index+.7,index+.7],[item,item,item+40,item],c='red',linewidth=3)
             self.annotate([index+1,index+1],[item,m],arrowstyle='<-',c='#760093',linewidth=3)
@@ -56,8 +61,16 @@ class Plot(DoStats):
                 func=axes[index].plot
             func(item['x'], item['y'],  c=self.black, linewidth=3)
             axes[index].set_title(item['title'])
-            axes[index].set_ylabel('PD' if index else 'Val')
+            yLabel='PD' if index else 'Val'
+            ax=axes[index]
+            self.setXyLabel(ax,yLabel)
         plt.tight_layout()
+    def setXyLabel(self,ax=None,xLabel=None,yLabel=None):
+        if ax is None:
+            ax=self.ax
+        yLabel and ax.set_ylabel(yLabel)
+        xLabel and ax.set_xlabel(xLabel)
+        return self
     def getPlt(self):
         return plt
     # Make the shaded region
@@ -197,12 +210,15 @@ class Plot(DoStats):
         dashes = [5, 5]  # 10 points on, 5 off, 100 on, 5 off
         line1, = ax.plot([x1,x2],[y1,y2],'-' if notHasOffset else '--', linewidth=1,color=color)
         not notHasOffset and line1.set_dashes(dashes)
+    def setXyLimits(self,x,y):
+        plt.xlim(*x)
+        plt.ylim(*y)
+        return self
     def setAxes(self, ax, x, y, yLable,format_fn=None,plt=None):
         if y is None:
             return
         # set the y limit
-        plt.xlim(x[0], x[1])
-        plt.ylim(y[0], y[1])
+        self.setXyLimits(x,y)
         if format_fn is None:
             x=range(0,x[1]+1,10)
             ax.set_xticks(x)
@@ -275,8 +291,15 @@ class Plot(DoStats):
             locator = ax.xaxis.set_major_locator
         else:
             locator = ax.xaxis.set_minor_locator
-        self.x_format_fn and ax.xaxis.set_major_formatter(FuncFormatter(self.x_format_fn))
+        xFormat=self.x_format_fn
+        xFormat and self.setXyFormat(xFormat)
         locator(MaxNLocator(integer=True))
+    def setXyFormat(self,ax=None,xFormat=None,yFormat=None):
+        if ax is None:
+            ax=self.ax
+        xFormat and ax.xaxis.set_major_formatter(FuncFormatter(xFormat))
+        yFormat and ax.yaxis.set_major_formatter(FuncFormatter(yFormat))
+        return self
     def scatterGrouped(self,l,title='',xTxt='',yTxt=''):
         fig, ax = self.getFigAx()
         self.setTxt(ax,title,xTxt,yTxt)
@@ -382,14 +405,14 @@ class Plot(DoStats):
                         linewidth=linewidth
                     ),
         )
-    def scatter(self, x=None, y=None):
+    def scatter(self, x=None, y=None,s=None):
         if isinstance(x,dict):
             self.info=x
         if x is None or y is None:
             x = self.info["x"]
             y = self.info["y"]
         l1, l2,minLen = self.normalize(x,y)
-        plt.scatter(l1, l2)
+        plt.scatter(l1, l2,s=s)
         self.setImgName()
         return self
     def setImgName(self):
@@ -399,9 +422,9 @@ class Plot(DoStats):
     def show(self):
         plt.show()
         
-    def plotFitLine(self):
+    def plotFitLine(self,color=None):
         mymodel = self.getModel()
-        plt.plot(self.info["x"], mymodel)
+        plt.plot(self.info["x"], mymodel,color=color)
         return self
     def format_fn(tick_val, tick_pos):
             if int(tick_val) ==0:

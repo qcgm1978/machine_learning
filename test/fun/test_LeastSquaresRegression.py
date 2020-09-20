@@ -21,11 +21,22 @@ class TDD_TEST_LEASTSQUARESREGRESSION(unittest.TestCase):
         self.__class__.p = PlotAI()
     def test_test_LeastSquaresRegression(self):
         x, y = self.p.getSortedXyInt((11,25,12),(130,620,12))
-        self.p.scatter({"x": x, "y": y}).plotFitLine().activate().saveAndShow().freeze()
+        self.p\
+            .scatter({"x": x, "y": y},s=100)\
+            .plotFitLine(color='#FF9700')\
+            .grid(x=True,y=True,color='#9F9F9F')\
+            .setXyLabel(xLabel='Temperature C',yLabel='Sales')\
+            .setXyLimits((10,26),(0,700))\
+            .setXyFormat(
+                yFormat=lambda v,_:'$'+str(int(v))
+            )\
+            .activate()\
+            .saveAndShow()\
+            .freeze()
         r = self.p.getR()
         self.assertAlmostEqual(r, .96, 2)
         p = self.p.predict(10)
         self.assertAlmostEqual(p, 80.1,1)
-        self.p.scatter(10,85.6)
+        # self.p.scatter(10,85.6)
 if __name__ == '__main__':
     unittest.main()
