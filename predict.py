@@ -34,6 +34,5 @@ class Predict(DoStats,DecisionTree):
         return slope * predictX + intercept
     def getModel(self):
         x = self.info["x"]
-        myfunc = self.predict
-        mymodel = list(map(myfunc, x))
-        return mymodel
+        y = list(map(self.predict, x))
+        return y

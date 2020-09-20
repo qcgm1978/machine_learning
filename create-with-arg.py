@@ -23,11 +23,19 @@ def main():
         f = open(sys.argv[1] + ".py", "w+")
         # for i in range(10):
         #      f.write("This is line %d\r\n" % (i+1))
-        content = """
-import unittest{2}
+        content = """import unittest{2}
+from graphic.plot import Plot
+from mysql_data.decorators_func import singleton
+from utilities import getPath,parseNumber
 class TDD_{0}(unittest.TestCase):
+    @singleton
+    def setUp(self):
+        class PlotAI(Plot):
+            def __init__(self,arg=None):
+                Plot.__init__(self)
+        self.__class__.p = Plot()
     def test_{1}(self):
-
+        self.assertEqual(True,1)
 if __name__ == '__main__':
     unittest.main()
 
