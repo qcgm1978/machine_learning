@@ -1,4 +1,4 @@
-import math,inspect, numpy as np
+import math,inspect,traceback, numpy as np
 from PIL.Image import NONE
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter, MaxNLocator
@@ -127,7 +127,11 @@ class Plot(DoStats):
         fig.tight_layout()
         self.show()
     def normalize(self, l1, l2):
-        lenO = len(l1)
+        if not isinstance(l1,list):
+            l1=[l1]
+        if not isinstance(l2,list):
+            l2=[l2]
+        lenO = len(l2)
         lenP = len(l2)
         if lenO <= lenP:
             minLen = lenO
@@ -288,6 +292,8 @@ class Plot(DoStats):
         this_function_name = inspect.currentframe().f_code.co_name
         self.saveAndShow(this_function_name)
     def saveAndShow(self, this_function_name=None, enableShow=False):
+        if Plot.isFreezing:
+            return self
         if this_function_name is None:
             if hasattr(self,'this_function_name'):
                 this_function_name=self.this_function_name
@@ -299,9 +305,15 @@ class Plot(DoStats):
         plt.tight_layout()
         fname = "img/{0}.png".format(this_function_name)
         file=getPath(fname)
+       
         plt.savefig(file)
         enableShow and self.show()
-        self.getFigAx()
+        return self
+    def activate(self):
+        Plot.isFreezing=False
+        return self
+    def freeze(self):
+        Plot.isFreezing=True
     def addScatter(self,ax,l):
         for ind,i in enumerate(l):
             y=i[1]
@@ -376,13 +388,19 @@ class Plot(DoStats):
             y = self.info["y"]
         l1, l2,minLen = self.normalize(x,y)
         plt.scatter(l1, l2)
+        self.setImgName()
+        return self
+    def setImgName(self):
+        name=traceback.extract_stack(None, 2)[0][2]
+        self.this_function_name=name
+        return name
     def show(self):
         plt.show()
-    def scatterLine(self):
+        
+    def plotFitLine(self):
         mymodel = self.getModel()
-        self.scatter()
         plt.plot(self.info["x"], mymodel)
-        self.show()
+        return self
     def format_fn(tick_val, tick_pos):
             if int(tick_val) ==0:
                 return '<{0}'.format(tick_val)
@@ -461,3 +479,4 @@ class Plot(DoStats):
         callable(callback) and callback(ax,plt)
         self.this_function_name = inspect.currentframe().f_code.co_name
         return self
+Plot.isFreezing=False

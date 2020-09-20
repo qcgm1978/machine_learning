@@ -168,11 +168,13 @@ class TDD_GETTING_STARTED(unittest.TestCase):
         x = [5, 7, 8, 7, 2, 17, 2, 9, 4, 11, 12, 9, 6]
         y = [99, 86, 87, 88, 111, 86, 103, 87, 94, 78, 77, 85, 86]
         d = self.PlotAI({"x": x, "y": y})
-        # d.scatterLine()
+        # d.scatter().activate().saveAndShow().freeze()
+        # d.scatter().plotFitLine().activate().saveAndShow().freeze()
         r = d.getR()
         self.assertAlmostEqual(r, -0.76, 2)
         p = d.predict(10)
-        self.assertEqual(p, 85.59308314937454)
+        self.assertAlmostEqual(p, 85.6,1)
+        d.scatter(10,85.6)
 
     def test_bad_fit(self):
         x = [
@@ -220,15 +222,15 @@ class TDD_GETTING_STARTED(unittest.TestCase):
             15,
         ]
         d = self.PlotAI({"x": x, "y": y})
-        # d.scatterLine()
+        d.scatter().plotFitLine().activate().saveAndShow().freeze()
         r = d.getR()
-        self.assertAlmostEqual(r, 0.01, 2)
+        self.assertAlmostEqual(r, 0.013, 3)
 
     def test_random_data(self):
         x = numpy.random.normal(5.0, 1.0, 1000)
         y = numpy.random.normal(10.0, 5.0, 1000)
         d = self.PlotAI({'x': x, 'y': y})
-        d.scatter()
+        d.scatter().saveAndShow().freeze()
 
 
 if __name__ == "__main__":
