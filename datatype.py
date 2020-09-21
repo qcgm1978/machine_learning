@@ -3,8 +3,10 @@ from data.handle_data import HandleData
 from AI import DoAI
 from graphic.plot import Plot
 from graphic.decision_tree import DecisionTree
-class DataTypes(HandleData, Predict, DoAI, Plot, DecisionTree):
-
+class DataTypes(HandleData, Predict, Plot, DecisionTree):
+    def __init__(self,*arg):
+        HandleData.__init__(self,*arg)
+        Plot.__init__(self)
     def getGini(self, getSample=None):
         if callable(getSample):
             samples = getSample(self.df)
