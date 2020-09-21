@@ -30,7 +30,7 @@ class TDD_REGRESSION(unittest.TestCase):
         y = [21, 46, 3, 35, 67, 95, 53, 72, 58, 10,
              26, 34, 90, 33, 38, 20, 56, 2, 47, 15]
         d = DataTypes({'x': x, 'y': y})
-        d.scatter().polynomialRegressionLine().saveAndShow().freeze()
+        d.scatter().polynomialRegressionLine().saveAndShow(enableShow=True).freeze()
         r = d.getRSquared()
         self.assertAlmostEqual(r, .00995, 5)
     def test_multiple_regression(self):
