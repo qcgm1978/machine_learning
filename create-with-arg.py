@@ -39,7 +39,7 @@ class TDD_{0}(unittest.TestCase):
         class PlotAI(Plot):
             def __init__(self,arg=None):
                 Plot.__init__(self)
-        self.__class__.p = Plot()
+        self.__class__.p = PlotAI()
     def test_{1}(self):
         self.assertEqual(True,1)
 if __name__ == '__main__':
