@@ -13,11 +13,17 @@ class TDD_REGRESSION(unittest.TestCase):
         y = [100, 90, 80, 60, 60, 55, 60, 65, 70,
              70, 75, 76, 78, 79, 90, 99, 99, 100]
         d = DataTypes({'x': x, 'y': y})
-        # d.polynomialRegressionLine()
+        d.scatter().polynomialRegressionLine().saveAndShow()
         r = d.getRSquared()
-        self.assertAlmostEqual(r, .95, 2)
-        speed = d.predictPolynomialRegression(17)
-        self.assertAlmostEqual(speed, 87, 0)
+        self.assertAlmostEqual(r, .94, 2)
+        x1=17
+        speed = d.predictPolynomialRegression(x1)
+        self.assertAlmostEqual(speed, 88.87, 2)
+        d\
+            .scatter(x1,speed)\
+            .plotLine([0,x1,x1,x1],[speed,speed,0,speed])\
+            .setXyLimits((0,20),(0,100))\
+            .saveAndShow('polynomialRegressionLine')
     def test_bad_fit(self):
         x = [89, 43, 36, 36, 95, 10, 66, 34, 38, 20,
              26, 29, 48, 64, 6, 5, 36, 66, 72, 40]
@@ -26,7 +32,7 @@ class TDD_REGRESSION(unittest.TestCase):
         d = DataTypes({'x': x, 'y': y})
         # d.polynomialRegressionLine()
         r = d.getRSquared()
-        self.assertAlmostEqual(r, .07, 2)
+        self.assertAlmostEqual(r, .00995, 5)
     def test_multiple_regression(self):
         file = "data/cars.csv"
         X = ['Weight', 'Volume']
@@ -73,7 +79,7 @@ class TDD_REGRESSION(unittest.TestCase):
         e = list(map(lambda x: round(x, 2), l[0]))
         self.assertEqual(e, [-2.1, -1.59])
     def test_scale_predict(self):
-        file = "cars2.csv"
+        file = "data/cars2.csv"
         X = ['Weight', 'Volume']
         y = 'CO2'
         d = DataTypes({'x': X, 'y': y})
@@ -92,15 +98,15 @@ class TDD_REGRESSION(unittest.TestCase):
         y = np.random.normal(150, 40, 100) / x
         d = DataTypes({'x': x, 'y': y})
         # d.polynomialRegressionLine()
-        p = d.predictPolynomialRegression(6)
-        p1 = d.predictPolynomialRegression(60)
+        p = d.predict4PolynomialRegression(6)
+        p1 = d.predict4PolynomialRegression(60)
         self.assertAlmostEqual(p, 181, 0)
         self.assertAlmostEqual(p1, 55100190, 0)
         r2 = d.getRSquared('train')
         self.assertAlmostEqual(r2, .797, 3)
         r2 = d.getRSquared('test')
         self.assertAlmostEqual(r2, .838, 3)
-        p = d.predictPolynomialRegression(5)
+        p = d.predict4PolynomialRegression(5)
         self.assertAlmostEqual(p, 24.88, 2)
 if __name__ == '__main__':
     unittest.main()

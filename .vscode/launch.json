@@ -15,7 +15,7 @@
             "name": "Some File",
             "type": "python",
             "request": "launch",
-            "program": "test/test_LeastSquaresRegression.py",
+            "program": "test/test_regression.py",
             "console": "integratedTerminal"
         }
     ]

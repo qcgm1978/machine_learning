@@ -276,9 +276,9 @@ class Plot(DoStats):
         maxX = int(max(x))  
         maxY = int(max(y))
         myline = np.linspace(minX, maxX, maxY)
-        self.scatter()
         plt.plot(myline, mymodel(myline))
-        self.show()
+        self.setImgName()
+        return self
     def scatterDots(self,x,y):
         self.scatter(x,y)
         self.show()
@@ -328,7 +328,6 @@ class Plot(DoStats):
         plt.tight_layout()
         fname = "img/{0}.png".format(this_function_name)
         file=getPath(fname)
-       
         plt.savefig(file)
         enableShow and self.show()
         return self
@@ -421,10 +420,14 @@ class Plot(DoStats):
         return name
     def show(self):
         plt.show()
-        
     def plotFitLine(self,color=None):
         mymodel = self.getModel()
-        plt.plot(self.info["x"], mymodel,color=color)
+        x=self.info["x"]
+        y=mymodel
+        self.plotLine(x, y,color=color)
+        return self
+    def plotLine(self,x, y,color=None):
+        plt.plot(x, y,color=color)
         return self
     def format_fn(tick_val, tick_pos):
             if int(tick_val) ==0:

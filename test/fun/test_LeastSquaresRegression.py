@@ -30,7 +30,6 @@ class TDD_TEST_LEASTSQUARESREGRESSION(unittest.TestCase):
             .setXyFormat(
                 yFormat=lambda v,_:'$'+str(int(v))
             )\
-            .activate()\
             .saveAndShow()
         r = self.p.getR()
         self.assertAlmostEqual(r, .96, 2)
@@ -38,20 +37,41 @@ class TDD_TEST_LEASTSQUARESREGRESSION(unittest.TestCase):
         p = self.p.predict(x)
         self.assertAlmostEqual(p, 418.7,1)
         self.p.scatter(x,p).saveAndShow()
-        m,b,lineEquation=self.p.leastSquaresRegression()
+        m,b,lineEquation,fitVals,error=self.p.leastSquaresRegression()
         self.assertAlmostEqual(m,37.6,1)
         self.assertAlmostEqual(b,-296.1,1)
     def test_m_b(self):
         filePath = "data/sun_ice.csv"
         path = getPath(filePath)
         df=self.p.readCsv(path)
-        print(df)
-        x=df['"x"\nHours of Sunshine']
-        y=df['"y"\nIce Creams Sold']
+        # print(df)
+        x=df['x']
+        y=df['y']
+        predicted=df.iloc[:, 2]
+        err=df.iloc[:, 3]
+        equation=predicted.name
         self.assertEqual(len(x),5)
-        m,b,lineEquation=self.p.leastSquaresRegression(x,y)
-        self.assertAlmostEqual(m,1.5,1)
-        self.assertAlmostEqual(b,.3,1)
-        self.assertEqual(lineEquation,'y=1.5x+0.3')
+        m,b,lineEquation,fitVals,error=self.p.leastSquaresRegression(x,y,roundTo=3)
+        self.assertAlmostEqual(m,1.518,3)
+        self.assertAlmostEqual(b,.305,3)
+        self.assertEqual(lineEquation,'y = 1.518x + 0.305')
+        self.assertEqual(lineEquation,equation)
+        self.assertEqual(predicted.tolist(),list(map(lambda y:round(y,2),fitVals)))
+        self.assertEqual(err.tolist(),list(map(lambda e:round(e,2),error)))
+        self.p\
+            .scatter({"x": x, "y": y},s=100)\
+            .plotFitLine(color='#FF9700')\
+            .grid(x=True,y=True,color='#9F9F9F')\
+            .setXyLabel(xLabel='Temperature C',yLabel='Sales')\
+            .setXyLimits((0,10),(0,15))\
+            .setXyFormat(
+                yFormat=lambda v,_:None if int(v) % 5 else int(v),
+                xFormat=lambda v,_:None if int(v) % 5 else int(v)
+            )\
+            .activate()\
+            .saveAndShow()\
+            .freeze()
+        p=self.p.predict(8)
+        self.assertAlmostEqual(p,12.45,2)
 if __name__ == '__main__':
     unittest.main()
