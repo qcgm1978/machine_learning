@@ -6,6 +6,7 @@ from matplotlib.ticker import FuncFormatter, MaxNLocator
 from matplotlib import colors
 import matplotlib.patches as patches
 from matplotlib.patches import Polygon
+from pylab import arrow,grid
 from do_statistics.doStats import DoStats
 from utilities import getPath
 class Plot(DoStats):
@@ -17,6 +18,52 @@ class Plot(DoStats):
     xInterval=1
     def __init__(self):
         self.fig, self.ax = self.getFigAx()
+    def pltCartesianCoordinate(self,hideAxis=False,hasLimit=False):
+        ax = self.ax
+        # scatter(x,y, s=100 ,marker='o', c=color)
+        # [ plot( [dot_x,dot_x] ,[0,dot_y], '-', linewidth = 3 ) for dot_x,dot_y in zip(x,y) ] 
+        # [ plot( [0,dot_x] ,[dot_y,dot_y], '-', linewidth = 3 ) for dot_x,dot_y in zip(x,y) ]
+        left,right = ax.get_xlim()
+        low,high = ax.get_ylim()
+        arrow( left, 0, right -left, 0, length_includes_head = True, head_width = 0.15,color='#9F8DFF' )
+        arrow( 0, low, 0, high-low, length_includes_head = True, head_width = 0.15,color='#F78E9E' ) 
+        if hasLimit:
+            x=self.x
+            y=self.y
+            minX=min(x)
+            maxX=max(x)
+            minY=min(y)
+            maxY=max(y)
+            xs=[0,minX,maxX,0,0]
+            ys=[0,0,0,minY,maxY]
+            self.scatter(xs,ys)
+            annos=[]
+            for item in zip(xs,ys):
+                t=list(filter(lambda v:v!=0,item))
+                annos.append({'position': item, 'txt': int(t[0]) if len(t) else 0, 'color': 'black','fontsize':18,'center':'left','vertical':'top'})
+            self.drawTxt(annos)
+        if hideAxis:
+            ax.spines['left'].set_visible(False)
+            ax.spines['bottom'].set_visible(False)
+            # for major ticks
+            # ax.set_xticks([])
+            # ax.set_yticks([])
+            # for minor ticks
+            # ax.set_xticks([], minor=True)
+            # ax.set_yticks([], minor=True)
+            plt.tick_params(
+                axis='both',          # changes apply to the x-axis
+                which='both',      # both major and minor ticks are affected
+                # bottom=False,      # ticks along the bottom edge are off
+                # left=False,
+                # top=False,         # ticks along the top edge are off
+                labelbottom=False, # labels along the bottom edge are off
+                labelleft=False
+            ) # labels along the bottom edge are off
+        grid()
+        return self
+    def getLinspaceData(self,start,stop,count):
+        return np.linspace(start,stop,count)
     def grid(self,x=False,y=False,color='#7F1299'):
         y and self.ax.yaxis.grid(c=color)        
         x and self.ax.xaxis.grid(c=color)        
@@ -86,8 +133,13 @@ class Plot(DoStats):
         verts = [(a, 0)] + list(zip(ix, iy)) + [(b, 0)]
         poly = Polygon(verts, facecolor=facecolor, edgecolor='0.5')
         ax.add_patch(poly)
-    def getXyData(self,ax=None,**kwargs):
-        x,y = self.getProbabilityDensity(**kwargs)
+    def getYByFunc(self,x,coefs):
+        y=np.polyval(coefs,x)
+        return y
+    def getXyData(self,ax=None,func=None,**kwargs):
+        if func is None:
+            func=self.getProbabilityDensity
+        x,y = func(**kwargs)
         if ax is None:
             if self.ax is None:
                 fig, ax = plt.subplots()
@@ -365,17 +417,20 @@ class Plot(DoStats):
         if not isinstance(annotation,(list,tuple)):
             annotation=[annotation]
         for anno in annotation:
-            d={'hasLine':False,'fontsize':14,'center':'center','color':'red',**anno}
+            d={'hasLine':False,'fontsize':14,'center':'center','color':'red','vertical':'baseline',**anno}
             txt=d['txt']
             if isinstance(d['txt'], str):
                 txt=[d['txt']]
             strings = [str(item) for item in txt] if isinstance(txt,list) else [str(txt)]
-            ax.text(d['position'][0], d['position'][1], "\n".join(strings),
-            horizontalalignment=d['center'],
-            fontsize=d['fontsize'],
-            # verticalalignment='top',
-            # transform=ax.transAxes,
-            color=d['color'])
+            ax.text(
+                d['position'][0], 
+                d['position'][1], "\n".join(strings),
+                horizontalalignment=d['center'],
+                fontsize=d['fontsize'],
+                verticalalignment=d['vertical'],
+                # transform=ax.transAxes,
+                color=d['color']
+            )
             if d['hasLine']:
                 self.plotLines(ax, d['position'][0], (d['position'][1]-.02,d['position'][1]), notHasOffset=True,color=self.black)
     def annotate(self,x,y,c='red',ax=None,arrowstyle="<->",linewidth=1,s='',fontsize=None,rotation=None,isScatter=False):
@@ -427,6 +482,8 @@ class Plot(DoStats):
         self.plotLine(x, y,color=color)
         return self
     def plotLine(self,x, y,color=None):
+        self.x=x
+        self.y=y
         plt.plot(x, y,color=color)
         return self
     def format_fn(tick_val, tick_pos):
