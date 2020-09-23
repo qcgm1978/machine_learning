@@ -76,17 +76,15 @@ class TDD_TEST_LEASTSQUARESREGRESSION(unittest.TestCase):
     def test_least_squares_definition(self):
         # A way of finding a "line of best fit" by making the total of the square of the errors as small as possible (which is why it is called "least squares").
         x, y = self.p.getSortedXyInt((0,10,10),(2.5,8,10))
-        annos=[]
-        for item in zip(x,y):
-            t='error'
-            annos.append({'position': item, 'txt': t, 'color': 'red','fontsize':18,'center':'left','vertical':'top'})
         lineX=reduce(lambda acc,item:acc+[list(item)],zip(x,x),[])
         self.assertRaises(ValueError,lambda:self.p.predict(x))
-        predictY=self.p.leastSquaresRegression(x,y)[3]
+        self.p.setInfo({'x':x,'y':y})
+        predictY=self.p.predict(x)
         lineY=reduce(lambda acc,item:acc+[list(item)],zip(y,predictY),[])
+        annos=self.p.getAnnos(zip(x,y),predictY)
         self.p\
             .clear()\
-            .scatter({"x":x, "y": y},s=100)\
+            .scatter(s=100)\
             .plotFitLine(color='#FF9700')\
             .drawTxt(annos)\
             .plotLine(lineX,lineY,isSeparate=True)\
@@ -97,6 +95,5 @@ class TDD_TEST_LEASTSQUARESREGRESSION(unittest.TestCase):
         # self.p\
         #     .plotLine(x,y)\
         #     .pltCartesianCoordinate(hideAxis=True,hasLimit=True)\
-
 if __name__ == '__main__':
     unittest.main()
