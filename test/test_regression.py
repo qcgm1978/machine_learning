@@ -3,9 +3,9 @@ import os
 PACKAGE_PARENT = '..'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
-from datatype import DataTypes
 import numpy as np
-import unittest
+import unittest,pandas
+from datatype import DataTypes
 class TDD_REGRESSION(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -16,7 +16,6 @@ class TDD_REGRESSION(unittest.TestCase):
         """
         super(TDD_REGRESSION, cls).setUpClass()
         cls.d = DataTypes({'x': X, 'y': y})
-        # cls.the_resource = get_some_resource()
     def test_regression(self):
         x = [1, 2, 3, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 18, 19, 21, 22]
         y = [100, 90, 80, 60, 60, 55, 60, 65, 70,
@@ -46,30 +45,34 @@ class TDD_REGRESSION(unittest.TestCase):
         file = "data/cars.csv"
         # predict the CO2 emission of a car where the weight is 2300kg, and the volume is 1300ccm:
         predictVals = [2300, 1300]
-        predict = self.d.predictMultipleRegression(file, predictVals)
+        predict = self.d.predictMultipleRegression( predictVals,file=file,isStandard=True)
+        self.assertIsInstance(self.d.df,pandas.core.frame.DataFrame)
         self.assertAlmostEqual(predict[0], 107.209, 3)
         self.assertEqual(
-            list(map(lambda x: round(x, 3), predict[1])), [0.008, 0.008])
-        predictVals1 = [v if i else v + 1 for (i, v) in enumerate(predictVals)]
-        self.assertEqual(predictVals1, [2301, 1300])
-        predict1 = self.d.predictMultipleRegression(file, predictVals1)
+            list(map(lambda x: round(x, 4), predict[1])), [0.0076, 0.0078])
+        self.assertEqual(predict[2],[('Weight', 2300, 0.0076), ('Volume', 1300, 0.0078)])
+        predictVals1 = predictVals.copy()
+        predictVals1[0]+=1
+        predict1 = self.d.predictMultipleRegression( predictVals1)
+        predict1_1=self.d.predictByIncrement([('Weight',1)])
         # These values tell us that if the weight increase by 1kg, the CO2 emission increases by 0.00755095g.
-        self.assertAlmostEqual(predict1[0], predict[0]+predict[1][0], 3)
+        self.assertAlmostEqual(predict1[0],predict[0]+.00755095)
+        self.assertAlmostEqual(predict1[0],predict1_1)
         # And if the engine size (Volume) increases by 1 ccm, the CO2 emission increases by 0.00780526 g.
-        predictVals2 = [v+1 if i else v for (i, v) in enumerate(predictVals)]
-        self.assertEqual(predictVals2, [2300, 1301])
-        predict2 = self.d.predictMultipleRegression(file, predictVals2)
-        self.assertAlmostEqual(predict2[0], predict[0] + predict[1][1], 3)
-        predictVals3 = [v+1 for (i, v) in enumerate(predictVals)]
-        self.assertEqual(predictVals3, [2301, 1301])
-        predict3 = self.d.predictMultipleRegression(file, predictVals3)
-        self.assertAlmostEqual(predict3[0], predict[0] + sum(predict[1]), 3)
-        predictVals4 = [v if i else v +
-                        1000 for (i, v) in enumerate(predictVals)]
-        self.assertEqual(predictVals4, [3300, 1300])
-        predict4 = self.d.predictMultipleRegression(file, predictVals4)
-        self.assertAlmostEqual(
-            predict4[0], predict[0] + predict[1][0] * 1000, 3)
+        predictVals2 = predictVals.copy()
+        predictVals2[1]+=1
+        predict2 = self.d.predictMultipleRegression( predictVals2)
+        predict2_1=self.d.predictByIncrement(('Volume',1))
+        self.assertAlmostEqual(predict2[0], predict2_1)
+        predict3 = self.d.predictByIncrement([('Volume',1),('Weight',1)])
+        self.assertEqual(predict3, predict[0] + sum(predict[1]))
+        varIncrease = 1000
+        predict4=self.d.predictByIncrement(('Weight',varIncrease))
+        predict5=self.d.predictByIncrement(('Volume',varIncrease))
+        self.assertEqual(
+            predict4, predict[0] + predict[1][0] *varIncrease , 3)
+        self.assertEqual(
+            predict5, predict[0] + predict[1][1] *varIncrease , 3)
     def test_scale(self):
         file = "data/cars.csv"
         scaleCols = ['Weight', 'Volume']

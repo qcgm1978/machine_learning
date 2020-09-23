@@ -10,14 +10,32 @@ class Predict(DoStats,DecisionTree):
     def predictbyDecisionTree(self,features,condition, y=None):
         dtree=self.getDtree(features,y)
         return dtree.predict([condition])
-    def predictMultipleRegression(self, file, predictVals):
+    def predictMultipleRegression(self, predictVals, file=None,isStandard=False):
+        if file is None:
+            file=self.file
+        # Tip: It is common to name the list of independent values with a upper case X, and the list of dependent values with a lower case y.
         X = self.info["x"]
         y = self.info["y"]
         df = self.readCsv(file)
         regr = linear_model.LinearRegression()
-        regr.fit(df[X], df[y])
+        dfX = df[X]
+        dfY = df[y]
+        regr.fit(dfX, dfY)
         predict = regr.predict([predictVals])
-        return predict[0], list(regr.coef_)
+        coef_ = list(regr.coef_)
+        self.file=file
+        if isStandard:
+            self.predict = predict
+            self.coef_=coef_
+        return predict[0], coef_,list(zip(X,predictVals,np.round(regr.coef_,4)))
+    def predictByIncrement(self,increment):
+        if isinstance(increment,tuple):
+            increment=[increment]
+        incre=0
+        for item in increment:
+            ind=self.info["x"].index(item[0])
+            incre+=self.coef_[ind]*item[1]
+        return self.predict[0]+incre
     def predictScale(self, file, toTransformVals):
         df = self.readCsv(file)
         X = df[self.info["x"]]
