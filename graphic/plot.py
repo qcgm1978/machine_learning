@@ -18,6 +18,14 @@ class Plot(DoStats):
     xInterval=1
     def __init__(self):
         self.fig, self.ax = self.getFigAx()
+    def setInfo(self,info):
+        self.info=info
+    def getAnnos(self,data,predictY):
+        annos=[]
+        for i,item in enumerate(data):
+            t='error'
+            annos.append({'position': item, 'txt': t, 'color': 'red','fontsize':18,'center':'left','vertical':'bottom' if item[1]<predictY[i] else 'top'})
+        return annos
     def pltCartesianCoordinate(self,hideAxis=False,hasLimit=False):
         ax = self.ax
         # scatter(x,y, s=100 ,marker='o', c=color)
