@@ -6,8 +6,17 @@ sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 from datatype import DataTypes
 import numpy as np
 import unittest
-import pandas
 class TDD_REGRESSION(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        X = ['Weight', 'Volume']
+        y = 'CO2'
+        """ to avoid calling it for each test use setUpClass()
+            and store the result as class variable
+        """
+        super(TDD_REGRESSION, cls).setUpClass()
+        cls.d = DataTypes({'x': X, 'y': y})
+        # cls.the_resource = get_some_resource()
     def test_regression(self):
         x = [1, 2, 3, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 18, 19, 21, 22]
         y = [100, 90, 80, 60, 60, 55, 60, 65, 70,
@@ -30,38 +39,35 @@ class TDD_REGRESSION(unittest.TestCase):
         y = [21, 46, 3, 35, 67, 95, 53, 72, 58, 10,
              26, 34, 90, 33, 38, 20, 56, 2, 47, 15]
         d = DataTypes({'x': x, 'y': y})
-        d.scatter().polynomialRegressionLine().saveAndShow(enableShow=True).freeze()
+        d.scatter().polynomialRegressionLine().saveAndShow().freeze()
         r = d.getRSquared()
         self.assertAlmostEqual(r, .00995, 5)
     def test_multiple_regression(self):
         file = "data/cars.csv"
-        X = ['Weight', 'Volume']
-        y = 'CO2'
         # predict the CO2 emission of a car where the weight is 2300kg, and the volume is 1300ccm:
         predictVals = [2300, 1300]
-        d = DataTypes({'x': X, 'y': y})
-        predict = d.predictMultipleRegression(file, predictVals)
+        predict = self.d.predictMultipleRegression(file, predictVals)
         self.assertAlmostEqual(predict[0], 107.209, 3)
         self.assertEqual(
             list(map(lambda x: round(x, 3), predict[1])), [0.008, 0.008])
         predictVals1 = [v if i else v + 1 for (i, v) in enumerate(predictVals)]
         self.assertEqual(predictVals1, [2301, 1300])
-        predict1 = d.predictMultipleRegression(file, predictVals1)
+        predict1 = self.d.predictMultipleRegression(file, predictVals1)
         # These values tell us that if the weight increase by 1kg, the CO2 emission increases by 0.00755095g.
         self.assertAlmostEqual(predict1[0], predict[0]+predict[1][0], 3)
         # And if the engine size (Volume) increases by 1 ccm, the CO2 emission increases by 0.00780526 g.
         predictVals2 = [v+1 if i else v for (i, v) in enumerate(predictVals)]
         self.assertEqual(predictVals2, [2300, 1301])
-        predict2 = d.predictMultipleRegression(file, predictVals2)
+        predict2 = self.d.predictMultipleRegression(file, predictVals2)
         self.assertAlmostEqual(predict2[0], predict[0] + predict[1][1], 3)
         predictVals3 = [v+1 for (i, v) in enumerate(predictVals)]
         self.assertEqual(predictVals3, [2301, 1301])
-        predict3 = d.predictMultipleRegression(file, predictVals3)
+        predict3 = self.d.predictMultipleRegression(file, predictVals3)
         self.assertAlmostEqual(predict3[0], predict[0] + sum(predict[1]), 3)
         predictVals4 = [v if i else v +
                         1000 for (i, v) in enumerate(predictVals)]
         self.assertEqual(predictVals4, [3300, 1300])
-        predict4 = d.predictMultipleRegression(file, predictVals4)
+        predict4 = self.d.predictMultipleRegression(file, predictVals4)
         self.assertAlmostEqual(
             predict4[0], predict[0] + predict[1][0] * 1000, 3)
     def test_scale(self):
