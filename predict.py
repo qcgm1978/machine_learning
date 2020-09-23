@@ -36,6 +36,8 @@ class Predict(DoStats,DecisionTree):
         self.degree=4
         return self.predictPolynomialRegression(predictX)
     def predict(self, predictX):
+        if not hasattr(self,'info'):
+            raise ValueError("self.info without value")
         # slope, intercept, r, p, std_err = self.getLinregress()
         slope, intercept,lineEquation,fitVals,error = self.leastSquaresRegression()
         return slope * predictX + intercept
@@ -74,7 +76,6 @@ class Predict(DoStats,DecisionTree):
     def getR(self):
         slope, intercept, r, p, std_err = self.getLinregress()
         return r
-    
     def getPolynomialModel(self):
         x = self.info["x"]
         y = self.info["y"]

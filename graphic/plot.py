@@ -61,6 +61,7 @@ class Plot(DoStats):
                 labelleft=False
             ) # labels along the bottom edge are off
         grid()
+        self.setImgName()
         return self
     def getLinspaceData(self,start,stop,count):
         return np.linspace(start,stop,count)
@@ -92,7 +93,7 @@ class Plot(DoStats):
         y=np.linspace(0,600,4)
         self.ax.set_yticks(y)
         self.ax.tick_params(axis='y', colors='#7F1299',labelsize=20)
-        self.this_function_name = inspect.currentframe().f_code.co_name
+        self.setImgName()
         self.saveAndShow()
     def plotEvolution(self,l):
         t=self.getEvolutiveData(l)
@@ -220,7 +221,7 @@ class Plot(DoStats):
         self.drawGridLines(ax,x,y,density)
         n, bins, rects=self.plotHist(l,bars,labels,y,density=density,facecolor=facecolor)
         self.setAxes(ax,x,y,yLable,format_fn,plt)
-        self.plotLines(ax, mean, y, density)
+        self.plotLines( mean, y, density)
         if annotation is None and y and mean:
             annotation = [{
                 'txt': 'Average = {0}'.format(mean),
@@ -230,7 +231,7 @@ class Plot(DoStats):
         self.drawTxt(annotation)
         if callable(callback):
             callback(plt,ax,np,bins)
-        self.this_function_name = inspect.currentframe().f_code.co_name
+        self.setImgName()
         return self
     def setBarsCol(self,N, bins, patches):
         length=len(patches)
@@ -252,7 +253,7 @@ class Plot(DoStats):
                 if nextPatch.xy[0] > i:
                     color=self.cutLineCol if hasattr(self,'cutLineCol') else self.white
             thispatch.set_facecolor(color)
-    def plotLines(self, ax, mean, y,notHasOffset,color=None):
+    def plotLines(self, mean, y,notHasOffset,color=None):
         if y is None or mean is None:
             return
         if color is None:
@@ -303,7 +304,7 @@ class Plot(DoStats):
                     else:
                         r.set_height(height)
         labels and ax.legend(loc='upper right')
-        self.this_function_name = inspect.currentframe().f_code.co_name
+        self.setImgName()
         return n, bins, rects
     def drawGridLines(self, ax, x, y,density):
         if y is None or density:
@@ -364,8 +365,10 @@ class Plot(DoStats):
                 return ''
         self.x_format_fn=format_fn
         self.setLables(ax, labels)
-        this_function_name = inspect.currentframe().f_code.co_name
-        self.saveAndShow(this_function_name)
+        self.setImgName()
+    def clear(self):
+        self.ax.clear()
+        return self
     def saveAndShow(self, this_function_name=None, enableShow=False):
         if Plot.isFreezing:
             return self
@@ -432,7 +435,8 @@ class Plot(DoStats):
                 color=d['color']
             )
             if d['hasLine']:
-                self.plotLines(ax, d['position'][0], (d['position'][1]-.02,d['position'][1]), notHasOffset=True,color=self.black)
+                self.plotLines(d['position'][0], (d['position'][1]-.02,d['position'][1]), notHasOffset=True,color=self.black)
+        return self
     def annotate(self,x,y,c='red',ax=None,arrowstyle="<->",linewidth=1,s='',fontsize=None,rotation=None,isScatter=False):
         if ax is None:
             ax=self.ax
@@ -476,14 +480,18 @@ class Plot(DoStats):
     def show(self):
         plt.show()
     def plotFitLine(self,color=None):
-        mymodel = self.getModel()
         x=self.info["x"]
-        y=mymodel
+        y = self.getModel()
         self.plotLine(x, y,color=color)
+        self.setImgName()
         return self
-    def plotLine(self,x, y,color=None):
+    def plotLine(self,x, y,color=None,isSeparate=False):
         self.x=x
         self.y=y
+        if isSeparate:
+            #  two-dimensional (in that case, the columns represent separate data sets).
+            x=np.transpose( x)
+            y=np.transpose( y)
         plt.plot(x, y,color=color)
         return self
     def format_fn(tick_val, tick_pos):
@@ -562,6 +570,6 @@ class Plot(DoStats):
         else:
             ax.fill_between(x, y, color='#0080CF', alpha=1)
         callable(callback) and callback(ax,plt)
-        self.this_function_name = inspect.currentframe().f_code.co_name
+        self.setImgName()
         return self
 Plot.isFreezing=False

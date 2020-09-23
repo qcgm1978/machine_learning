@@ -5,6 +5,7 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(
     os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 import unittest
+from functools import reduce
 from graphic.plot import Plot
 from predict import Predict
 from data.handle_data import HandleData
@@ -68,10 +69,34 @@ class TDD_TEST_LEASTSQUARESREGRESSION(unittest.TestCase):
                 yFormat=lambda v,_:None if int(v) % 5 else int(v),
                 xFormat=lambda v,_:None if int(v) % 5 else int(v)
             )\
-            .activate()\
             .saveAndShow()\
             .freeze()
         p=self.p.predict(8)
         self.assertAlmostEqual(p,12.45,2)
+    def test_least_squares_definition(self):
+        # A way of finding a "line of best fit" by making the total of the square of the errors as small as possible (which is why it is called "least squares").
+        x, y = self.p.getSortedXyInt((0,10,10),(2.5,8,10))
+        annos=[]
+        for item in zip(x,y):
+            t='error'
+            annos.append({'position': item, 'txt': t, 'color': 'red','fontsize':18,'center':'left','vertical':'top'})
+        lineX=reduce(lambda acc,item:acc+[list(item)],zip(x,x),[])
+        self.assertRaises(ValueError,lambda:self.p.predict(x))
+        predictY=self.p.leastSquaresRegression(x,y)[3]
+        lineY=reduce(lambda acc,item:acc+[list(item)],zip(y,predictY),[])
+        self.p\
+            .clear()\
+            .scatter({"x":x, "y": y},s=100)\
+            .plotFitLine(color='#FF9700')\
+            .drawTxt(annos)\
+            .plotLine(lineX,lineY,isSeparate=True)\
+            .saveAndShow()\
+            .freeze()
+        # x=self.p.getLinspaceData(0,10,10)
+        # y=self.p.getYByFunc(x,[1,2.5])
+        # self.p\
+        #     .plotLine(x,y)\
+        #     .pltCartesianCoordinate(hideAxis=True,hasLimit=True)\
+
 if __name__ == '__main__':
     unittest.main()
