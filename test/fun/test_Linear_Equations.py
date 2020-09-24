@@ -1,6 +1,5 @@
 import sys
 import os
-
 from numpy.lib.function_base import append
 PACKAGE_PARENT = '../..'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(
@@ -21,12 +20,12 @@ class TDD_TEST_LINEAR_EQUATIONS(unittest.TestCase):
         equation='y = 2x + 1'
         coefs=self.d.getCoefs(equation)
         intercepts=self.d.getIntercept(coefs)
-        
-        x=self.d.getLinspaceData(-2,3,50)
+        append = [-1,1,2]
+        x=self.d.getLinspaceData(-2,3,50,append=append)
         y=self.d.getYByFunc(x,coefs)
         self.d\
             .plotLine(x,y)\
-            .pltCartesianCoordinate(hasLimit=True,intercepts=intercepts)\
+            .pltCartesianCoordinate(hasLimit=True,intercepts=intercepts,other=append)\
             .saveAndShow()
 if __name__ == '__main__':
     unittest.main()

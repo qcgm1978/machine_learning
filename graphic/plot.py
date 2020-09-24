@@ -26,7 +26,7 @@ class Plot(DoStats):
             t='error'
             annos.append({'position': item, 'txt': t, 'color': 'red','fontsize':18,'center':'left','vertical':'bottom' if item[1]<predictY[i] else 'top'})
         return annos
-    def pltCartesianCoordinate(self,hideAxis=False,hasLimit=False,intercepts=None):
+    def pltCartesianCoordinate(self,hideAxis=False,hasLimit=False,intercepts=None,other=None):
         ax = self.ax
         left,right = ax.get_xlim()
         low,high = ax.get_ylim()
@@ -41,21 +41,35 @@ class Plot(DoStats):
             maxY=max(y)
             xs=[0,minX,maxX,0,0]
             ys=[0,0,0,minY,maxY]
-            if intercepts:
-                xs+=list(map(lambda item:item[0],intercepts))
-                ys+=list(map(lambda item:item[1],intercepts))
+            if intercepts is None:
+                intercepts=[]
+            if other is None:
+                other =[]
+            otherData=intercepts+other
+            for item in otherData:
+                if isinstance(item,list):
+                    xs.append(item[0])
+                    ys.append(item[1])
+                else:
+                    ind=np.where(x==item)
+                    yInd=y[ind]
+                    xs.append(item)
+                    ys.append(yInd[0])
             self.scatter(xs,ys)
             annos=[]
-            for item in zip(xs,ys):
-                t=list(filter(lambda v:v!=0,item))
-                if len(t):
-                    intT=int(t[0])
-                    if intT==t[0]:
-                        txt=intT
-                    else:
-                        txt=t[0]
+            for item in zip(xs,list(ys)):
+                if item[0] in other:
+                    txt='({0:.{2}f},{1:.{2}f})'.format(item[0],item[1],0)
                 else:
-                    txt= 0
+                    t=list(filter(lambda v:v!=0,item))
+                    if len(t):
+                        intT=int(t[0])
+                        if intT==t[0]:
+                            txt=intT
+                        else:
+                            txt=t[0]
+                    else:
+                        txt= 0
                 annos.append({'position': item, 'txt': txt, 'color': 'black','fontsize':18,'center':'left','vertical':'top'})
             self.drawTxt(annos)
         if hideAxis:
