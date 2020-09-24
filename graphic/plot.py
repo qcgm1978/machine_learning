@@ -26,11 +26,8 @@ class Plot(DoStats):
             t='error'
             annos.append({'position': item, 'txt': t, 'color': 'red','fontsize':18,'center':'left','vertical':'bottom' if item[1]<predictY[i] else 'top'})
         return annos
-    def pltCartesianCoordinate(self,hideAxis=False,hasLimit=False):
+    def pltCartesianCoordinate(self,hideAxis=False,hasLimit=False,intercepts=None):
         ax = self.ax
-        # scatter(x,y, s=100 ,marker='o', c=color)
-        # [ plot( [dot_x,dot_x] ,[0,dot_y], '-', linewidth = 3 ) for dot_x,dot_y in zip(x,y) ] 
-        # [ plot( [0,dot_x] ,[dot_y,dot_y], '-', linewidth = 3 ) for dot_x,dot_y in zip(x,y) ]
         left,right = ax.get_xlim()
         low,high = ax.get_ylim()
         arrow( left, 0, right -left, 0, length_includes_head = True, head_width = 0.15,color='#9F8DFF' )
@@ -44,35 +41,43 @@ class Plot(DoStats):
             maxY=max(y)
             xs=[0,minX,maxX,0,0]
             ys=[0,0,0,minY,maxY]
+            if intercepts:
+                xs+=list(map(lambda item:item[0],intercepts))
+                ys+=list(map(lambda item:item[1],intercepts))
             self.scatter(xs,ys)
             annos=[]
             for item in zip(xs,ys):
                 t=list(filter(lambda v:v!=0,item))
-                annos.append({'position': item, 'txt': int(t[0]) if len(t) else 0, 'color': 'black','fontsize':18,'center':'left','vertical':'top'})
+                if len(t):
+                    intT=int(t[0])
+                    if intT==t[0]:
+                        txt=intT
+                    else:
+                        txt=t[0]
+                else:
+                    txt= 0
+                annos.append({'position': item, 'txt': txt, 'color': 'black','fontsize':18,'center':'left','vertical':'top'})
             self.drawTxt(annos)
         if hideAxis:
             ax.spines['left'].set_visible(False)
             ax.spines['bottom'].set_visible(False)
-            # for major ticks
-            # ax.set_xticks([])
-            # ax.set_yticks([])
-            # for minor ticks
-            # ax.set_xticks([], minor=True)
-            # ax.set_yticks([], minor=True)
             plt.tick_params(
                 axis='both',          # changes apply to the x-axis
                 which='both',      # both major and minor ticks are affected
-                # bottom=False,      # ticks along the bottom edge are off
-                # left=False,
-                # top=False,         # ticks along the top edge are off
                 labelbottom=False, # labels along the bottom edge are off
                 labelleft=False
-            ) # labels along the bottom edge are off
+            ) 
         grid()
         self.setImgName()
         return self
-    def getLinspaceData(self,start,stop,count):
-        return np.linspace(start,stop,count)
+    def getLinspaceData(self,start,stop,count,append=None):
+        lin=np.linspace(start,stop,count)
+        if append:
+            if not isinstance(append,list):
+                append=[append]
+            for item in append:
+                lin=np.append(lin,item)
+        return lin
     def grid(self,x=False,y=False,color='#7F1299'):
         y and self.ax.yaxis.grid(c=color)        
         x and self.ax.xaxis.grid(c=color)        

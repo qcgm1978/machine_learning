@@ -15,7 +15,7 @@
             "name": "Some File",
             "type": "python",
             "request": "launch",
-            "program": "test/test_regression.py",
+            "program": "test/fun/test_Linear_Equations.py",
             "console": "integratedTerminal"
         }
     ]
