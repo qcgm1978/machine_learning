@@ -18,8 +18,10 @@ class TDD_TEST_LINEAR_EQUATIONS(unittest.TestCase):
         cls.d = PlotAI()
     def test_test_Linear_Equations(self):
         equation='y = 2x + 1'
+        equation='y = 3x - 6'
         coefs=self.d.getCoefs(equation)
         intercepts=self.d.getIntercept(coefs)
+        print(intercepts)
         append = [-1,1,2]
         x=self.d.getLinspaceData(-2,3,50,append=append)
         y=self.d.getYByFunc(x,coefs)
