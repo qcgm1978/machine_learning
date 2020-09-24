@@ -4,14 +4,13 @@ class DoMath(DoNumpy):
     def getIntercept(self,coefs):
         xIntercept = -coefs[1]/coefs[0]
         yIntercept = coefs[1]
-        # print(xIntercept,yIntercept)
         return [[xIntercept,0],[0,yIntercept]]
     def solve_linear(self,A,B):
         if len(np.array(A).shape) == 1:
             A=[A]
         return np.linalg.solve(A,B)
     def getCoefs(self,s):
-        l=re.findall(r'\d+(?=x)|[+-]\s*\d+(?!x)',s)
+        l=re.findall(r'\d+(?=x)|[+-]?\s*\d+(?!x)',s)
         intL=map(lambda item:float(re.sub(r'\s+','',item)),l)
         return list(intL)
     def getVariables(self,l):
