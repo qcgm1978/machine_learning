@@ -20,12 +20,17 @@ class Plot(DoStats):
         self.fig, self.ax = self.getFigAx()
     def setInfo(self,info):
         self.info=info
-    def getAnnos(self,data,predictY):
+    def getAnnos(self,data,txt='error',predictY=None):
+        if len(np.array(data).shape)==1:
+            data=[data]
         annos=[]
         for i,item in enumerate(data):
-            t='error'
-            annos.append({'position': item, 'txt': t, 'color': 'red','fontsize':18,'center':'left','vertical':'bottom' if item[1]<predictY[i] else 'top'})
+            t=txt
+            annos.append({'position': item, 'txt': t, 'color': 'red','fontsize':18,'center':'left','vertical':'bottom' if predictY and item[1]<predictY[i] else 'top'})
         return annos
+    def pltArrow(self,x1,y1,dx,dy,color='#9F8DFF',head_width = 0.15):
+        arrow( x1, y1, dx, dy, length_includes_head = True, head_width = head_width,color=color)
+        return self
     def pltCartesianCoordinate(self,hideAxis=False,hasLimit=False,intercepts=None,other=None):
         ax = self.ax
         left,right = ax.get_xlim()
@@ -447,7 +452,7 @@ class Plot(DoStats):
         if not isinstance(annotation,(list,tuple)):
             annotation=[annotation]
         for anno in annotation:
-            d={'hasLine':False,'fontsize':14,'center':'center','color':'red','vertical':'baseline',**anno}
+            d={'hasLine':False,'fontsize':14,'center':'center','color':'red','vertical':'baseline','rotation':None,**anno}
             txt=d['txt']
             if isinstance(d['txt'], str):
                 txt=[d['txt']]
@@ -459,7 +464,8 @@ class Plot(DoStats):
                 fontsize=d['fontsize'],
                 verticalalignment=d['vertical'],
                 # transform=ax.transAxes,
-                color=d['color']
+                color=d['color'],
+                rotation=d['rotation']
             )
             if d['hasLine']:
                 self.plotLines(d['position'][0], (d['position'][1]-.02,d['position'][1]), notHasOffset=True,color=self.black)

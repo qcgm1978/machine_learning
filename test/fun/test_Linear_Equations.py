@@ -19,15 +19,37 @@ class TDD_TEST_LINEAR_EQUATIONS(unittest.TestCase):
     def test_test_Linear_Equations(self):
         equation='y = 2x + 1'
         equation='y = 3x - 6'
+        # equation='5x = 6'
         coefs=self.d.getCoefs(equation)
         intercepts=self.d.getIntercept(coefs)
-        print(intercepts)
         append = [-1,1,2]
         x=self.d.getLinspaceData(-2,3,50,append=append)
         y=self.d.getYByFunc(x,coefs)
+        
+        start=intercepts[1].copy()
+        start[0]+=2
+        dxy=[-2,0]
+        annos=[{
+            'position':intercepts[1],
+            'txt':'m',
+            'fontsize':20,
+            'rotation':45,
+            'color':'#0081E7',
+            'center':'right'
+        },{
+            'position':start,
+            'txt':'b',
+            'fontsize':20,
+            'color':'#23A200',
+            'vertical':'center',
+            'center':'left'
+        }]
+        print(annos)
         self.d\
-            .plotLine(x,y)\
+            .plotLine(x,y,color=annos[0]['color'])\
             .pltCartesianCoordinate(hasLimit=True,intercepts=intercepts,other=append)\
-            .saveAndShow()
+            .pltArrow(*start,*dxy,color='#23A200',head_width=.3)\
+            .drawTxt(annos)\
+            .saveAndShow('pltCartesianCoordinate')
 if __name__ == '__main__':
     unittest.main()
