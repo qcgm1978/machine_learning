@@ -64,10 +64,12 @@ class HandleData(DoMath, MysqlOp):
         img = pltimg.imread(img)
         imgplot = plt.imshow(img)
         return self
-    def scale(self, file, scaleCols):
+    def scale(self, file, ScaleCols=None):
+        if ScaleCols is None:
+            ScaleCols=self.info['x']
         scale = StandardScaler()
         df = self.readCsv(file)
-        X = df[scaleCols]
+        X = df[ScaleCols]
         scaledX = scale.fit_transform(X)
         return scaledX
     def readCsv(self, file):

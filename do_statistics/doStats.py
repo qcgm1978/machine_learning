@@ -5,8 +5,24 @@ from scipy.stats import ttest_ind_from_stats
 import re, math,warnings, numpy as np
 from functools import reduce
 class DoStats(object):
+    def getBayesByMore(self,s,target):
+        l=re.findall(r'(\w+).+?(\d+).+(\d+)%',s)
+        lFloat=list(map(lambda item:tuple(float(i) if re.search(r'\d+',i) else i for i in item ),l))
+        A=next(item for item in lFloat if item[0]==target)
+        total=reduce(lambda acc,item: acc+item[1],lFloat,0)
+        PA=A[1]/total
+        return PA
+    def getCatAllergy(self,done,undone,percentAll):
+        PA=percentAll
+        PBA=done
+        PB=percentAll*done+(1-percentAll)*undone
+        return self.getBayes(PA,PBA,PB)
     def polyfit(self,x,y):
         return np.polyfit(x,y,2)
+    def getBayes(self,PA,PBA,PB,isPercent=False):
+        # P(A|B) =  P(A) * P(B|A) / P(B)
+        val = PA*PBA/PB
+        return str(val*100)+'%' if isPercent else val
     def getPdf(self,x, mu, sigma):
         # y=((1 / (np.sqrt(2 * np.pi) * σ)) * np.exp(-0.5 * (1 / σ * (zScore - μ))**2))
         return stats.norm.pdf(x, mu, sigma)

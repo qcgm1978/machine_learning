@@ -75,9 +75,7 @@ class TDD_REGRESSION(unittest.TestCase):
             predict5, predict[0] + predict[1][1] *varIncrease , 3)
     def test_scale(self):
         file = "data/cars.csv"
-        scaleCols = ['Weight', 'Volume']
-        d = DataTypes()
-        scale = d.scale(file, scaleCols)
+        scale = self.d.scale(file)
         # print(scale)
         self.assertIsInstance(scale, np.ndarray)
         # To get the number of dimensions, shape (size of each dimension) and size (number of all elements) of NumPy array, use attributes ndim , shape , and size of numpy. ndarray .
@@ -89,10 +87,7 @@ class TDD_REGRESSION(unittest.TestCase):
         self.assertEqual(e, [-2.1, -1.59])
     def test_scale_predict(self):
         file = "data/cars2.csv"
-        X = ['Weight', 'Volume']
-        y = 'CO2'
-        d = DataTypes({'x': X, 'y': y})
-        p = d.predictScale(file, [2300, 1.3])
+        p = self.d.predictScale(file, [2300, 1.3],0)
         self.assertAlmostEqual(p[0], 107.209, 3)
     def test_test_model(self):
         np.random.seed(2)

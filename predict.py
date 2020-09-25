@@ -9,7 +9,7 @@ class Predict(DoStats,DecisionTree):
     degree=3
     def predictbyDecisionTree(self,features,condition, y=None):
         dtree=self.getDtree(features,y)
-        return dtree.predict([condition])
+        return self.regrPredict(dtree, condition)
     def predictMultipleRegression(self, predictVals, file=None,isStandard=False):
         if file is None:
             file=self.file
@@ -17,17 +17,25 @@ class Predict(DoStats,DecisionTree):
         X = self.info["x"]
         y = self.info["y"]
         df = self.readCsv(file)
-        regr = linear_model.LinearRegression()
         dfX = df[X]
         dfY = df[y]
-        regr.fit(dfX, dfY)
-        predict = regr.predict([predictVals])
+        regr, predict = self.predictByRegr(dfX, dfY, predictVals)
         coef_ = list(regr.coef_)
         self.file=file
         if isStandard:
             self.predict = predict
             self.coef_=coef_
         return predict[0], coef_,list(zip(X,predictVals,np.round(regr.coef_,4)))
+
+    def predictByRegr(self, dfX, dfY, predictVals):
+        regr = self.getRegr(dfX, dfY)
+        predict = self.regrPredict(regr, predictVals)
+        return regr, predict
+
+    def getRegr(self, dfX, dfY):
+        regr = linear_model.LinearRegression()
+        regr.fit(dfX, dfY)
+        return regr
     def predictByIncrement(self,increment):
         if isinstance(increment,tuple):
             increment=[increment]
@@ -36,17 +44,21 @@ class Predict(DoStats,DecisionTree):
             ind=self.info["x"].index(item[0])
             incre+=self.coef_[ind]*item[1]
         return self.predict[0]+incre
-    def predictScale(self, file, toTransformVals):
+    def predictScale(self, file, toTransformVals,predictIndex):
         df = self.readCsv(file)
         X = df[self.info["x"]]
         y = df[self.info["y"]]
         scale = StandardScaler()
         scaledX = scale.fit_transform(X)
-        regr = linear_model.LinearRegression()
-        regr.fit(scaledX, y)
         scaled = scale.transform([toTransformVals])
-        predict = regr.predict([scaled[0]])
+        val = scaled[predictIndex]
+        regr, predict = self.predictByRegr(scaledX, y, val)
         return predict[0], list(regr.coef_)
+
+    def regrPredict(self, regr, val):
+        if len(np.array(val).shape)==1:
+            val=[val]
+        return regr.predict(val)
     def predictPolynomialRegression(self, predictX):
         mymodel = self.getPolynomialModel()
         return mymodel(predictX)
