@@ -7,15 +7,14 @@ sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 import unittest
 from graphic.plot import Plot
 from mathMethods.doMath import DoMath
-from mysql_data.decorators_func import singleton
 from utilities import getPath,parseNumber
 class TDD_POLINOMIALS(unittest.TestCase):
-    @singleton
-    def setUp(self):
+    @classmethod
+    def setUpClass(self):
         class PlotAI(Plot,DoMath):
             def __init__(self,arg=None):
                 Plot.__init__(self)
-        self.__class__.p = PlotAI()
+        self.p = PlotAI()
     def test_polinomials(self):
         b=self.p.isPolynomial('4xy**2+3x-5')
         b1=self.p.isPolynomial('1/4xy**2+3x-5')

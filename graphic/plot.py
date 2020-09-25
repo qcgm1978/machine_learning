@@ -16,8 +16,10 @@ class Plot(DoStats):
     barCol=''
     ax=None
     xInterval=1
+    freezeIndex=0
     def __init__(self):
         self.fig, self.ax = self.getFigAx()
+        self.freezeIndex=0   
     def setInfo(self,info):
         self.info=info
     def getAnnos(self,data,txt='error',predictY=None):
@@ -28,7 +30,7 @@ class Plot(DoStats):
             t=txt
             annos.append({'position': item, 'txt': t, 'color': 'red','fontsize':18,'center':'left','vertical':'bottom' if predictY and item[1]<predictY[i] else 'top'})
         return annos
-    def pltArrow(self,x1,y1,dx,dy,color='#9F8DFF',head_width = 0.15):
+    def arrow(self,x1,y1,dx,dy,color='#9F8DFF',head_width = 0.15):
         arrow( x1, y1, dx, dy, length_includes_head = True, head_width = head_width,color=color)
         return self
     def pltCartesianCoordinate(self,hideAxis=False,hasLimit=False,intercepts=None,other=None):
@@ -166,9 +168,7 @@ class Plot(DoStats):
         verts = [(a, 0)] + list(zip(ix, iy)) + [(b, 0)]
         poly = Polygon(verts, facecolor=facecolor, edgecolor='0.5')
         ax.add_patch(poly)
-    def getYByFunc(self,x,coefs):
-        y=np.polyval(coefs,x)
-        return y
+    
     def getXyData(self,ax=None,func=None,**kwargs):
         if func is None:
             func=self.getProbabilityDensity
@@ -353,10 +353,9 @@ class Plot(DoStats):
                 ax.add_patch(sq)
         ax.relim()
         ax.autoscale_view()
-    def polynomialRegressionLine(self):
-        x = self.info["x"]
-        y = self.info["y"]
-        mymodel = np.poly1d(np.polyfit(x, y, 3))
+    def polynomialRegressionLine(self,dataType='None'):
+        x,y=self.getData(dataType)
+        mymodel = np.poly1d(np.polyfit(x, y, 4))
         minX = int(min(x))
         maxX = int(max(x))  
         maxY = int(max(y))
@@ -399,16 +398,18 @@ class Plot(DoStats):
         self.setLables(ax, labels)
         self.setImgName()
     def clear(self):
-        self.ax.clear()
+        # self.ax.clear()
+        # self.fig.clear()
+        plt.clf()
         return self
     def saveAndShow(self, this_function_name=None, enableShow=False):
-        if Plot.isFreezing:
+        if self.freezeIndex<Plot.freezeIndex:
             return self
         if this_function_name is None:
             if hasattr(self,'this_function_name'):
                 this_function_name=self.this_function_name
             else:
-                this_function_name='drawFunction'
+                this_function_name='demo'
         # Hide the right and top spines
         self.ax.spines['right'].set_visible(False)
         self.ax.spines['top'].set_visible(False)
@@ -417,12 +418,15 @@ class Plot(DoStats):
         file=getPath(fname)
         plt.savefig(file)
         enableShow and self.show()
+        Plot.freezeIndex=self.freezeIndex
         return self
     def activate(self):
         Plot.isFreezing=False
         return self
-    def freeze(self):
-        Plot.isFreezing=True
+    def freeze(self,ind=0):
+        self.freezeIndex=ind
+        self.clear()
+        return self
     def addScatter(self,ax,l):
         for ind,i in enumerate(l):
             y=i[1]
@@ -496,19 +500,22 @@ class Plot(DoStats):
                         linewidth=linewidth
                     ),
         )
-    def scatter(self, x=None, y=None,s=None):
+    def plotScatter(self, dataType="All"):
+        x, y = self.getData(dataType)
+        return self.scatter(x, y)
+    def scatter(self, x=None, y=None,s=None,c=None):
         if isinstance(x,dict):
             self.info=x
         if x is None or y is None:
             x = self.info["x"]
             y = self.info["y"]
         l1, l2,minLen = self.normalize(x,y)
-        plt.scatter(l1, l2,s=s)
+        plt.scatter(l1, l2,s=s,c=c)
         self.setImgName()
         return self
     def setImgName(self):
         name=traceback.extract_stack(None, 2)[0][2]
-        self.this_function_name=name
+        # self.this_function_name=name
         return name
     def show(self):
         plt.show()
@@ -526,6 +533,7 @@ class Plot(DoStats):
             x=np.transpose( x)
             y=np.transpose( y)
         plt.plot(x, y,color=color)
+        self.setImgName()
         return self
     def format_fn(tick_val, tick_pos):
             if int(tick_val) ==0:
@@ -605,4 +613,3 @@ class Plot(DoStats):
         callable(callback) and callback(ax,plt)
         self.setImgName()
         return self
-Plot.isFreezing=False

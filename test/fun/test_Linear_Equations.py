@@ -48,7 +48,7 @@ class TDD_TEST_LINEAR_EQUATIONS(unittest.TestCase):
         self.d\
             .plotLine(x,y,color=annos[0]['color'])\
             .pltCartesianCoordinate(hasLimit=True,intercepts=intercepts,other=append)\
-            .pltArrow(*start,*dxy,color='#23A200',head_width=.3)\
+            .arrow(*start,*dxy,color='#23A200',head_width=.3)\
             .drawTxt(annos)\
             .saveAndShow('pltCartesianCoordinate')
 if __name__ == '__main__':

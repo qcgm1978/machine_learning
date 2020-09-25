@@ -39,7 +39,7 @@ class TDD_TEST_BAYES_THEOREM(unittest.TestCase):
 Pia put in 5 paintings, 6% of her works have won First Prize.
 Pablo put in 10 paintings, 3% of his works have won First Prize.'''
         PAB=self.d.getBayesByMore(description,'Pam')
-        print(PAB)
+        self.assertEqual(PAB,.5)
         # self.assertEqual(PAB,.075,3)
 if __name__ == '__main__':
     unittest.main()
