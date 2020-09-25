@@ -40,7 +40,7 @@ class TDD_{0}(unittest.TestCase):
                 Plot.__init__(self)
         cls.d = PlotAI()
     def test_{1}(self):
-        self.assertEqual(True,1)
+        self.assertIsInstance(self.d,object)
 if __name__ == '__main__':
     unittest.main()
 

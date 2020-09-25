@@ -15,7 +15,7 @@
             "name": "Some File",
             "type": "python",
             "request": "launch",
-            "program": "test/fun/test_Linear_Equations.py",
+            "program": "test/fun/test_Bayes_Theorem.py",
             "console": "integratedTerminal"
         }
     ]
