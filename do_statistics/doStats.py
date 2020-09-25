@@ -11,7 +11,10 @@ class DoStats(object):
         A=next(item for item in lFloat if item[0]==target)
         total=reduce(lambda acc,item: acc+item[1],lFloat,0)
         PA=A[1]/total
-        return PA
+        PBA=A[2]/100
+        PB=reduce(lambda acc,item:acc+item[1]*item[2],lFloat,0)/100/total
+        # print(PA,PBA,PB)
+        return self.getBayes(PA,PBA,PB)
     def getCatAllergy(self,done,undone,percentAll):
         PA=percentAll
         PBA=done

@@ -19,9 +19,4 @@ class DataTypes(HandleData, Predict, Plot, DecisionTree):
         y = n - x
         Gini = 1 - (x / n) ** 2 - (y / n) ** 2
         return Gini, n, [y, x]
-    def plotScatter(self, dataType="All"):
-        x = self.info["x"]
-        y = self.info["y"]
-        x, y = self.getData(dataType)
-        self.scatter(x, y)
-        self.show()
+    

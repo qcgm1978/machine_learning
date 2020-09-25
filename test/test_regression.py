@@ -93,15 +93,22 @@ class TDD_REGRESSION(unittest.TestCase):
         np.random.seed(2)
         x = np.random.normal(3, 1, 100)
         y = np.random.normal(150, 40, 100) / x
-        d = DataTypes({'x': x, 'y': y})
-        # d.plotScatter('train')
-        # d.plotScatter('test')
+        self.d.setInfo({'x': x, 'y': y})
+        self.d\
+            .freeze(1)\
+            .plotScatter('train')\
+            .plotScatter('test')\
+            .saveAndShow()
     def test_polynormial_line(self):
         np.random.seed(2)
         x = np.random.normal(3, 1, 100)
         y = np.random.normal(150, 40, 100) / x
         d = DataTypes({'x': x, 'y': y})
-        # d.polynomialRegressionLine()
+        d\
+            .freeze(4)\
+            .plotScatter('train')\
+            .polynomialRegressionLine(dataType='train')\
+            .saveAndShow()
         p = d.predict4PolynomialRegression(6)
         p1 = d.predict4PolynomialRegression(60)
         self.assertAlmostEqual(p, 181, 0)
@@ -110,7 +117,11 @@ class TDD_REGRESSION(unittest.TestCase):
         self.assertAlmostEqual(r2, .797, 3)
         r2 = d.getRSquared('test')
         self.assertAlmostEqual(r2, .838, 3)
-        p = d.predict4PolynomialRegression(5)
+        toPredict = 5
+        p = d.predict4PolynomialRegression(toPredict)
         self.assertAlmostEqual(p, 24.88, 2)
+        d\
+            .plotLine([toPredict,toPredict,0],[0,p,p])\
+            .saveAndShow(this_function_name='polynomialRegressionLine')
 if __name__ == '__main__':
     unittest.main()

@@ -93,16 +93,7 @@ class HandleData(DoMath, MysqlOp):
             df[field] = df[field].map(v)
         self.df = df
         return df
-    def getData(self, dataType="All"):
-        x = self.info["x"]
-        y = self.info["y"]
-        if dataType == "train":
-            x = x[:80]
-            y = y[:80]
-        elif dataType == "test":
-            x = x[80:]
-            y = y[80:]
-        return x, y
+    
     def Numerical(self):
         return self.Discrete() or self.Continuous()
     def Discrete(self):

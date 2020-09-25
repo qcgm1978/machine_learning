@@ -1,14 +1,25 @@
 import math,re,numpy as np
 from .doNp import DoNumpy
 class DoMath(DoNumpy):
+    def getYByFunc(self,x,coefs):
+        y=np.polyval(coefs,x)
+        return y
+    def polyval3d(self,x, y, z, c):
+        sol=np.polyval3d(x, y, z, c)
+        return sol
+    def cardboardModel(self,l,w,h,t=0,newT=0):
+        totalV=(l-2*t)*(w-2*t)*(h-2*t)
+        totalNewV=(l-2*newT)*(w-2*newT)*(h-2*newT)
+        change=(totalNewV-totalV)/totalV
+        return totalV,totalNewV,change
     def getIntercept(self,coefs):
         xIntercept = -coefs[1]/coefs[0]
         yIntercept = coefs[1]
         return [[xIntercept,0],[0,yIntercept]]
-    def solve_linear(self,A,B):
-        if len(np.array(A).shape) == 1:
-            A=[A]
-        return np.linalg.solve(A,B)
+    def linalgSolve(self,a,b):
+        if len(np.array(a).shape) == 1:
+            a=[a]
+        return np.linalg.solve(a,b)
     def getCoefs(self,s):
         l=re.findall(r'\d+(?=x)|[+-]?\s*\d+(?!x)',s)
         intL=map(lambda item:float(re.sub(r'\s+','',item)),l)

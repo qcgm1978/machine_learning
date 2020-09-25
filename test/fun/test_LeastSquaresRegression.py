@@ -9,17 +9,16 @@ from functools import reduce
 from graphic.plot import Plot
 from predict import Predict
 from data.handle_data import HandleData
-from mysql_data.decorators_func import singleton
 from utilities import getPath,parseNumber
 import numpy as np
 class TDD_TEST_LEASTSQUARESREGRESSION(unittest.TestCase):
-    @singleton
-    def setUp(self):
+    @classmethod
+    def setUpClass(self):
         class PlotAI(Plot,Predict,HandleData):
             def __init__(self,arg=None):
                 Plot.__init__(self)
                 HandleData.__init__(self)
-        self.__class__.p = PlotAI()
+        self.p = PlotAI()
     def test_test_LeastSquaresRegression(self):
         x, y = self.p.getSortedXyInt((11,25,12),(130,620,12))
         self.p\
@@ -90,10 +89,10 @@ class TDD_TEST_LEASTSQUARESREGRESSION(unittest.TestCase):
             .plotLine(lineX,lineY,isSeparate=True)\
             .saveAndShow()\
             .freeze()
-        # x=self.p.getLinspaceData(0,10,10)
-        # y=self.p.getYByFunc(x,[1,2.5])
-        # self.p\
-        #     .plotLine(x,y)\
-        #     .pltCartesianCoordinate(hideAxis=True,hasLimit=True)\
+        x=self.p.getLinspaceData(0,10,10)
+        y=self.p.getYByFunc(x,[1,2.5])
+        self.p\
+            .plotLine(x,y)\
+            .saveAndShow()
 if __name__ == '__main__':
     unittest.main()

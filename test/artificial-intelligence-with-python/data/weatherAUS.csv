@@ -1,0 +1,6 @@
+Index,Date,Location,MinTemp,...,RainToday,RISK_MM,RainTomorrow
+0,2008-12-01,Albury,13.4,...,No,0.0,No
+1,2008-12-02,Albury,7.4,...,No,0.0,No
+2,2008-12-03,Albury,12.9,...,No,0.0,No
+3,2008-12-04,Albury,9.2,...,No,1.0,No
+4,2008-12-05,Albury,17.5,...,No,0.2,No

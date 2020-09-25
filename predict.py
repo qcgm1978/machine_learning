@@ -97,12 +97,22 @@ class Predict(DoStats,DecisionTree):
         x = self.info["x"]
         y = list(map(self.predict, x))
         return y
-    def getRSquared(self, dataType="All"):
+    def getRSquared(self, dataType=None):
         x = self.info["x"]
         y = self.info["y"]
         x, y = self.getData(dataType)
         mymodel = self.getPolynomialModel()
         return r2_score(y, mymodel(x))
+    def getData(self, dataType="All"):
+        x = self.info["x"]
+        y = self.info["y"]
+        if dataType == "train":
+            x = x[:80]
+            y = y[:80]
+        elif dataType == "test":
+            x = x[80:]
+            y = y[80:]
+        return x, y
     def getR(self):
         slope, intercept, r, p, std_err = self.getLinregress()
         return r
