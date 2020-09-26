@@ -15,7 +15,7 @@
             "name": "Some File",
             "type": "python",
             "request": "launch",
-            "program": "test/fun/mathematical_model.py",
+            "program": "test/artificial-intelligence-with-python/test_Machine_Learning.py",
             "console": "integratedTerminal"
         }
     ]
