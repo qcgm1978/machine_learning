@@ -33,13 +33,18 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
     def test_data_preprocessing(self):
         rows,cols=self.p.df.shape
         columns = ['Sunshine','Evaporation','Cloud3pm','Cloud9am','Location','RISK_MM','Date','WindGustDir','WindDir9am','WindSpeed9am','WindDir3pm']
-        self.p\
+        score,time=self.p\
             .loadDataSet(self.path)\
             .preprocessingData(columns)\
-            .explore()
+            .explore()\
+            .buildModel()\
+            .getScoreTime()
         cols=cols-len(columns)
         self.assertEqual(cols,13)
         rows = 115160
         self.assertEqual(self.p.df.shape[0],rows)
+        self.assertEqual(self.p.getXcolumns().tolist(),['Rainfall', 'Humidity3pm', 'RainToday'])
+        self.assertAlmostEqual(score[1],.8,1)
+        self.assertAlmostEqual(time[1],.4,1)
 if __name__ == '__main__':
     unittest.main()
