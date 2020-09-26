@@ -6,6 +6,10 @@ from scipy import stats
 from sklearn import preprocessing
 #Using SelectKBest to get the top features!
 from sklearn.feature_selection import SelectKBest, chi2
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+import time
 class Panda(object):
     def DataFrame(self,s,cols):
         l=re.split(r'\n',s)
@@ -48,10 +52,35 @@ class Panda(object):
         return self
     def explore(self):
         df=self.df
-        X = df.loc[:,df.columns!='RainTomorrow']
-        y = df[['RainTomorrow']]
-        selector = SelectKBest(chi2, k=3)
-        selector.fit(X, y)
-        X_new = selector.transform(X)
-        print(X.columns[selector.get_support(indices=True)])
+        self.X = df.loc[:,df.columns!='RainTomorrow']
+        self.y = df[['RainTomorrow']]
+        self.selector = SelectKBest(chi2, k=3)
+        self.selector.fit(self.X, self.y)
+        X_new =self. selector.transform(self.X)
+        self.simplify()
         return self
+    def buildModel(self):
+        #Logistic Regression
+        #Calculating the accuracy and the time taken by the classifier
+        t0=time.time()
+        #Data Splicing
+        X_train,X_test,y_train,y_test = train_test_split(self.X,self.y.values.ravel(),test_size=0.25)
+        clf_logreg = LogisticRegression(random_state=0)
+        #Building the model using the training data set
+        clf_logreg.fit(preprocessing.scale(X_train),y_train)
+        #Evaluating the model using testing data set
+        y_pred = clf_logreg.predict(X_test)
+        score = accuracy_score(y_test,y_pred)
+        #Printing the accuracy and the time taken by the classifier
+        self.scoreTime= ('score',score),('time',time.time()-t0)
+        return self
+    def getScoreTime(self):
+        return self.scoreTime
+    def simplify(self):
+        #The important features are put in a data frame
+        self.df = self.df[['Humidity3pm','Rainfall','RainToday','RainTomorrow']]
+        #To simplify computations we will use only one feature (Humidity3pm) to build the model
+        X = self.df[['Humidity3pm']]
+        y = self.df[['RainTomorrow']]
+    def getXcolumns(self):
+        return self.X.columns[self.selector.get_support(indices=True)]
