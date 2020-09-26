@@ -10,6 +10,12 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 import time
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn import svm
+from sklearn.model_selection import train_test_split
 class Panda(object):
     def DataFrame(self,s,cols):
         l=re.split(r'\n',s)
@@ -56,24 +62,68 @@ class Panda(object):
         self.y = df[['RainTomorrow']]
         self.selector = SelectKBest(chi2, k=3)
         self.selector.fit(self.X, self.y)
+        self.y=self.y.values.ravel()
         X_new =self. selector.transform(self.X)
         self.simplify()
         return self
-    def buildModel(self):
+    def buildModel(self,classificationModel=0):
+        models=(self.LogisticRegression,self.RandomForest,self.DecisionTree,self.supportVectorMachine)
+        score,t0=models[classificationModel]()
+        #Return the accuracy and the time taken by the classifier
+        self.scoreTime= ('score',score),('time',time.time()-t0)
+        return self
+    def supportVectorMachine(self):
+        #Calculating the accuracy and the time taken by the classifier
+        t0=time.time()
+        #Data Splicing
+        X_train,X_test,y_train,y_test = train_test_split(self.X,self.y,test_size=0.25)
+        # clf_svc = svm.SVC(kernel='linear') # too slow
+        clf_svc = svm.LinearSVC()
+        #Building the model using the training data set
+        clf_svc.fit(X_train,y_train)
+        #Evaluating the model using testing data set
+        y_pred = clf_svc.predict(X_test)
+        score = accuracy_score(y_test,y_pred)
+        return score,t0
+    #Decision Tree Classifier
+    def DecisionTree(self):
+        #Calculating the accuracy and the time taken by the classifier
+        t0=time.time()
+        #Data Splicing
+        X_train,X_test,y_train,y_test = train_test_split(self.X,self.y,test_size=0.25)
+        clf_dt = DecisionTreeClassifier(random_state=0)
+        #Building the model using the training data set
+        clf_dt.fit(X_train,y_train)
+        #Evaluating the model using testing data set
+        y_pred = clf_dt.predict(X_test)
+        score = accuracy_score(y_test,y_pred)
+        return score,t0
+    def RandomForest(self):
+        #Random Forest Classifier
+        #Calculating the accuracy and the time taken by the classifier
+        t0=time.time()
+        #Data Splicing
+        X_train,X_test,y_train,y_test = train_test_split(self.X,self.y,test_size=0.25)
+        clf_rf = RandomForestClassifier(n_estimators=100, max_depth=4,random_state=0)
+        #Building the model using the training data set
+        clf_rf.fit(X_train,y_train)
+        #Evaluating the model using testing data set
+        y_pred = clf_rf.predict(X_test)
+        score = accuracy_score(y_test,y_pred)
+        return score,t0
+    def LogisticRegression(self):
         #Logistic Regression
         #Calculating the accuracy and the time taken by the classifier
         t0=time.time()
         #Data Splicing
-        X_train,X_test,y_train,y_test = train_test_split(self.X,self.y.values.ravel(),test_size=0.25)
+        X_train,X_test,y_train,y_test = train_test_split(self.X,self.y,test_size=0.25)
         clf_logreg = LogisticRegression(random_state=0)
         #Building the model using the training data set
         clf_logreg.fit(preprocessing.scale(X_train),y_train)
         #Evaluating the model using testing data set
         y_pred = clf_logreg.predict(X_test)
         score = accuracy_score(y_test,y_pred)
-        #Printing the accuracy and the time taken by the classifier
-        self.scoreTime= ('score',score),('time',time.time()-t0)
-        return self
+        return score,t0
     def getScoreTime(self):
         return self.scoreTime
     def simplify(self):
