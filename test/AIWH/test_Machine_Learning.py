@@ -20,8 +20,8 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
                 pass
                 # Plot.__init__(self)
         cls.p = PlotAI()
-        p = '/Users/zhanghongliang/Documents/machine_learning/test/AIWH/data/weatherAUS.csv'
-        cls.p.read_csv(p)
+        cls.path = '/Users/zhanghongliang/Documents/machine_learning/test/AIWH/data/weatherAUS.csv'
+        cls.p.loadDataSet(cls.path)
     def test_to_csv(self):
         pass
         # self.p.to_csv(self.df,p)
@@ -33,7 +33,10 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
     def test_data_preprocessing(self):
         rows,cols=self.p.df.shape
         columns = ['Sunshine','Evaporation','Cloud3pm','Cloud9am','Location','RISK_MM','Date','WindGustDir','WindDir9am','WindSpeed9am','WindDir3pm']
-        self.p.preprocessingData(columns).replace().normalize()
+        self.p\
+            .loadDataSet(self.path)\
+            .preprocessingData(columns)\
+            .explore()
         cols=cols-len(columns)
         self.assertEqual(cols,13)
         rows = 115160
