@@ -9,7 +9,7 @@ sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 import unittest,numpy as np
 from graphic.plot import Plot
 from utilities import getPath,parseNumber
-from ml import Panda
+from machine_learning import Panda
 class TDD_MACHINE_LEARNING(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
