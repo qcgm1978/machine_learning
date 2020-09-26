@@ -45,6 +45,21 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
         self.assertEqual(self.p.df.shape[0],rows)
         self.assertEqual(self.p.getXcolumns().tolist(),['Rainfall', 'Humidity3pm', 'RainToday'])
         self.assertAlmostEqual(score[1],.8,1)
-        self.assertAlmostEqual(time[1],.4,1)
+        self.assertLess(time[1],1)
+        score,time=self.p\
+            .buildModel(1)\
+            .getScoreTime()
+        self.assertAlmostEqual(score[1],.8,1)
+        self.assertLess(time[1],7)
+        score,time=self.p\
+            .buildModel(2)\
+            .getScoreTime()
+        self.assertAlmostEqual(score[1],.8,1)
+        self.assertLess(time[1],6)
+        score,time=self.p\
+            .buildModel(3)\
+            .getScoreTime()
+        self.assertGreater(score[1],.8)
+        self.assertLess(time[1],6)
 if __name__ == '__main__':
     unittest.main()
