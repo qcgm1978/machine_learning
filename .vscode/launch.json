@@ -15,8 +15,9 @@
             "name": "Some File",
             "type": "python",
             "request": "launch",
-            "program": "test/AIWH/test_Machine_Learning.py",
+            "module": "test.AIWH.test_Machine_Learning",
             "console": "integratedTerminal"
+
         }
     ]
 }

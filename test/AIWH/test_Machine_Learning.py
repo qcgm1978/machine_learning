@@ -11,7 +11,7 @@ sys.path.append(os.path.dirname(__file__))
 import unittest,numpy as np
 from graphic.plot import Plot
 from utilities import getPath,parseNumber
-from AIWH.ml import Panda
+from .ml import Panda
 class TDD_MACHINE_LEARNING(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -34,6 +34,7 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
         rows,cols=self.p.df.shape
         columns = ['Sunshine','Evaporation','Cloud3pm','Cloud9am','Location','RISK_MM','Date','WindGustDir','WindDir9am','WindSpeed9am','WindDir3pm']
         score,time=self.p\
+            .defineObjective()\
             .loadDataSet(self.path)\
             .preprocessingData(columns)\
             .explore()\
