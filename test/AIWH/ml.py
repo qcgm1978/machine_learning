@@ -34,30 +34,23 @@ class ML(object):
                     if not skip:
                         raise
         return self
-    def __loadDataSet(self,p):
-        if not hasattr(self,'df'):
-        #Load the data set
-            df = pd.read_csv(p)
-            self.df=df
-        return self
-    def preprocessingData(self,path,columns=None):
-        self.__loadDataSet(path)
+    def preprocessDrop(self,columns=None):
         if columns is None:
             return
         self.df=self.df.drop(columns=columns,axis=1)
         #Removing null values
         self.df = self.df.dropna(how='any')
-        self.removeOutliers().replace().normalize()
+        self.removeOutliers()
         return self
-    def explore(self):
+    def explorePredictor(self,target):
+        self.__target=target
         df=self.df
-        self.X = df.loc[:,df.columns!='RainTomorrow']
-        self.y = df[['RainTomorrow']]
+        self.X = df.loc[:,df.columns!=self.target]
+        self.y = df[[self.target]]
         self.selector = SelectKBest(chi2, k=3)
         self.selector.fit(self.X, self.y)
         self.y=self.y.values.ravel()
         X_new =self. selector.transform(self.X)
-        self.simplify()
         return self
     def buildModel(self,classificationModel=0):
         models=(self.LogisticRegression,self.RandomForest,self.DecisionTree,self.supportVectorMachine)
@@ -70,9 +63,23 @@ class ML(object):
         return self
     def predict(self):
         return self.scoreTime
-    def getObservations(self):
+    def preprocessLoadData(self,p):
+        if not hasattr(self,'df'):
+        #Load the data set
+            df = pd.read_csv(p)
+            self.df=df
+        return self
+    @property
+    def shape(self):
+        return self.df.shape
+    @property
+    def target(self):
+        return self.__target
+    @property
+    def observations(self):
         return self.df.shape[0]
-    def getFeatures(self):
+    @property
+    def features(self):
         return self.df.shape[1]
     def DataFrame(self,s,cols):
         l=re.split(r'\n',s)
@@ -89,12 +96,11 @@ class ML(object):
         z = np.abs(stats.zscore(self.df._get_numeric_data()))
         self.df= self.df[(z < 3).all(axis=1)]
         return self
-    def replace(self):
-        #Change yes and no to 1 and 0 respectvely for RainToday and RainTomorrow variable
-        self.df['RainToday'].replace({'No': 0, 'Yes': 1},inplace = True)
-        self.df['RainTomorrow'].replace({'No': 0, 'Yes': 1},inplace = True)
+    def preprocessReplace(self,l):
+        for item in l:
+            self.df[item[0]].replace(item[1],inplace = True)
         return self
-    def normalize(self):
+    def preprocessNormalize(self):
         scaler = preprocessing.MinMaxScaler()
         # print(df[1:2].to_string(header=True))
         scaler.fit(self.df)
@@ -153,12 +159,15 @@ class ML(object):
         y_pred = clf_logreg.predict(X_test)
         score = accuracy_score(y_test,y_pred)
         return score,t0
-    
-    def simplify(self):
+    def exploreSimplify(self,input=None):
+        if not isinstance(input,list):
+            input=[input]
         #The important features are put in a data frame
-        self.df = self.df[['Humidity3pm','Rainfall','RainToday','RainTomorrow']]
+        self.xColumns = self.getXcolumns()
+        self.df = self.df[self.xColumns.tolist()+[self.target]]
         #To simplify computations we will use only one feature (Humidity3pm) to build the model
-        X = self.df[['Humidity3pm']]
-        y = self.df[['RainTomorrow']]
+        self.X = self.df[input]
+        self.y = self.df[self.target]
+        return self
     def getXcolumns(self):
         return self.X.columns[self.selector.get_support(indices=True)]
