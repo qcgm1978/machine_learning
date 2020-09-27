@@ -16,16 +16,34 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
 from sklearn import svm
 from sklearn.model_selection import train_test_split
-class Panda(object):
-    def defineObjective(self):
+import urllib.request
+class ML(object):
+    def defineObjective(self,objective):
+        self.objective=objective
         return self
-    def loadDataSet(self,p):
+    def gatherData(self,url=None,skip=False):
+        if not skip:
+            if url is None:
+                return print('No url supplied')
+            else:
+                try:
+                    print('Beginning file download with urllib2...')
+                    urllib.request.urlretrieve(url, '/Users/zhanghongliang/Documents/machine_learning/test/AIWH/data/weatherAUS.csv')
+                except urllib.error.URLError as e:
+                    print(e)
+                    if not skip:
+                        raise
+        return self
+    def __loadDataSet(self,p):
         if not hasattr(self,'df'):
         #Load the data set
             df = pd.read_csv(p)
             self.df=df
         return self
-    def preprocessingData(self,columns):
+    def preprocessingData(self,path,columns=None):
+        self.__loadDataSet(path)
+        if columns is None:
+            return
         self.df=self.df.drop(columns=columns,axis=1)
         #Removing null values
         self.df = self.df.dropna(how='any')
@@ -43,10 +61,19 @@ class Panda(object):
         return self
     def buildModel(self,classificationModel=0):
         models=(self.LogisticRegression,self.RandomForest,self.DecisionTree,self.supportVectorMachine)
-        score,t0=models[classificationModel]()
+        self.model=models[classificationModel]
+        return self
+    def ModelEvaluationOptimization(self):
+        score,t0=self.model()
         #Return the accuracy and the time taken by the classifier
         self.scoreTime= ('score',score),('time',time.time()-t0)
         return self
+    def predict(self):
+        return self.scoreTime
+    def getObservations(self):
+        return self.df.shape[0]
+    def getFeatures(self):
+        return self.df.shape[1]
     def DataFrame(self,s,cols):
         l=re.split(r'\n',s)
         rows=list(map(lambda item:re.split(r'\s+',item.lstrip()),l))
@@ -58,7 +85,6 @@ class Panda(object):
         return df
     def to_csv(self,df,p):
         df.to_csv(p,index=False)
-    
     def removeOutliers(self):
         z = np.abs(stats.zscore(self.df._get_numeric_data()))
         self.df= self.df[(z < 3).all(axis=1)]
@@ -75,7 +101,6 @@ class Panda(object):
         self.df = pd.DataFrame(scaler.transform(self.df), index=self.df.index, columns=self.df.columns)
         self.df.iloc[4:10]
         return self
-    
     def supportVectorMachine(self):
         #Calculating the accuracy and the time taken by the classifier
         t0=time.time()
@@ -128,8 +153,7 @@ class Panda(object):
         y_pred = clf_logreg.predict(X_test)
         score = accuracy_score(y_test,y_pred)
         return score,t0
-    def getScoreTime(self):
-        return self.scoreTime
+    
     def simplify(self):
         #The important features are put in a data frame
         self.df = self.df[['Humidity3pm','Rainfall','RainToday','RainTomorrow']]
