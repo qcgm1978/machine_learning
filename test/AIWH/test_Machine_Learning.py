@@ -48,20 +48,23 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
         self.assertEqual(self.ml.xColumns.tolist(),['Rainfall', 'Humidity3pm', 'RainToday'])
         self.assertAlmostEqual(score[1],.8,1)
         self.assertLess(time[1],1)
-        # score,time=self.ml\
-        #     .buildModel(1)\
-        #     .getScoreTime()
-        # self.assertAlmostEqual(score[1],.8,1)
-        # self.assertLess(time[1],7)
-        # score,time=self.ml\
-        #     .buildModel(2)\
-        #     .getScoreTime()
-        # self.assertAlmostEqual(score[1],.8,1)
-        # self.assertLess(time[1],6)
-        # score,time=self.ml\
-        #     .buildModel(3)\
-        #     .getScoreTime()
-        # self.assertGreater(score[1],.8)
-        # self.assertLess(time[1],6)
+        score,time=self.ml\
+            .buildModel(1)\
+            .ModelEvaluationOptimization()\
+            .predict()
+        self.assertAlmostEqual(score[1],.8,1)
+        self.assertLess(time[1],10)
+        score,time=self.ml\
+            .buildModel(2)\
+            .ModelEvaluationOptimization()\
+            .predict()
+        self.assertAlmostEqual(score[1],.8,1)
+        self.assertLess(time[1],6)
+        score,time=self.ml\
+            .buildModel(3)\
+            .ModelEvaluationOptimization()\
+            .predict()
+        self.assertGreater(score[1],.8)
+        self.assertLess(time[1],6)
 if __name__ == '__main__':
     unittest.main()

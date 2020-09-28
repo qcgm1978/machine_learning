@@ -1,34 +1,38 @@
-import sys
-import os
-PACKAGE_PARENT = '..'
-SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
-sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 from datatype import DataTypes
 import numpy as np
 import unittest
 import pandas
 class TDD_DECISION_TREE(unittest.TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         file = "data/shows.csv"
         d1 = {"UK": 0, "USA": 1, "N": 2}
         d2 = {"YES": 1, "NO": 0}
-        mapData = {"Nationality": d1, "Go": d2}
-        self.d = DataTypes({"file": file, "mapData": mapData, 'target': "Go"})
-        return super().setUp()
+        cls.mapData = (("Nationality", d1), ("Go", d2))
+        cls.d = DataTypes({"file": file, ##"mapData": self.mapData, 
+        'target': "Go"})
+        rep=cls.mapData
+        cls.d.preprocessReplace(rep)
+        cls.X = ["Age", "Experience", "Rank", "Nationality"]
+        cls.y = "Go"
     def test_decision_tree(self):
         file = "data/shows.csv"
-        img = "img/mydecisiontree.png"
-        X = ["Age", "Experience", "Rank", "Nationality"]
-        y = "Go"
-        d1 = {"UK": 0, "USA": 1, "N": 2}
-        d2 = {"YES": 1, "NO": 0}
-        dictionary = {"Nationality": d1, "Go": d2}
         d = DataTypes()
-        d\
-            .getAndFormatData(file, dictionary)\
-            .createDecisionTreeData(X, y)\
-            .graphByData(img)\
-            .show()
+        objective = 'go to a comedy show or not'
+        p=d\
+            .defineObjective(objective)\
+            .gatherData(skip=True)\
+            .preprocessLoadData(file)\
+            .preprocessReplace(self.mapData
+            # .createDecisionTreeData(self.X, self.y)
+            )\
+            .explorePredictor(self.X, self.y)\
+            .buildModel()\
+            .ModelEvaluationOptimization()\
+            .predictDecisionTree(val=[40, 10, 6, 1])
+        self.assertEqual(p,(0, 'NO'))
+        features=d.getXcolumns()
+        self.assertEqual(features.tolist(),['Age', 'Experience', 'Rank','Nationality'])
     def test_first_step(self):
         df = self.d.df
         y = df["Go"]
@@ -96,8 +100,15 @@ class TDD_DECISION_TREE(unittest.TestCase):
         X = ["Age", "Experience", "Rank", "Nationality"]
         p = self.d.predictbyDecisionTree(X, [40, 10, 7, 1])
         # The Decision Tree does not give us a 100% certain answer. It is based on the probability of an outcome, and the answer will vary.
-        self.assertTrue(list(p)[0] in [0, 1])
+        self.assertTrue(p[0] in (0,1))
         p = self.d.predictbyDecisionTree(X, [40, 10, 6, 1])
-        self.assertTrue(list(p)[0] in [0, 1])
+        self.assertEqual(p, (0, 'NO'))
+    def test_DecisionTree(self):
+        self.d.setAttribute({'X':self.d.df[self.X],'y':self.d.df[self.y]})
+        p=self.d\
+            .buildModel()\
+            .ModelEvaluationOptimization()\
+            .predictDecisionTree(val=[40, 10, 6, 1])
+        self.assertEqual(p,(0, 'NO'))
 if __name__ == "__main__":
     unittest.main()

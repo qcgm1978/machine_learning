@@ -1,12 +1,41 @@
 # Machine Learning is a program that analyses data and learns to predict the outcome.
+import logging
+logging.basicConfig(
+    format='%(asctime)s,%(msecs)d %(levelname)-8s [%(pathname)s:%(lineno)d in function %(funcName)s] %(message)s',
+    # datefmt='',
+    level=logging.INFO)
 import numpy as np
 from sklearn import linear_model
 from sklearn.preprocessing import StandardScaler
 from do_statistics.doStats import DoStats
 from graphic.decision_tree import DecisionTree
 from sklearn.metrics import r2_score
+import urllib.request
 class Predict(DoStats,DecisionTree):
     degree=3
+    def defineObjective(self,objective):
+        self.objective=objective
+        return self
+    def gatherData(self,url=None,skip=False):
+        if not skip:
+            if url is None:
+                return print('No url supplied')
+            else:
+                try:
+                    print('Beginning file download with urllib2...')
+                    urllib.request.urlretrieve(url, '/Users/zhanghongliang/Documents/machine_learning/test/AIWH/data/weatherAUS.csv')
+                except urllib.error.URLError as e:
+                    print(e)
+                    if not skip:
+                        raise
+        return self
+    def predictDecisionTree(self,val=None):
+        if val:
+            if len(np.array(val).shape)==1:
+                val=[val]
+            p = self.clf_dt.predict(val)[0]
+            # logging.info(p)   
+            return (p,'GO' if p else 'NO')
     def predictbyDecisionTree(self,features,condition, y=None):
         dtree=self.getDtree(features,y)
         return self.regrPredict(dtree, condition)
@@ -26,12 +55,10 @@ class Predict(DoStats,DecisionTree):
             self.predict = predict
             self.coef_=coef_
         return predict[0], coef_,list(zip(X,predictVals,np.round(regr.coef_,4)))
-
     def predictByRegr(self, dfX, dfY, predictVals):
         regr = self.getRegr(dfX, dfY)
         predict = self.regrPredict(regr, predictVals)
         return regr, predict
-
     def getRegr(self, dfX, dfY):
         regr = linear_model.LinearRegression()
         regr.fit(dfX, dfY)
@@ -54,11 +81,11 @@ class Predict(DoStats,DecisionTree):
         val = scaled[predictIndex]
         regr, predict = self.predictByRegr(scaledX, y, val)
         return predict[0], list(regr.coef_)
-
     def regrPredict(self, regr, val):
         if len(np.array(val).shape)==1:
             val=[val]
-        return regr.predict(val)
+        p = regr.predict(val)[0]
+        return (p,'GO' if p else 'NO')
     def predictPolynomialRegression(self, predictX):
         mymodel = self.getPolynomialModel()
         return mymodel(predictX)

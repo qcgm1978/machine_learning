@@ -223,7 +223,7 @@ class Plot(DoStats):
         autolabel(rects1)
         autolabel(rects2)
         fig.tight_layout()
-        self.show()
+        self.__show()
     def normalize(self, l1, l2):
         if not isinstance(l1,list):
             l1=[l1]
@@ -244,7 +244,7 @@ class Plot(DoStats):
         if x is None:
             x = self.list
         plt.bar(x, height)
-        self.show()
+        self.__show()
     def getFigAx(self):
         self.fig,self.ax=plt.subplots()
         return self.fig,self.ax
@@ -365,7 +365,7 @@ class Plot(DoStats):
         return self
     def scatterDots(self,x,y):
         self.scatter(x,y)
-        self.show()
+        self.__show()
     def setTxt(self,ax,title,xTxt,yTxt):
         ax.set_title('\n'.join(title),loc='left')
         ax.set_xlabel(xTxt)
@@ -417,7 +417,7 @@ class Plot(DoStats):
         fname = "img/{0}.png".format(this_function_name)
         file=getPath(fname)
         plt.savefig(file)
-        enableShow and self.show()
+        enableShow and self.__show()
         Plot.freezeIndex=self.freezeIndex
         return self
     def activate(self):
@@ -517,8 +517,7 @@ class Plot(DoStats):
         name=traceback.extract_stack(None, 2)[0][2]
         # self.this_function_name=name
         return name
-    def show(self):
-        plt.show()
+    
     def plotFitLine(self,color=None):
         x=self.info["x"]
         y = self.getModel()
@@ -613,3 +612,5 @@ class Plot(DoStats):
         callable(callback) and callback(ax,plt)
         self.setImgName()
         return self
+    def __show(self):
+        plt.show()
