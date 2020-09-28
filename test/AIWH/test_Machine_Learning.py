@@ -83,7 +83,7 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
             .explorePredictor(X, y)\
             .buildModel(2)\
             .ModelEvaluationOptimization()\
-            .predictDecisionTree(val=[40, 10, 6, 1])
+            .predict(val=[40, 10, 6, 1],custom=True)
         self.assertEqual(p,(0, 'NO'))
         features=d.getXcolumns()
         self.assertEqual(features.tolist(),['Age', 'Experience', 'Rank','Nationality'])
