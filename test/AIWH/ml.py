@@ -98,8 +98,13 @@ class ML(object):
         self.graphByData()
         # self.saveAndShow()
         return self
-    def predict(self):
-        return self.scoreTime
+    def predict(self,*args,custom=False,**kwargs):
+        if custom:
+            name = 'predict'+self.evalModel.__name__
+            if hasattr(self,name):
+                return getattr(self,name)(*args,**kwargs)
+        else:
+            return self.scoreTime
     def graphByData(self, img = "img/mydecisiontree.png"):
         if not isinstance(self.features,list):
             return self
