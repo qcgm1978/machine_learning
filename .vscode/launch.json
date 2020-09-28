@@ -18,6 +18,14 @@
             "module": "test.AIWH.test_Machine_Learning",
             "console": "integratedTerminal"
 
+        },
+        {
+            "name": "Process 2",
+            "type": "python",
+            "request": "launch",
+            "module": "test.test_decision_tree",
+            "console": "integratedTerminal"
+
         }
     ]
 }

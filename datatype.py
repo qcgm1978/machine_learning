@@ -1,6 +1,5 @@
 from predict import Predict
 from data.handle_data import HandleData
-from AI import DoAI
 from graphic.plot import Plot
 from graphic.decision_tree import DecisionTree
 class DataTypes(HandleData, Predict, Plot, DecisionTree):
