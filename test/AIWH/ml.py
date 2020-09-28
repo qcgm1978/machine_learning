@@ -1,7 +1,7 @@
 # For linear algebra
 import numpy as np
 # For data processing
-import pandas as pd,re
+import pandas as pd,re,pydotplus,matplotlib.image as pltimg, matplotlib.pyplot as plt
 from scipy import stats
 from sklearn import preprocessing
 from sklearn.feature_selection import SelectKBest, chi2
@@ -11,7 +11,7 @@ from sklearn.metrics import accuracy_score
 import time
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
-from sklearn import svm
+from sklearn import svm,tree
 import urllib.request
 class ML(object):
     @property
@@ -23,7 +23,7 @@ class ML(object):
     @property
     def observations(self):
         return self.df.shape[0]
-    @property
+    # @property
     def features(self):
         return self.df.shape[1]
     def defineObjective(self,objective):
@@ -56,11 +56,20 @@ class ML(object):
         self.df = self.df.dropna(how='any')
         self.removeOutliers()
         return self
-    def explorePredictor(self,target):
-        self.__target=target
-        df=self.df
-        self.X = df.loc[:,df.columns!=self.target]
-        self.y = df[[self.target]]
+    def explorePredictor(self,features=None,y=None,target=None):
+        if target:
+            self.__target=target
+            df=self.df
+            self.X = df.loc[:,df.columns!=self.target]
+            self.y = df[[self.target]]
+        else:
+            if y is None:
+                y=self.target
+            df = self.df
+            X = df[features]
+            self.features=features
+            self.X=X
+            self.y=df[y]
         #Using SelectKBest to get the top features!
         self.selector = SelectKBest(chi2, k=len(self.X.columns))
         self.selector.fit(self.X, self.y)
@@ -69,17 +78,40 @@ class ML(object):
         return self
     def buildModel(self,classificationModel=0):
         models=(self.LogisticRegression,self.RandomForest,self.DecisionTree,self.supportVectorMachine)
-        self.model=models[classificationModel]
+        self.evalModel=models[classificationModel]
+        #Data Splicing
+        self.X_train,self.X_test,self.y_train,self.y_test = train_test_split(self.X,self.y,test_size=0.25)
         self.scoreTime=None
         return self
     def ModelEvaluationOptimization(self):
-        score,t0=self.model()
-        #Return the accuracy and the time taken by the classifier
-        self.scoreTime= ('score',score),('time',time.time()-t0)
+        #Calculating the time taken by the classifier
+        self.t0=time.time()
+        self.evalModel()
+        #Evaluating the model using testing data set
+        if hasattr(self,'clf'):
+            X_test=self.X_test
+            y_test=self.y_test
+            y_pred = self.clf.predict(X_test)
+            self.score = accuracy_score(y_test,y_pred)
+            #Set the accuracy and the time taken by the classifier
+            self.scoreTime= ('score',self.score),('time',time.time()-self.t0)
+        self.graphByData()
+        # self.saveAndShow()
         return self
     def predict(self):
         return self.scoreTime
-    
+    def graphByData(self, img = "img/mydecisiontree.png"):
+        if not isinstance(self.features,list):
+            return self
+        if not hasattr(self,'graphData'):
+            self.graphData = tree.export_graphviz(
+            self.clf, out_file=None, feature_names=self.features
+        )
+        graph = pydotplus.graph_from_dot_data(self.graphData)
+        graph.write_png(img)
+        img = pltimg.imread(img)
+        imgplot = plt.imshow(img)
+        return self
     def DataFrame(self,s,cols):
         l=re.split(r'\n',s)
         rows=list(map(lambda item:re.split(r'\s+',item.lstrip()),l))
@@ -107,65 +139,44 @@ class ML(object):
         self.df.iloc[4:10]
         return self
     def supportVectorMachine(self):
-        #Calculating the accuracy and the time taken by the classifier
-        t0=time.time()
+        #Calculating the accuracy
         #Data Splicing
-        X_train,X_test,y_train,y_test = train_test_split(self.X,self.y,test_size=0.25)
         # clf_svc = svm.SVC(kernel='linear') # too slow
         clf_svc = svm.LinearSVC()
         #Building the model using the training data set
-        clf_svc.fit(X_train,y_train)
-        #Evaluating the model using testing data set
-        y_pred = clf_svc.predict(X_test)
-        score = accuracy_score(y_test,y_pred)
-        return score,t0
+        clf_svc.fit(self.X_train,self.y_train)
+        self.clf=clf_svc
+        return self
     #Decision Tree Classifier
     def DecisionTree(self):
-        #Calculating the accuracy and the time taken by the classifier
-        self.t0=time.time()
-        #Data Splicing
-        X_train,X_test,y_train,y_test = train_test_split(self.X,self.y,test_size=0.25)
+        #Calculating the accuracy
         clf_dt = DecisionTreeClassifier(random_state=0)
         #Building the model using the training data set
-        clf_dt.fit(X_train,y_train)
-        self.clf_dt=clf_dt
-        self.X_test=X_test
-        self.y_test=y_test
-    def predictDecisionTree(self,X_test=None,y_test=None):
-        if X_test is None:
-            X_test=self.X_test
-        if y_test is None:
-            y_test=self.X_test
-        #Evaluating the model using testing data set
-        y_pred = self.clf_dt.predict(X_test)
-        score = accuracy_score(y_test,y_pred)
-        return score,self.t0
+        clf_dt.fit(self.X_train,self.y_train)
+        self.clf=clf_dt
+        return self
+    def predictDecisionTree(self,val=None):
+        if val:
+            if len(np.array(val).shape)==1:
+                val=[val]
+            p = self.clf.predict(val)[0]
+            # logging.info(p)   
+            return (p,'GO' if p else 'NO')
     def RandomForest(self):
         #Random Forest Classifier
-        #Calculating the accuracy and the time taken by the classifier
-        t0=time.time()
-        #Data Splicing
-        X_train,X_test,y_train,y_test = train_test_split(self.X,self.y,test_size=0.25)
         clf_rf = RandomForestClassifier(n_estimators=100, max_depth=4,random_state=0)
         #Building the model using the training data set
-        clf_rf.fit(X_train,y_train)
-        #Evaluating the model using testing data set
-        y_pred = clf_rf.predict(X_test)
-        score = accuracy_score(y_test,y_pred)
-        return score,t0
+        clf_rf.fit(self.X_train,self.y_train)
+        self.clf=clf_rf
+        return self
     def LogisticRegression(self):
         #Logistic Regression
         #Calculating the accuracy and the time taken by the classifier
-        t0=time.time()
-        #Data Splicing
-        X_train,X_test,y_train,y_test = train_test_split(self.X,self.y,test_size=0.25)
         clf_logreg = LogisticRegression(random_state=0)
         #Building the model using the training data set
-        clf_logreg.fit(preprocessing.scale(X_train),y_train)
-        #Evaluating the model using testing data set
-        y_pred = clf_logreg.predict(X_test)
-        score = accuracy_score(y_test,y_pred)
-        return score,t0
+        clf_logreg.fit(preprocessing.scale(self.X_train),self.y_train)
+        self.clf=clf_logreg
+        return self
     def exploreSimplify(self,input=None):
         if not isinstance(input,list):
             input=[input]
@@ -173,7 +184,6 @@ class ML(object):
         self.xColumns = self.getXcolumns()
         self.df = self.df[self.xColumns.tolist()+[self.target]]
         #To simplify computations we will use only one feature (Humidity3pm) to build the model
-        self.X = self.df[input]
         self.y = self.df[self.target]
         return self
     def getXcolumns(self):
