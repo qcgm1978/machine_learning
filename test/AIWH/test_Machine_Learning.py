@@ -15,7 +15,7 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
     def test_data_preprocessing(self):
         self.ml.preprocessLoadData(self.path)
         self.assertEqual(self.ml.shape,(142193, 24))
-        self.assertEqual(self.ml.features(),24)
+        self.assertEqual(self.ml.dataCols,24)
         self.assertAlmostEqual(self.ml.observations,145e3,-5)
         vals = self.ml.df.count().sort_values()
         self.assertIsInstance(vals[0],np.int64)
@@ -72,7 +72,7 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
         mapData = (("Nationality", d1), ("Go", d2))
         file = "data/shows.csv"
         X = ["Age", "Experience", "Rank", "Nationality"]
-        y = "Go"
+        target = "Go"
         d = ML()
         objective = 'go to a comedy show or not'
         p=d\
@@ -80,7 +80,7 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
             .gatherData(skip=True)\
             .preprocessLoadData(file)\
             .preprocessReplace(mapData)\
-            .explorePredictor(X, y)\
+            .explorePredictor(X, target)\
             .buildModel(2)\
             .ModelEvaluationOptimization()\
             .predict(val=[40, 10, 6, 1],custom=True)

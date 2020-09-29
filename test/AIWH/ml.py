@@ -28,20 +28,20 @@ class ML(object):
     @property
     def observations(self):
         return self.df.shape[0]
-    # @property
-    def features(self):
+    @property
+    def dataCols(self):
         return self.df.shape[1]
     def defineObjective(self,objective):
         self.objective=objective
         return self
-    def gatherData(self,url=None,skip=False):
+    def gatherData(self,url=None,skip=False,location=None):
         if not skip:
             if url is None:
                 return print('No url supplied')
             else:
                 try:
                     print('Beginning file download with urllib2...')
-                    urllib.request.urlretrieve(url, '/Users/zhanghongliang/Documents/machine_learning/test/AIWH/data/weatherAUS.csv')
+                    urllib.request.urlretrieve(url, location)
                 except urllib.error.URLError as e:
                     print(e)
                     if not skip:
@@ -61,20 +61,15 @@ class ML(object):
         self.df = self.df.dropna(how='any')
         self.removeOutliers()
         return self
-    def explorePredictor(self,features=None,y=None,target=None):
-        if target:
-            self.__target=target
-            df=self.df
-            self.X = df.loc[:,df.columns!=self.target]
-            self.y = df[[self.target]]
+    def explorePredictor(self,features=None,target=None):
+        df=self.df
+        self.__target=target
+        if features:
+            self.X=df[features]
         else:
-            if y is None:
-                y=self.target
-            df = self.df
-            X = df[features]
-            self.features=features
-            self.X=X
-            self.y=df[y]
+            self.X = df.loc[:,df.columns!=self.target]
+        self.features=self.X.columns
+        self.y=df[target]
         #Using SelectKBest to get the top features!
         topFeaturesNum = self.topFeaturesNum or len(self.X.columns)
         self.selector = SelectKBest(chi2, k=topFeaturesNum)
@@ -112,12 +107,15 @@ class ML(object):
         else:
             return self.scoreTime
     def graphByData(self, img = "img/mydecisiontree.png"):
-        if not isinstance(self.features,list):
+        if not hasattr(self,'features'):
             return self
         if not hasattr(self,'graphData'):
-            self.graphData = tree.export_graphviz(
-            self.clf, out_file=None, feature_names=self.features
-        )
+            try:
+                self.graphData = tree.export_graphviz(
+                    self.clf, out_file=None, feature_names=self.features
+                )
+            except (AttributeError,ValueError):
+                return self
         graph = pydotplus.graph_from_dot_data(self.graphData)
         graph.write_png(img)
         img = pltimg.imread(img)
@@ -194,6 +192,7 @@ class ML(object):
         #The important features are put in a data frame
         self.xColumns = self.getXcolumns()
         self.df = self.df[self.xColumns.tolist()+[self.target]]
+        self.features=self.df
         #To simplify computations we will use only one feature (Humidity3pm) to build the model
         self.y = self.df[self.target]
         return self
