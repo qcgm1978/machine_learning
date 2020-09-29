@@ -5,7 +5,7 @@ from .ml import ML
 class TDD_MACHINE_LEARNING(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.ml = ML()
+        cls.ml = ML({'topFeaturesNum':3})
         cls.path = '/Users/zhanghongliang/Documents/machine_learning/test/AIWH/data/weatherAUS.csv'
         cls.columns = ['Sunshine','Evaporation','Cloud3pm','Cloud9am','Location','RISK_MM','Date','WindGustDir','WindDir9am','WindSpeed9am','WindDir3pm']
         cls.target='RainTomorrow'
@@ -45,7 +45,7 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
         self.assertEqual(cols,13)
         rows = 115160
         self.assertEqual(self.ml.df.shape[0],rows)
-        # self.assertEqual(self.ml.xColumns.tolist(),['Rainfall', 'Humidity3pm', 'RainToday'])
+        self.assertEqual(self.ml.xColumns.tolist(),['Rainfall', 'Humidity3pm', 'RainToday'])
         self.assertAlmostEqual(score[1],.8,1)
         self.assertLess(time[1],1)
         score,time=self.ml\

@@ -14,6 +14,11 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn import svm,tree
 import urllib.request
 class ML(object):
+    def __init__(self,d=None):
+        if d is None:
+            self.topFeaturesNum=0
+        else:
+            self.topFeaturesNum=d['topFeaturesNum']
     @property
     def shape(self):
         return self.df.shape
@@ -71,7 +76,8 @@ class ML(object):
             self.X=X
             self.y=df[y]
         #Using SelectKBest to get the top features!
-        self.selector = SelectKBest(chi2, k=len(self.X.columns))
+        topFeaturesNum = self.topFeaturesNum or len(self.X.columns)
+        self.selector = SelectKBest(chi2, k=topFeaturesNum)
         self.selector.fit(self.X, self.y)
         self.y=self.y.values.ravel()
         X_new =self. selector.transform(self.X)
