@@ -6,7 +6,8 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.ml = ML({'topFeaturesNum':3})
-        cls.path = '/Users/zhanghongliang/Documents/machine_learning/test/AIWH/data/weatherAUS.csv'
+        cls.path = getPath('test/AIWH/data/weatherAUS.csv')
+        cls.path = 'data/weatherAUS.csv'
         cls.columns = ['Sunshine','Evaporation','Cloud3pm','Cloud9am','Location','RISK_MM','Date','WindGustDir','WindDir9am','WindSpeed9am','WindDir3pm']
         cls.target='RainTomorrow'
     def test_to_csv(self):
