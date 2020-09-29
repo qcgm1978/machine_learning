@@ -86,7 +86,7 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
             .ModelEvaluationOptimization(enableGraph=False)\
             .predict(val=[40, 10, 6, 1],custom=True)
         self.assertEqual(p,(0, 'NO'))
-        features=d.getXcolumns()
+        features=d.extractFeatures()
         self.assertEqual(features.tolist(),['Age', 'Experience', 'Rank','Nationality'])
 if __name__ == '__main__':
     unittest.main()

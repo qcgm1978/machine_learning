@@ -18,15 +18,9 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn import svm,tree
 import urllib.request
-class ML(object):
-    def __init__(self,d=None):
-        if d is None:
-            self.topFeaturesNum=0
-        else:
-            self.topFeaturesNum=d['topFeaturesNum']
-    @property
-    def shape(self):
-        return self.df.shape
+from .base import Base
+class ML(Base):
+    
     @property
     def target(self):
         return self.__target
@@ -52,16 +46,11 @@ class ML(object):
                     if not skip:
                         raise
         return self
-    def preprocessLoadData(self,p):
-        if not hasattr(self,'df'):
-        #Load the data set
-            df = pd.read_csv(p)
-            self.df=df
-        return self
+    
     def preprocessDrop(self,columns=None):
         if columns is None:
             return
-        self.df=self.df.drop(columns=columns,axis=1)
+        self.preprocessDropCols(columns)
         #Removing null values
         self.df = self.df.dropna(how='any')
         self.removeOutliers()
@@ -196,12 +185,11 @@ class ML(object):
         if input and not isinstance(input,list):
             input=[input]
         #The important features are put in a data frame
-        self.xColumns = self.getXcolumns()
-        features = input if input else self.xColumns+[self.target]
-        self.X = self.df[features]
-        self.features=features
+        self.xColumns = self.extractFeatures()
+        self.features = input if input else self.xColumns+[self.target]
+        self.X = self.df[self.features]
         #To simplify computations we will use only one feature (Humidity3pm) to build the model
         self.y = self.df[self.target]
         return self
-    def getXcolumns(self):
+    def extractFeatures(self):
         return self.X.columns[self.selector.get_support(indices=True)]
