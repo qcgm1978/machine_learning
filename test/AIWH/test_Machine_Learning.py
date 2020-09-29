@@ -83,7 +83,7 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
             .preprocessReplace(mapData)\
             .explorePredictor(X, target)\
             .buildModel(2)\
-            .ModelEvaluationOptimization()\
+            .ModelEvaluationOptimization(enableGraph=False)\
             .predict(val=[40, 10, 6, 1],custom=True)
         self.assertEqual(p,(0, 'NO'))
         features=d.getXcolumns()

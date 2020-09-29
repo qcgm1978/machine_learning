@@ -1,4 +1,9 @@
 # For linear algebra
+import logging
+logging.basicConfig(
+    format='%(asctime)s,%(msecs)d %(levelname)-8s [%(pathname)s:%(lineno)d in function %(funcName)s] %(message)s',
+    # datefmt='',
+    level=logging.INFO)
 import numpy as np
 # For data processing
 import pandas as pd,re,pydotplus,matplotlib.image as pltimg, matplotlib.pyplot as plt
@@ -68,7 +73,8 @@ class ML(object):
             self.X=df[features]
         else:
             self.X = df.loc[:,df.columns!=self.target]
-        self.features=self.X.columns
+        self.features=self.X.columns.tolist()
+        # logging.info(self.features)
         self.y=df[target]
         #Using SelectKBest to get the top features!
         topFeaturesNum = self.topFeaturesNum or len(self.X.columns)
@@ -84,7 +90,7 @@ class ML(object):
         self.X_train,self.X_test,self.y_train,self.y_test = train_test_split(self.X,self.y,test_size=0.25)
         self.scoreTime=None
         return self
-    def ModelEvaluationOptimization(self):
+    def ModelEvaluationOptimization(self,enableGraph=True):
         #Calculating the time taken by the classifier
         self.t0=time.time()
         self.evalModel()
@@ -96,7 +102,7 @@ class ML(object):
             self.score = accuracy_score(y_test,y_pred)
             #Set the accuracy and the time taken by the classifier
             self.scoreTime= ('score',self.score),('time',time.time()-self.t0)
-        self.graphByData()
+        enableGraph and self.graphByData()
         # self.saveAndShow()
         return self
     def predict(self,*args,custom=False,**kwargs):
@@ -114,7 +120,8 @@ class ML(object):
                 self.graphData = tree.export_graphviz(
                     self.clf, out_file=None, feature_names=self.features
                 )
-            except (AttributeError,ValueError):
+            except (AttributeError,ValueError) as e:
+                logging.info(e)
                 return self
         graph = pydotplus.graph_from_dot_data(self.graphData)
         graph.write_png(img)
@@ -169,7 +176,6 @@ class ML(object):
             if len(np.array(val).shape)==1:
                 val=[val]
             p = self.clf.predict(val)[0]
-            # logging.info(p)   
             return (p,'GO' if p else 'NO')
     def RandomForest(self):
         #Random Forest Classifier
@@ -187,12 +193,13 @@ class ML(object):
         self.clf=clf_logreg
         return self
     def exploreSimplify(self,input=None):
-        if not isinstance(input,list):
+        if input and not isinstance(input,list):
             input=[input]
         #The important features are put in a data frame
         self.xColumns = self.getXcolumns()
-        self.df = self.df[self.xColumns.tolist()+[self.target]]
-        self.features=self.df
+        f = input if input else self.xColumns.tolist()+[self.target]
+        self.X = self.df[f]
+        self.features=self.X.columns.tolist()
         #To simplify computations we will use only one feature (Humidity3pm) to build the model
         self.y = self.df[self.target]
         return self
