@@ -73,7 +73,7 @@ class ML(object):
             self.X=df[features]
         else:
             self.X = df.loc[:,df.columns!=self.target]
-        self.features=self.X.columns.tolist()
+        self.features=self.X.columns
         # logging.info(self.features)
         self.y=df[target]
         #Using SelectKBest to get the top features!
@@ -197,9 +197,9 @@ class ML(object):
             input=[input]
         #The important features are put in a data frame
         self.xColumns = self.getXcolumns()
-        f = input if input else self.xColumns.tolist()+[self.target]
-        self.X = self.df[f]
-        self.features=self.X.columns.tolist()
+        features = input if input else self.xColumns+[self.target]
+        self.X = self.df[features]
+        self.features=features
         #To simplify computations we will use only one feature (Humidity3pm) to build the model
         self.y = self.df[self.target]
         return self
