@@ -37,7 +37,7 @@ class DL(Base):
         #Calculating the time taken by the classifier
         # self.t0=time.time()
         self.model=self.evalModel()
-        self.optimize()
+        self.optimize().evaluate().model_efficacy()
         #Evaluating the model using testing data set
         # if hasattr(self,'clf'):
         #     X_test=self.X_test
@@ -51,8 +51,66 @@ class DL(Base):
             self.graphData(self.train_history, 'accuracy', 'val_accuracy')
             # Display the loss curves for training and validation sets
             self.graphData(self.train_history, 'loss', 'val_loss')
-
-        # self.saveAndShow()
+        return self
+    def predict(self,*args,custom=False,**kwargs):
+        if custom:
+            name = 'predict'+self.evalModel.__name__
+            if hasattr(self,name):
+                return getattr(self,name)(*args,**kwargs)
+        else:
+            return self.scoreTime
+    def evaluate(self):
+        # Testing set for model evaluation
+        scores = self.model.evaluate(self.test_feature_trans,self. test_label)
+        # Display accuracy of the model
+        print('n')
+        print('Accuracy=', scores[1])
+        self.scoreTime= scores[1]
+        prediction =self. model.predict(self.test_feature_trans)
+        df_ans = pd.DataFrame({'Real Class': self.test_label})
+        df_ans['Prediction'] = prediction
+        df_ans['Prediction'].value_counts()
+        df_ans['Real Class'].value_counts()
+        cols = ['Real_Class_1', 'Real_Class_0'] # Gold standard
+        rows = ['Prediction_1', 'Prediction_0'] # Diagnostic tool (our prediction)
+        B1P1 = len(df_ans[(df_ans['Prediction'] == df_ans['Real Class']) & (df_ans['Real Class'] == 1)])
+        B1P0 = len(df_ans[(df_ans['Prediction'] != df_ans['Real Class']) & (df_ans['Real Class'] == 1)])
+        B0P1 = len(df_ans[(df_ans['Prediction'] != df_ans['Real Class']) & (df_ans['Real Class'] == 0)])
+        B0P0 = len(df_ans[(df_ans['Prediction'] == df_ans['Real Class']) & (df_ans['Real Class'] == 0)])
+        self.conf = np.array([[B1P1, B0P1], [B1P0, B0P0]])
+        df_cm = pd.DataFrame(self.conf, columns=[i for i in cols], index=[i for i in rows])
+        f, ax = plt.subplots(figsize=(5, 5))
+        sns.heatmap(df_cm, annot=True, ax=ax, fmt='d')
+        # Making x label be on top is common in textbooks.
+        ax.xaxis.set_ticks_position('top')
+        print('Total number of test cases: ', np.sum(self.conf))
+        return self.saveAndShow()
+    # Model summary function
+    def model_efficacy(self):
+        conf=self.conf
+        total_num = np.sum(conf)
+        sen = conf[0][0] / (conf[0][0] + conf[1][0])
+        spe = conf[1][1] / (conf[1][0] + conf[1][1])
+        false_positive_rate = conf[0][1] / (conf[0][1] + conf[1][1])
+        false_negative_rate = conf[1][0] / (conf[0][0] + conf[1][0])
+        print('Total number of test cases: ', total_num)
+        print('G = gold standard, P = prediction')
+        # G = gold standard; P = prediction
+        print('G1P1: ', conf[0][0])
+        print('G0P1: ', conf[0][1])
+        print('G1P0: ', conf[1][0])
+        print('G0P0: ', conf[1][1])
+        print('--------------------------------------------------')
+        print('Sensitivity: ', sen)
+        print('Specificity: ', spe)
+        print('False_positive_rate: ', false_positive_rate)
+        print('False_negative_rate: ', false_negative_rate)
+        return self
+    def saveAndShow(self,enableShow=False):
+        file='img/dl{0}.png'.format(self.imgIndex)
+        self.imgIndex+=1
+        plt.savefig(file)
+        enableShow and plt.show()
         return self
     def optimize(self):
         # Using 'Adam' to optimize the Accuracy matrix
@@ -92,7 +150,4 @@ class DL(Base):
         plt.ylabel(train)
         plt.xlabel('Epoch')
         plt.legend(['train', 'validation'], loc='best')
-        file='img/dl{0}.png'.format(self.imgIndex)
-        self.imgIndex+=1
-        plt.savefig(file)
-        enableShow and plt.show()
+        self.saveAndShow()

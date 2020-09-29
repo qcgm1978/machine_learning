@@ -45,8 +45,9 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
             .preprocessSplit()\
             .preprocessNormalize()\
             .buildModel()
-        ai\
-            .ModelEvaluationOptimization()
+        scoreTime=ai\
+            .ModelEvaluationOptimization()\
+            .predict()
         summary = ai.model.summary
         self.assertTrue(inspect.ismethod(summary))
         # Display the size of the train dataframe
@@ -55,5 +56,6 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
         # Display the size of test dataframe
         self.assertEqual(ai.train_label.shape,(trainRows,))
         self.assertIsInstance(ai.train_history,History)
+        self.assertAlmostEqual(scoreTime,.987,3)
 if __name__ == '__main__':
     unittest.main()
