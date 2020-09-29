@@ -56,6 +56,7 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
         # Display the size of test dataframe
         self.assertEqual(ai.train_label.shape,(trainRows,))
         self.assertIsInstance(ai.train_history,History)
-        self.assertAlmostEqual(scoreTime,.987,3)
+        self.assertAlmostEqual(scoreTime[0][1],.987,3)
+        self.assertLess(scoreTime[1][1],12)
 if __name__ == '__main__':
     unittest.main()

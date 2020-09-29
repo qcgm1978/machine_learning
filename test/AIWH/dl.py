@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import os
 os.environ["TF_CPP_MIN_LOG_LEVEL"]="3"
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt,time
 # Import Keras, Dense, Dropout
 from keras.models import Sequential
 from keras.layers import Dense
@@ -35,7 +35,7 @@ class DL(Base):
         return self
     def ModelEvaluationOptimization(self,enableGraph=True):
         #Calculating the time taken by the classifier
-        # self.t0=time.time()
+        self.t0=time.time()
         self.model=self.evalModel()
         self.optimize().evaluate().model_efficacy()
         #Evaluating the model using testing data set
@@ -45,7 +45,7 @@ class DL(Base):
         #     y_pred = self.clf.predict(X_test)
         #     self.score = accuracy_score(y_test,y_pred)
         #     #Set the accuracy and the time taken by the classifier
-        #     self.scoreTime= ('score',self.score),('time',time.time()-self.t0)
+        self.scoreTime= ('score',self.score),('time',time.time()-self.t0)
         # Display the accuracy curves for training and validation sets
         if enableGraph:
             self.graphData(self.train_history, 'accuracy', 'val_accuracy')
@@ -65,7 +65,7 @@ class DL(Base):
         # Display accuracy of the model
         print('n')
         print('Accuracy=', scores[1])
-        self.scoreTime= scores[1]
+        self.score= scores[1]
         prediction =self. model.predict(self.test_feature_trans)
         df_ans = pd.DataFrame({'Real Class': self.test_label})
         df_ans['Prediction'] = prediction
