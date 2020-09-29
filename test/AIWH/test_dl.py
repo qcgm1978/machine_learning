@@ -1,5 +1,6 @@
-import unittest,numpy as np
+import inspect, unittest,numpy as np
 import pandas
+from tensorflow.python.keras.callbacks import History
 from utilities import getPath,parseNumber
 from .dl import DL
 class TDD_MACHINE_LEARNING(unittest.TestCase):
@@ -27,15 +28,32 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
         nonfraud=counts[0:].tolist()[0]
         self.assertFalse(self.ai.isBalance([self.fraud,nonfraud]))
     def test_preprocess(self):
-        df=self.ai.df
-        self.ai\
+        ai = self.ai
+        df=ai.df
+        ai\
             .preprocessStratified()\
             .preprocessDropCols('Time')
         # Create a new data frame with the first "3000" samples
         df_sample = df.iloc[:3000, :]
         # Now count the number of samples for each class
-        ls = self.ai.valueCounts('Class',df_sample).tolist()
+        ls = ai.valueCounts('Class',df_sample).tolist()
         self.assertEqual(ls,[2508,self.fraud ])
-        self.assertTrue(self.ai.isBalance(ls))
+        self.assertTrue(ai.isBalance(ls))
+        #Randomly shuffle the data set
+        ai\
+            .preprocessShuffle(df_sample)\
+            .preprocessSplit()\
+            .preprocessNormalize()\
+            .buildModel()
+        ai\
+            .ModelEvaluationOptimization()
+        summary = ai.model.summary
+        self.assertTrue(inspect.ismethod(summary))
+        # Display the size of the train dataframe
+        trainRows = 2400
+        self.assertEqual(ai.train_feature.shape,(trainRows,29))
+        # Display the size of test dataframe
+        self.assertEqual(ai.train_label.shape,(trainRows,))
+        self.assertIsInstance(ai.train_history,History)
 if __name__ == '__main__':
     unittest.main()
