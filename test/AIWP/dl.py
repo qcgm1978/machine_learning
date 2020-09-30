@@ -11,11 +11,11 @@ from keras.layers import Dropout
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, fbeta_score, classification_report, confusion_matrix, precision_recall_curve, roc_auc_score, roc_curve
 from .ml import ML
 class DL(ML):
     def __init__(self,d=None):
         self.trainField = 'accuracy'
+        self.isDL=True
         self.imgIndex=0
         self.testCounts=[]
         ML.__init__(self,d)
@@ -144,7 +144,7 @@ class DL(ML):
             kernel_initializer='uniform',
             activation='sigmoid'))
         self.model=model
-        self.setCategory('Classification',isDL=True)
+        self.setCategory('Classification')
         return self
     def graphData(self,train_history, train, validation,enableShow=False):
         # A function to plot the learning curves

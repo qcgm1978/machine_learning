@@ -61,6 +61,6 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
         self.assertEqual(ai.testsInfo['False_positive_rate'],1)
         self.assertEqual(ai.testCounts,[600])
         category=ai.getProblemCategory()
-        self.assertEqual(category,{'type':'Supervised', 'output':'categorical' ,'aim':'category' ,'algorithm':'Logistic Regression'})
+        self.assertCountEqual(category,{'type':'Supervised', 'output':'categorical' ,'aim':'category' ,'algorithm':'Logistic Regression','isDL': True,})
 if __name__ == '__main__':
     unittest.main()
