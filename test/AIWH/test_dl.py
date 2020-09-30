@@ -30,24 +30,23 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
     def test_preprocess(self):
         ai = self.ai
         df=ai.df
-        ai\
+        objective = 'classify a transaction as either fraudulent or not based on past transactions'
+        scoreTime=ai\
+            .defineObjective(objective)\
+            .gatherData(skip=True)\
+            .preprocessLoadData(self.path)\
             .preprocessStratified()\
-            .preprocessDropCols('Time')
-        # Create a new data frame with the first "3000" samples
-        df_sample = df.iloc[:3000, :]
-        # Now count the number of samples for each class
-        ls = ai.valueCounts('Class',df_sample).tolist()
-        self.assertEqual(ls,[2508,self.fraud ])
-        self.assertTrue(ai.isBalance(ls))
-        #Randomly shuffle the data set
-        ai\
-            .preprocessShuffle(df_sample)\
+            .preprocessDropCols('Time')\
+            .preprocessShuffle(3000)\
             .preprocessSplit()\
             .preprocessNormalize()\
-            .buildModel()
-        scoreTime=ai\
+            .buildModel()\
             .ModelEvaluationOptimization()\
             .predict()
+        # Now count the number of samples for each class
+        ls = ai.df_sample.tolist()
+        self.assertEqual(ls,[2508,self.fraud ])
+        self.assertTrue(ai.isBalance(ls))
         summary = ai.model.summary
         self.assertTrue(inspect.ismethod(summary))
         # Display the size of the train dataframe
@@ -56,7 +55,9 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
         # Display the size of test dataframe
         self.assertEqual(ai.train_label.shape,(trainRows,))
         self.assertIsInstance(ai.train_history,History)
-        self.assertAlmostEqual(scoreTime[0][1],.987,3)
-        self.assertLess(scoreTime[1][1],12)
+        self.assertGreater(scoreTime[0][1],.97)
+        self.assertLess(scoreTime[1][1],16)
+        self.assertEqual(ai.testsInfo['False_positive_rate'],1)
+        self.assertEqual(ai.testCounts,[600])
 if __name__ == '__main__':
     unittest.main()
