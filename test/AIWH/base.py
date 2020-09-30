@@ -36,19 +36,21 @@ class Base(object):
         self.df=self.df.drop(columns=columns,axis=1)
         return self
     def preprocessShuffle(self, n):
+        self.n=n
         # Create a new data frame with the first n samples
         df_sample = self.df.iloc[:n, :]
         self.shuffle_df = shuffle(df_sample, random_state=42)
         self.df_sample=self.valueCounts('Class',df_sample)
         return self
-    def preprocessSplit(self):
+    def preprocessSplit(self,featuresEnd):
         # Spilt the dataset into train and test data frame
-        df_train = self.shuffle_df[0:2400]
-        df_test = self.shuffle_df[2400:]
+        endInd = int(self.n*.8)
+        df_train = self.shuffle_df[0:endInd]
+        df_test = self.shuffle_df[endInd:]
         # Spilt each dataframe into feature and label
-        self.train_feature = np.array(df_train.values[:, 0:29])
+        self.train_feature = np.array(df_train.values[:, 0:featuresEnd])
         self.train_label = np.array(df_train.values[:, -1])
-        self.test_feature = np.array(df_test.values[:, 0:29])
+        self.test_feature = np.array(df_test.values[:, 0:featuresEnd])
         self.test_label = np.array(df_test.values[:, -1])
         return self
     def valueCounts(self,colName,df=None):
