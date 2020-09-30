@@ -144,7 +144,7 @@ class DL(ML):
             kernel_initializer='uniform',
             activation='sigmoid'))
         self.model=model
-        self.setCategory('Classification')
+        self.setCategory('Classification',isDL=True)
         return self
     def graphData(self,train_history, train, validation,enableShow=False):
         # A function to plot the learning curves
