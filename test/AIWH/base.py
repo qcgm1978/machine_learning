@@ -1,5 +1,6 @@
 import pandas as pd,numpy as np
 from sklearn.utils import shuffle
+import urllib.request
 class Base(object):
     def __init__(self,d=None):
         if d is None:
@@ -9,6 +10,22 @@ class Base(object):
     @property
     def shape(self):
         return self.df.shape
+    def defineObjective(self,objective):
+        self.objective=objective
+        return self
+    def gatherData(self,url=None,skip=False,location=None):
+        if not skip:
+            if url is None:
+                return print('No url supplied')
+            else:
+                try:
+                    print('Beginning file download with urllib2...')
+                    urllib.request.urlretrieve(url, location)
+                except urllib.error.URLError as e:
+                    print(e)
+                    if not skip:
+                        raise
+        return self
     def preprocessLoadData(self,p):
         if not hasattr(self,'df'):
         #Load the data set
@@ -18,8 +35,11 @@ class Base(object):
     def preprocessDropCols(self,columns):
         self.df=self.df.drop(columns=columns,axis=1)
         return self
-    def preprocessShuffle(self, df_sample):
+    def preprocessShuffle(self, n):
+        # Create a new data frame with the first n samples
+        df_sample = self.df.iloc[:n, :]
         self.shuffle_df = shuffle(df_sample, random_state=42)
+        self.df_sample=self.valueCounts('Class',df_sample)
         return self
     def preprocessSplit(self):
         # Spilt the dataset into train and test data frame

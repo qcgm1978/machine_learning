@@ -16,6 +16,7 @@ from .base import Base
 class DL(Base):
     def __init__(self,d=None):
         self.imgIndex=0
+        self.testCounts=[]
         Base.__init__(self,d)
     def preprocessStratified(self):
         #Sort the dataset by "class" to apply stratified sampling
@@ -62,9 +63,7 @@ class DL(Base):
     def evaluate(self):
         # Testing set for model evaluation
         scores = self.model.evaluate(self.test_feature_trans,self. test_label)
-        # Display accuracy of the model
-        print('n')
-        print('Accuracy=', scores[1])
+        # Set accuracy of the model
         self.score= scores[1]
         prediction =self. model.predict(self.test_feature_trans)
         df_ans = pd.DataFrame({'Real Class': self.test_label})
@@ -77,34 +76,34 @@ class DL(Base):
         B1P0 = len(df_ans[(df_ans['Prediction'] != df_ans['Real Class']) & (df_ans['Real Class'] == 1)])
         B0P1 = len(df_ans[(df_ans['Prediction'] != df_ans['Real Class']) & (df_ans['Real Class'] == 0)])
         B0P0 = len(df_ans[(df_ans['Prediction'] == df_ans['Real Class']) & (df_ans['Real Class'] == 0)])
-        self.conf = np.array([[B1P1, B0P1], [B1P0, B0P0]])
-        df_cm = pd.DataFrame(self.conf, columns=[i for i in cols], index=[i for i in rows])
+        self.tests = np.array([[B1P1, B0P1], [B1P0, B0P0]])
+        df_cm = pd.DataFrame(self.tests, columns=[i for i in cols], index=[i for i in rows])
         f, ax = plt.subplots(figsize=(5, 5))
         sns.heatmap(df_cm, annot=True, ax=ax, fmt='d')
         # Making x label be on top is common in textbooks.
         ax.xaxis.set_ticks_position('top')
-        print('Total number of test cases: ', np.sum(self.conf))
+        self.testCounts.append(np.sum(self.tests))
         return self.saveAndShow()
     # Model summary function
     def model_efficacy(self):
-        conf=self.conf
+        conf=self.tests
         total_num = np.sum(conf)
         sen = conf[0][0] / (conf[0][0] + conf[1][0])
         spe = conf[1][1] / (conf[1][0] + conf[1][1])
         false_positive_rate = conf[0][1] / (conf[0][1] + conf[1][1])
         false_negative_rate = conf[1][0] / (conf[0][0] + conf[1][0])
-        print('Total number of test cases: ', total_num)
-        print('G = gold standard, P = prediction')
-        # G = gold standard; P = prediction
-        print('G1P1: ', conf[0][0])
-        print('G0P1: ', conf[0][1])
-        print('G1P0: ', conf[1][0])
-        print('G0P0: ', conf[1][1])
-        print('--------------------------------------------------')
-        print('Sensitivity: ', sen)
-        print('Specificity: ', spe)
-        print('False_positive_rate: ', false_positive_rate)
-        print('False_negative_rate: ', false_negative_rate)
+        testsInfo={}
+        testsInfo['count']= total_num
+        # 'G = gold standard, P = prediction'
+        testsInfo['G1P1']= conf[0][0]
+        testsInfo['G0P1']= conf[0][1]
+        testsInfo['G1P0']= conf[1][0]
+        testsInfo['G0P0']= conf[1][1]
+        testsInfo['Sensitivity']= sen
+        testsInfo['Specificity']= spe
+        testsInfo['False_positive_rate']= false_positive_rate
+        testsInfo['False_negative_rate']= false_negative_rate
+        self.testsInfo=testsInfo
         return self
     def saveAndShow(self,enableShow=False):
         file='img/dl{0}.png'.format(self.imgIndex)
@@ -118,12 +117,19 @@ class DL(Base):
         metrics=['accuracy'])
         # Fit the model
         # number of epochs = 200 and batch size = 500
-        self.train_history =self. model.fit(x=self.train_feature_trans, y=self.train_label,
-        validation_split=0.8, epochs=200,
-        batch_size=500, verbose=2)
+        self.train_history =self. model.fit(
+            x=self.train_feature_trans, 
+            y=self.train_label,
+            validation_split=0.8, 
+            epochs=200,
+            batch_size=500, 
+            # verbose: 0, 1, or 2. Verbosity mode. 0 = silent, 1 = progress bar, 2 = one line per epoch. Note that the progress bar is not particularly useful when logged to a file, so verbose=2 is recommended when not running interactively (eg, in a production environment).
+            verbose=0
+        )
         return self
     def denseSequential(self):
-        model=Sequential() # Adding a Dense layer with 200 neuron units and ReLu activation function
+        model=Sequential() 
+        # Adding a Dense layer with 200 neuron units and ReLu activation function
         model.add(Dense(units=200,
         input_dim=29,
         kernel_initializer='uniform',
@@ -131,15 +137,17 @@ class DL(Base):
         # Add Dropout
         model.add(Dropout(0.5))
         # Second Dense layer with 200 neuron units and ReLu activation function
-        model.add(Dense(units=200,
-        kernel_initializer='uniform',
-        activation='relu'))
+        model.add(
+            Dense(units=200,
+                kernel_initializer='uniform',
+                activation='relu')
+        )
         # Add Dropout
         model.add(Dropout(0.5))
         # The output layer with 1 neuron unit and Sigmoid activation function
         model.add(Dense(units=1,
-        kernel_initializer='uniform',
-        activation='sigmoid'))
+            kernel_initializer='uniform',
+            activation='sigmoid'))
         return model
     def graphData(self,train_history, train, validation,enableShow=False):
         # A function to plot the learning curves

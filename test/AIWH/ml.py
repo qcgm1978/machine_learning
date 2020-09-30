@@ -17,7 +17,6 @@ import time
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn import svm,tree
-import urllib.request
 from .base import Base
 class ML(Base):
     
@@ -30,22 +29,7 @@ class ML(Base):
     @property
     def dataCols(self):
         return self.df.shape[1]
-    def defineObjective(self,objective):
-        self.objective=objective
-        return self
-    def gatherData(self,url=None,skip=False,location=None):
-        if not skip:
-            if url is None:
-                return print('No url supplied')
-            else:
-                try:
-                    print('Beginning file download with urllib2...')
-                    urllib.request.urlretrieve(url, location)
-                except urllib.error.URLError as e:
-                    print(e)
-                    if not skip:
-                        raise
-        return self
+    
     
     def preprocessDrop(self,columns=None):
         if columns is None:
