@@ -1,7 +1,7 @@
 import pandas as pd,numpy as np
 from sklearn.utils import shuffle
 import urllib.request
-class Base(object):
+class AI(object):
     def __init__(self,d=None):
         if d is None:
             self.topFeaturesNum=0
@@ -10,6 +10,9 @@ class Base(object):
     @property
     def shape(self):
         return self.df.shape
+    def setCategory(self,category):
+        self.category=category
+        return self
     def defineObjective(self,objective):
         self.objective=objective
         return self

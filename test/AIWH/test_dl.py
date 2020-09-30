@@ -1,5 +1,6 @@
 import inspect, unittest,numpy as np
 import pandas
+from pandas.core.indexes import category
 from tensorflow.python.keras.callbacks import History
 from utilities import getPath,parseNumber
 from .dl import DL
@@ -59,5 +60,7 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
         self.assertLess(scoreTime[1][1],16)
         self.assertEqual(ai.testsInfo['False_positive_rate'],1)
         self.assertEqual(ai.testCounts,[600])
+        category=ai.getProblemCategory()
+        self.assertEqual(category,{'type':'Supervised', 'output':'categorical' ,'aim':'category' ,'algorithm':'Logistic Regression'})
 if __name__ == '__main__':
     unittest.main()

@@ -17,9 +17,8 @@ import time
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn import svm,tree
-from .base import Base
-class ML(Base):
-    
+from .AI import AI
+class ML(AI):
     @property
     def target(self):
         return self.__target
@@ -29,8 +28,13 @@ class ML(Base):
     @property
     def dataCols(self):
         return self.df.shape[1]
-    
-    
+    categories={
+        'Regression': {'type':'Supervised','output':'continuous','aim':'predict','algorithm':'Linear Regression'},
+        'Classification':{'type':'Supervised', 'output':'categorical' ,'aim':'category' ,'algorithm':'Logistic Regression'},
+        'Clustering':{'type':'Unsupervised','output':'clusters','aim':'group','algorithm':'K-means'}
+    }
+    def getProblemCategory(self):
+        return self.categories[self.category]
     def preprocessDrop(self,columns=None):
         if columns is None:
             return
@@ -39,7 +43,7 @@ class ML(Base):
         self.df = self.df.dropna(how='any')
         self.removeOutliers()
         return self
-    def explorePredictor(self,features=None,target=None):
+    def EDApredictor(self,features=None,target=None):
         df=self.df
         self.__target=target
         if features:

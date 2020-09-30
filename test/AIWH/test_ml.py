@@ -34,7 +34,7 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
             .preprocessReplace(rep)\
             .preprocessDrop(self.columns)\
             .preprocessNormalize()\
-            .explorePredictor(target=self.target)\
+            .EDApredictor(target=self.target)\
             .exploreSimplify('Humidity3pm')\
             .buildModel()\
             .ModelEvaluationOptimization()\
@@ -81,7 +81,7 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
             .gatherData(skip=True)\
             .preprocessLoadData(file)\
             .preprocessReplace(mapData)\
-            .explorePredictor(X, target)\
+            .EDApredictor(X, target)\
             .buildModel(2)\
             .ModelEvaluationOptimization(enableGraph=False)\
             .predict(val=[40, 10, 6, 1],custom=True)
