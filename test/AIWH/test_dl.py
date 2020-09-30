@@ -38,7 +38,7 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
             .preprocessStratified()\
             .preprocessDropCols('Time')\
             .preprocessShuffle(3000)\
-            .preprocessSplit()\
+            .preprocessSplit(29)\
             .preprocessNormalize()\
             .buildModel()\
             .ModelEvaluationOptimization()\

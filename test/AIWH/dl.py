@@ -15,6 +15,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from .base import Base
 class DL(Base):
     def __init__(self,d=None):
+        self.trainField = 'accuracy'
         self.imgIndex=0
         self.testCounts=[]
         Base.__init__(self,d)
@@ -39,17 +40,10 @@ class DL(Base):
         self.t0=time.time()
         self.model=self.evalModel()
         self.optimize().evaluate().model_efficacy()
-        #Evaluating the model using testing data set
-        # if hasattr(self,'clf'):
-        #     X_test=self.X_test
-        #     y_test=self.y_test
-        #     y_pred = self.clf.predict(X_test)
-        #     self.score = accuracy_score(y_test,y_pred)
-        #     #Set the accuracy and the time taken by the classifier
         self.scoreTime= ('score',self.score),('time',time.time()-self.t0)
         # Display the accuracy curves for training and validation sets
         if enableGraph:
-            self.graphData(self.train_history, 'accuracy', 'val_accuracy')
+            self.graphData(self.train_history,self.trainField , 'val_'+self.trainField)
             # Display the loss curves for training and validation sets
             self.graphData(self.train_history, 'loss', 'val_loss')
         return self
@@ -113,8 +107,10 @@ class DL(Base):
         return self
     def optimize(self):
         # Using 'Adam' to optimize the Accuracy matrix
-        self.model.compile(loss='binary_crossentropy', optimizer='adam',
-        metrics=['accuracy'])
+        self.model.compile(
+            loss='binary_crossentropy', 
+            optimizer='adam',
+            metrics=[self.trainField])
         # Fit the model
         # number of epochs = 200 and batch size = 500
         self.train_history =self. model.fit(
