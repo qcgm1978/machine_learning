@@ -7,11 +7,21 @@ class AI(object):
             self.topFeaturesNum=0
         else:
             self.topFeaturesNum=d['topFeaturesNum']
+        self.categories={
+        'Regression': {'type':'Supervised','output':'continuous','aim':'predict','algorithm':'Linear Regression'},
+        'Classification':{'type':'Supervised', 'output':'categorical' ,'aim':'category' ,'algorithm':'Logistic Regression'},
+        'Clustering':{'type':'Unsupervised','output':'clusters','aim':'group','algorithm':'K-means'}
+    }
     @property
     def shape(self):
         return self.df.shape
-    def setCategory(self,category):
+   
+    def getProblemCategory(self):
+        return self.categories[self.category]
+    def setCategory(self,category,isDL=False):
         self.category=category
+        if isDL:
+            self.categories[category].update('isDL',True)
         return self
     def defineObjective(self,objective):
         self.objective=objective

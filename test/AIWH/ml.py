@@ -28,13 +28,7 @@ class ML(AI):
     @property
     def dataCols(self):
         return self.df.shape[1]
-    categories={
-        'Regression': {'type':'Supervised','output':'continuous','aim':'predict','algorithm':'Linear Regression'},
-        'Classification':{'type':'Supervised', 'output':'categorical' ,'aim':'category' ,'algorithm':'Logistic Regression'},
-        'Clustering':{'type':'Unsupervised','output':'clusters','aim':'group','algorithm':'K-means'}
-    }
-    def getProblemCategory(self):
-        return self.categories[self.category]
+    
     def preprocessDrop(self,columns=None):
         if columns is None:
             return
