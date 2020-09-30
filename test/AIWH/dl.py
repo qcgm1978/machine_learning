@@ -12,13 +12,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, fbeta_score, classification_report, confusion_matrix, precision_recall_curve, roc_auc_score, roc_curve
-from .base import Base
-class DL(Base):
+from .ml import ML
+class DL(ML):
     def __init__(self,d=None):
         self.trainField = 'accuracy'
         self.imgIndex=0
         self.testCounts=[]
-        Base.__init__(self,d)
+        ML.__init__(self,d)
     def preprocessStratified(self):
         #Sort the dataset by "class" to apply stratified sampling
         self.df.sort_values(by='Class', ascending=False, inplace=True)
@@ -38,8 +38,7 @@ class DL(Base):
     def ModelEvaluationOptimization(self,enableGraph=True):
         #Calculating the time taken by the classifier
         self.t0=time.time()
-        self.model=self.evalModel()
-        self.optimize().evaluate().model_efficacy()
+        self.evalModel().optimize().evaluate().model_efficacy()
         self.scoreTime= ('score',self.score),('time',time.time()-self.t0)
         # Display the accuracy curves for training and validation sets
         if enableGraph:
@@ -144,7 +143,9 @@ class DL(Base):
         model.add(Dense(units=1,
             kernel_initializer='uniform',
             activation='sigmoid'))
-        return model
+        self.model=model
+        self.setCategory('Classification')
+        return self
     def graphData(self,train_history, train, validation,enableShow=False):
         # A function to plot the learning curves
         # def show_train_history(train_history, train, validation):
