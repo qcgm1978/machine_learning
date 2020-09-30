@@ -18,10 +18,10 @@ class AI(object):
    
     def getProblemCategory(self):
         return self.categories[self.category]
-    def setCategory(self,category,isDL=False):
+    def setCategory(self,category):
         self.category=category
-        if isDL:
-            self.categories[category].update('isDL',True)
+        if self.isDL:
+            self.categories[category].update({'isDL':True})
         return self
     def defineObjective(self,objective):
         self.objective=objective
