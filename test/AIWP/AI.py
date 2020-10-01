@@ -2,6 +2,7 @@ import pandas as pd,numpy as np
 from sklearn.utils import shuffle
 import urllib.request
 class AI(object):
+    hasLoadModel=False
     def __init__(self,d=None):
         if d is None:
             self.topFeaturesNum=0
@@ -71,14 +72,34 @@ class AI(object):
         self.test_feature = np.array(df_test.values[:, 0:featuresEnd])
         self.test_label = np.array(df_test.values[:, -1])
         return self
-    def debugSave(self):
-        # serialize model to JSON
-        model_json = self.model.to_json()
-        with open("test/AIWP/models/model.json", "w") as json_file:
-            json_file.write(model_json)
+    def debugSave(self,isJSON=True):
+        if self.hasLoadModel:
+            raise RuntimeError('Local model has loaded'
+                         'Disable `ai.debugLoadModel`.')
+        formats=(self.model.to_json,self.model.to_yaml)
+        # serialize model to JSON or yaml
+        model_format = formats[isJSON]()
+        with open("test/AIWP/models/model.{0}".format('json' if isJSON else 'yaml'), "w") as file:
+            file.write(model_format)
         # serialize weights to HDF5
         self.model.save_weights("test/AIWP/models/model.h5")
-        print("Saved model to disk")
+        return self
+    def debugLoadModel(self,isJSON=True):
+        from keras.models import model_from_json,model_from_yaml
+         # load json and create model
+        file = open('test/AIWP/models/model.{0}'.format('json' if isJSON else 'yaml'), 'r')
+        loaded_model_format = file.read()
+        file.close()
+        self.loaded_model = (model_from_json if isJSON else model_from_yaml)(loaded_model_format)
+        # load weights into new model
+        self.loaded_model.load_weights("test/AIWP/models/model.h5")
+        self.hasLoadModel=True
+        return self
+    def debugEvalModel(self):
+        # evaluate loaded model on test data
+        self.loaded_model.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
+        score = self.loaded_model.evaluate(**self.currentFitData, verbose=0)
+        self.scoreTime=(self.loaded_model.metrics_names[1], "%.2f%%" % (score[1]*100))
         return self
     def valueCounts(self,colName,df=None):
         if df is None:

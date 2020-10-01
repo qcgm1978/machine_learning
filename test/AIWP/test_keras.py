@@ -57,7 +57,12 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
         # make class predictions with the model
         binaryPredict = ai.predictdenseSequential(5)
         self.assertAlmostEqual(binaryPredict,1,0)
-        temp.debugSave()
-    
+        if ai.hasLoadModel:
+            self.assertRaises(RuntimeError,temp.debugSave,isJSON=False)
+        # ai.debugSave(isJSON=False)
+    def test_load_model(self):
+        pass
+        accuracyScore=self.ai.debugLoadModel(isJSON=False).debugEvalModel().predict()
+        self.assertEqual(accuracyScore,('accuracy','74.71%'))
 if __name__ == '__main__':
     unittest.main()
