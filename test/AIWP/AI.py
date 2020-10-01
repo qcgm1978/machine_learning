@@ -14,6 +14,8 @@ class AI(object):
         'Clustering':{'type':'Unsupervised','output':'clusters','aim':'group','algorithm':'K-means'}
     }
         self.normalized=False
+        self.path='test/AIWP/models/'
+        
     @property
     def shape(self):
         return self.df.shape
@@ -72,32 +74,42 @@ class AI(object):
         self.test_feature = np.array(df_test.values[:, 0:featuresEnd])
         self.test_label = np.array(df_test.values[:, -1])
         return self
-    def debugSave(self,isJSON=True):
-        if self.hasLoadModel:
+    def debugSave(self,isJSON=True,isSave=False):
+        if isSave:
+            self.model.save("{0}model.h5".format(self.path))
+        elif self.hasLoadModel:
             raise RuntimeError('Local model has loaded'
-                         'Disable `ai.debugLoadModel`.')
-        formats=(self.model.to_json,self.model.to_yaml)
-        # serialize model to JSON or yaml
-        model_format = formats[isJSON]()
-        with open("test/AIWP/models/model.{0}".format('json' if isJSON else 'yaml'), "w") as file:
-            file.write(model_format)
-        # serialize weights to HDF5
-        self.model.save_weights("test/AIWP/models/model.h5")
+                        'Disable `ai.debugLoadModel`.')
+        else:
+            formats=(self.model.to_json,self.model.to_yaml)
+            # serialize model to JSON or yaml
+            model_format = formats[isJSON]()
+            with open("{1}model.{0}".format('json' if isJSON else 'yaml',self.path), "w") as file:
+                file.write(model_format)
+            # serialize weights to HDF5
+            self.model.save_weights("{0}model.h5".format(self.path))
         return self
-    def debugLoadModel(self,isJSON=True):
-        from keras.models import model_from_json,model_from_yaml
-         # load json and create model
-        file = open('test/AIWP/models/model.{0}'.format('json' if isJSON else 'yaml'), 'r')
-        loaded_model_format = file.read()
-        file.close()
-        self.loaded_model = (model_from_json if isJSON else model_from_yaml)(loaded_model_format)
-        # load weights into new model
-        self.loaded_model.load_weights("test/AIWP/models/model.h5")
+    def debugLoadModel(self,isJSON=True,isSave=False):
+        from keras.models import model_from_json,model_from_yaml,load_model
+        self.isSave=True
+        if isSave:
+            self.loaded_model = load_model('{0}model.h5'.format(self.path))
+            # summarize model.
+            self.loaded_model.summary()
+        else:
+            # load json and create model
+            file = open('{1}model.{0}'.format('json' if isJSON else 'yaml',self.path), 'r')
+            loaded_model_format = file.read()
+            file.close()
+            self.loaded_model = (model_from_json if isJSON else model_from_yaml)(loaded_model_format)
+            # load weights into new model
+            self.loaded_model.load_weights("{0}model.h5".format(self.path))
         self.hasLoadModel=True
         return self
     def debugEvalModel(self):
         # evaluate loaded model on test data
-        self.loaded_model.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
+        if not self.isSave:
+            self.loaded_model.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
         score = self.loaded_model.evaluate(**self.currentFitData, verbose=0)
         self.scoreTime=(self.loaded_model.metrics_names[1], "%.2f%%" % (score[1]*100))
         return self
