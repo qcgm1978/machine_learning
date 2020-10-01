@@ -59,10 +59,10 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
         self.assertAlmostEqual(binaryPredict,1,0)
         if ai.hasLoadModel:
             self.assertRaises(RuntimeError,temp.debugSave,isJSON=False)
-        # ai.debugSave(isJSON=False)
+        # ai.debugSave(isSave=True)
     def test_load_model(self):
         pass
-        accuracyScore=self.ai.debugLoadModel(isJSON=False).debugEvalModel().predict()
-        self.assertEqual(accuracyScore,('accuracy','74.71%'))
+        accuracyScore=self.ai.debugLoadModel(isJSON=False,isSave=True).debugEvalModel().predict()
+        self.assertEqual(accuracyScore,('accuracy','74.55%'))
 if __name__ == '__main__':
     unittest.main()
