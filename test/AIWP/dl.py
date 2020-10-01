@@ -29,6 +29,7 @@ class DL(ML):
         scaler.fit(self.train_feature)
         self.train_feature_trans = scaler.transform(self.train_feature)
         self.test_feature_trans = scaler.transform(self.test_feature)
+        self.normalized=True
         return self
     def buildModel(self,classificationModel=0):
         #Select model type
@@ -46,13 +47,22 @@ class DL(ML):
             # Display the loss curves for training and validation sets
             self.graphData(self.train_history, 'loss', 'val_loss')
         return self
-    def predict(self,*args,custom=False,**kwargs):
+    def predict(self,*args,custom=False,times=1,**kwargs):
         if custom:
             name = 'predict'+self.evalModel.__name__
             if hasattr(self,name):
                 return getattr(self,name)(*args,**kwargs)
         else:
-            return self.scoreTime
+            if times==1:
+                return self.scoreTime
+            else:
+                l=[self.scoreTime]
+                tot=0
+                for i in range(times-1):
+                    self.ModelEvaluationOptimization(enableGraph=False)
+                    l.append(self.scoreTime)
+                    tot+=self.scoreTime[0][1]
+                return l,tot/times
     def evaluate(self):
         # Testing set for model evaluation
         scores = self.model.evaluate(self.test_feature_trans,self. test_label)
@@ -77,6 +87,21 @@ class DL(ML):
         ax.xaxis.set_ticks_position('top')
         self.testCounts.append(np.sum(self.tests))
         return self.saveAndShow()
+    def predictdenseSequential(self,n):
+        # make class predictions with the model
+        X = self.currentFitData['x']
+        predictions = self.model.predict(X)
+        # summarize the first n cases
+        numerator= denominator=0
+        for i,(p,y) in enumerate(zip(predictions, self.currentFitData['y'])):
+            if i==n:
+                break
+            # print(p,y)
+            if round(p[0])==y:
+                numerator+=1
+            else:
+                denominator+=1
+        return numerator/denominator if denominator else 1
     # Model summary function
     def model_efficacy(self):
         conf=self.tests
@@ -111,10 +136,12 @@ class DL(ML):
             optimizer='adam',
             metrics=[self.trainField])
         # Fit the model
-        # number of epochs = 200 and batch size = 500
+        self.currentFitData={
+            'x':self.train_feature_trans, 
+            'y':self.train_label,
+        }
         self.train_history =self. model.fit(
-            x=self.train_feature_trans, 
-            y=self.train_label,
+            **self.currentFitData,
             validation_split=0.8, 
             epochs=200,
             batch_size=500, 
@@ -124,9 +151,13 @@ class DL(ML):
         return self
     def denseSequential(self):
         model=Sequential() 
+        if hasattr(self,'input_dim'):
+            input_dim=self.input_dim
+        else:
+            input_dim=self.shape[1]-1
         # Adding a Dense layer with 200 neuron units and ReLu activation function
         model.add(Dense(units=200,
-        input_dim=29,
+        input_dim=input_dim,
         kernel_initializer='uniform',
         activation='relu'))
         # Add Dropout

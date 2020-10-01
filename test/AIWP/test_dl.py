@@ -30,8 +30,8 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
         self.assertFalse(self.ai.isBalance([self.fraud,nonfraud]))
     def test_preprocess(self):
         ai = self.ai
-        df=ai.df
         objective = 'classify a transaction as either fraudulent or not based on past transactions'
+        self.input_dim=29
         scoreTime=ai\
             .defineObjective(objective)\
             .gatherData(skip=True)\

@@ -42,6 +42,8 @@ class ML(AI):
         self.__target=target
         if features:
             self.X=df[features]
+        elif hasattr(self,'input'):
+            self.X=self.input
         else:
             self.X = df.loc[:,df.columns!=self.target]
         self.features=self.X.columns
