@@ -3,3 +3,4 @@ venv/
 .DS_Store
 data/creditcard.csv
 data/weatherAUS.csv
+data/pima-indians-diabetes.data.csv

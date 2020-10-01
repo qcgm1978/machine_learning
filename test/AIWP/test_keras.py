@@ -40,6 +40,7 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
             .preprocessNormalize()\
             .buildModel()\
             .ModelEvaluationOptimization()
+            
         scoreTime=temp.predict()
         self.assertEqual(ai.shape,(767, 9))
         io=ai.getInputOutput()
@@ -56,7 +57,7 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
         # make class predictions with the model
         binaryPredict = ai.predictdenseSequential(5)
         self.assertAlmostEqual(binaryPredict,1,0)
-
+        temp.debugSave()
     
 if __name__ == '__main__':
     unittest.main()

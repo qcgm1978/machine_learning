@@ -19,29 +19,6 @@ class AI(object):
     @property
     def layers(self):
         return 3
-    def getInputOutput(self):
-        formula='y = f(X)'
-        df=self.df
-        input=[]
-        output=[]
-        for i in range (self.shape[1]):
-            data=df[:i]
-            numbers = [1, 0]
-            reports = data.isin(numbers)
-            if all(reports):
-                output.append(i)
-            else:
-                input.append(i)
-        return {'formula':formula,'input':input,'output':output}
-    def getProblemCategory(self):
-        return self.categories[self.category]
-    def setCategory(self,category):
-        self.category=category
-        if self.isDL:
-            self.categories[category].update({'isDL':True})
-        return self
-    def setColumnsName(self,l):
-        self.columnsName=l
     def defineObjective(self,objective):
         self.objective=objective
         return self
@@ -94,6 +71,15 @@ class AI(object):
         self.test_feature = np.array(df_test.values[:, 0:featuresEnd])
         self.test_label = np.array(df_test.values[:, -1])
         return self
+    def debugSave(self):
+        # serialize model to JSON
+        model_json = self.model.to_json()
+        with open("test/AIWP/models/model.json", "w") as json_file:
+            json_file.write(model_json)
+        # serialize weights to HDF5
+        self.model.save_weights("test/AIWP/models/model.h5")
+        print("Saved model to disk")
+        return self
     def valueCounts(self,colName,df=None):
         if df is None:
             df = self.df
@@ -110,4 +96,27 @@ class AI(object):
         self.output = self.df.iloc[:,r.stop]
         self.input_dim=self.input.shape[1]
         return self.input,self.output
+    def getInputOutput(self):
+        formula='y = f(X)'
+        df=self.df
+        input=[]
+        output=[]
+        for i in range (self.shape[1]):
+            data=df[:i]
+            numbers = [1, 0]
+            reports = data.isin(numbers)
+            if all(reports):
+                output.append(i)
+            else:
+                input.append(i)
+        return {'formula':formula,'input':input,'output':output}
+    def getProblemCategory(self):
+        return self.categories[self.category]
+    def setCategory(self,category):
+        self.category=category
+        if self.isDL:
+            self.categories[category].update({'isDL':True})
+        return self
+    def setColumnsName(self,l):
+        self.columnsName=l
     
