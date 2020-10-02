@@ -23,24 +23,14 @@ def main():
         f = open(sys.argv[1] + ".py", "w+")
         # for i in range(10):
         #      f.write("This is line %d\r\n" % (i+1))
-        content = """import sys
-import os
-PACKAGE_PARENT = '../..'
-SCRIPT_DIR = os.path.dirname(os.path.realpath(
-    os.path.join(os.getcwd(), os.path.expanduser(__file__))))
-sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
-import unittest{2}
-from graphic.plot import Plot
+        content = """import unittest{2}
 from utilities import getPath,parseNumber
 class TDD_{0}(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        class PlotAI(Plot):
-            def __init__(self,arg=None):
-                Plot.__init__(self)
-        cls.d = PlotAI()
+        cls.foo = 1
     def test_{1}(self):
-        self.assertIsInstance(self.d,object)
+        self.assertEqual(self.foo,1)
 if __name__ == '__main__':
     unittest.main()
 

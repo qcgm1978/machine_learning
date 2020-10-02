@@ -41,7 +41,7 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
             .buildModel()\
             .ModelEvaluationOptimization()
             
-        scoreTime=temp.predict()
+        accuracyTime=temp.predict()
         self.assertEqual(ai.shape,(767, 9))
         io=ai.getInputOutput()
         self.assertCountEqual(io,{'formula':'y = f(X)','input':list(range(0,9)),'output':[9]})
@@ -51,7 +51,7 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
         self.assertEqual(X.shape,(767,dim))
         self.assertEqual(ai.input_dim,dim)
         self.assertEqual(ai.layers,3)
-        self.assertAlmostEqual(scoreTime[0][1],.8,1)
+        self.assertAlmostEqual(accuracyTime[0][1],.8,1)
         # scoreTime,average=temp.predict(times=5)
         # self.assertAlmostEqual(average,.77,2)
         # make class predictions with the model
@@ -62,7 +62,7 @@ class TDD_MACHINE_LEARNING(unittest.TestCase):
         # ai.debugSave(isSave=True)
     def test_load_model(self):
         pass
-        accuracyScore=self.ai.debugLoadModel(isJSON=False,isSave=True).debugEvalModel().predict()
-        self.assertEqual(accuracyScore,('accuracy','74.55%'))
+        accuracyScore,average=self.ai.debugLoadModel(isJSON=False,isSave=True).debugEvalModel().predict(times=5)
+        self.assertGreater(average,.6)
 if __name__ == '__main__':
     unittest.main()
