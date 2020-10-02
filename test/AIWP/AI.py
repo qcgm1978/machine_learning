@@ -95,7 +95,6 @@ class AI(object):
         if isSave:
             self.loaded_model = load_model('{0}model.h5'.format(self.path))
             # summarize model.
-            self.loaded_model.summary()
         else:
             # load json and create model
             file = open('{1}model.{0}'.format('json' if isJSON else 'yaml',self.path), 'r')
@@ -109,10 +108,20 @@ class AI(object):
     def debugEvalModel(self):
         # evaluate loaded model on test data
         if not self.isSave:
-            self.loaded_model.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
+            self.loaded_model.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics=[self.trainField])
         score = self.loaded_model.evaluate(**self.currentFitData, verbose=0)
-        self.scoreTime=(self.loaded_model.metrics_names[1], "%.2f%%" % (score[1]*100))
+        self.score= score[1]
         return self
+    def interpretPlotModel(self):
+        from keras.utils.vis_utils import plot_model
+        plot_model(self.model, to_file='{0}model_plot.png'.format(self.path), show_shapes=True, show_layer_names=True)
+        return self
+    
+    def summary(self):
+        l=[]
+        self.model.summary(print_fn=lambda item:l.append(item))
+        return l
+    
     def valueCounts(self,colName,df=None):
         if df is None:
             df = self.df

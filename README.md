@@ -1,5 +1,7 @@
 # machine_learning
 
+tensorboard: python3 -m tensorboard.main --logdir=test/keras/logs
+
 switch pip source:
 
 pip installpython -m ensurepip

@@ -39,13 +39,16 @@ class DL(ML):
     def ModelEvaluationOptimization(self,enableGraph=True):
         #Calculating the time taken by the classifier
         self.t0=time.time()
-        self.evalModel().optimize().evaluate().model_efficacy()
-        self.scoreTime= ('score',self.score),('time',time.time()-self.t0)
+        if self.hasLoadModel:
+            self.debugEvalModel()
+        else:
+            self.evalModel().optimize().evaluate().model_efficacy()
+        self.accuracyTime= (self.trainField,self.score),('time',time.time()-self.t0)
         # Display the accuracy curves for training and validation sets
-        if enableGraph:
-            self.graphData(self.train_history,self.trainField , 'val_'+self.trainField)
-            # Display the loss curves for training and validation sets
-            self.graphData(self.train_history, 'loss', 'val_loss')
+        # if enableGraph:
+        #     self.graphData(self.train_history,self.trainField , 'val_'+self.trainField)
+        #     # Display the loss curves for training and validation sets
+        #     self.graphData(self.train_history, 'loss', 'val_loss')
         return self
     def predict(self,*args,custom=False,times=1,**kwargs):
         if custom:
@@ -54,14 +57,17 @@ class DL(ML):
                 return getattr(self,name)(*args,**kwargs)
         else:
             if times==1:
-                return self.scoreTime
+                return self.accuracyTime
             else:
-                l=[self.scoreTime]
+                l=[self.accuracyTime]
                 tot=0
                 for i in range(times-1):
-                    self.ModelEvaluationOptimization(enableGraph=False)
-                    l.append(self.scoreTime)
-                    tot+=self.scoreTime[0][1]
+                    if self.hasLoadModel:
+                        self.debugEvalModel()
+                    else:
+                        self.ModelEvaluationOptimization(enableGraph=False)
+                    l.append(self.accuracyTime)
+                    tot+=self.accuracyTime[0][1]
                 return l,tot/times
     def evaluate(self):
         # Testing set for model evaluation
@@ -149,6 +155,8 @@ class DL(ML):
             verbose=0
         )
         return self
+    def getHistory(self):
+        return self.train_history.history.keys()
     def denseSequential(self):
         model=Sequential() 
         if hasattr(self,'input_dim'):
@@ -177,6 +185,26 @@ class DL(ML):
         self.model=model
         self.setCategory('Classification')
         return self
+    def interpretPlotCurve(self):
+        history=self.train_history
+        # # summarize history for accuracy
+        # plt.plot(list(history.history['accuracy']))
+        plt.plot(history.history['accuracy'])
+        # # plt.plot(history.history['val_accuracy'])
+        # plt.title('model accuracy')
+        # plt.ylabel('accuracy')
+        # plt.xlabel('epoch')
+        # plt.legend(['train', 'test'], loc='upper left')
+        self.saveAndShow()
+        # summarize history for loss
+        # plt.plot(history.history['loss'])
+        # plt.plot(history.history['val_loss'])
+        # plt.title('model loss')
+        # plt.ylabel('loss')
+        # plt.xlabel('epoch')
+        # plt.legend(['train', 'test'], loc='upper left')
+        # self.saveAndShow()
+        return self
     def graphData(self,train_history, train, validation,enableShow=False):
         # A function to plot the learning curves
         # def show_train_history(train_history, train, validation):
@@ -187,3 +215,9 @@ class DL(ML):
         plt.xlabel('Epoch')
         plt.legend(['train', 'validation'], loc='best')
         self.saveAndShow()
+    def sequential(self):
+        model = Sequential()
+        model.add(Dense(2, input_dim=1, activation='relu'))
+        model.add(Dense(1, activation='sigmoid'))
+        self.model=model
+        return self
