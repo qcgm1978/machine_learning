@@ -3,8 +3,21 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras import layers
 from tensorflow import keras
+from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 import os
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+def compileModel(hp):
+    return  Dataset.model.compile(optimizer=keras.optimizers.Adam(
+            hp.Choice('learning_rate',
+                      values=[1e-2, 1e-3, 1e-4])), loss="mse", run_eagerly=True)
+import kerastuner
+tuner = kerastuner.tuners.Hyperband(
+  compileModel,
+  objective='val_loss',
+  max_epochs=100,
+  max_trials=200,
+  executions_per_trial=2,
+  directory='my_dir')    
 class Dataset(object):
     # Let's say we expect our inputs to be RGB images of arbitrary size
     inputs = keras.Input(shape=(None, None, 3))
@@ -13,6 +26,8 @@ class Dataset(object):
         'test/keras', batch_size=64, image_size=(200, 200))
     datasetTxt = keras.preprocessing.text_dataset_from_directory(
         'test/keras', batch_size=64)
+    vectorizer = TextVectorization(output_mode="int")
+    model=None
     def getModel(self, outputs):
         model = keras.Model(inputs=self.inputs, outputs=outputs)
         self.model = model
@@ -33,8 +48,41 @@ class Dataset(object):
         for data, labels in dataset:
             l.append({'data': data, 'labels': labels})
         return l
+    def asynPreprocess(self,samples,isAsyn=True):
+        samples=np.array(samples)
+        labels = [[0], [1]]
+        # Prepare a TextVectorization layer.
+        self.vectorizer.adapt(samples)
+        # Asynchronous preprocessing: the text vectorization is part of the tf.data pipeline.
+        # First, create a dataset
+        dataset = tf.data.Dataset.from_tensor_slices((samples, labels)).batch(2)
+        if isAsyn:
+            inputs = keras.Input(shape=(None,), dtype="int64")
+            # Apply text vectorization to the samples
+            dataset = dataset.map(lambda x, y: (self.vectorizer(x), y))
+            # Prefetch with a buffer size of 2 batches
+            dataset = dataset.prefetch(2)
+            x = layers.Embedding(input_dim=10, output_dim=32)(inputs)
+        else:
+            inputs = keras.Input(shape=(1,), dtype="string")
+            x = self.vectorizer(inputs)
+            x = layers.Embedding(input_dim=10, output_dim=32)(x)
+        # Our model should expect sequences of integers as inputs
+        outputs = layers.Dense(1)(x)
+        Dataset.model = keras.Model(inputs, outputs)
+        Dataset.model=compileModel()
+        return Dataset.model.fit(dataset)
+    def e2e(self,samples):
+        inputs = keras.Input(shape=(28, 28))
+        x = layers.experimental.preprocessing.Rescaling(1.0 / 255)(inputs)
+        x = layers.Flatten()(x)
+        x = layers.Dense(128, activation="relu")(x)
+        x = layers.Dense(128, activation="relu")(x)
+        outputs = layers.Dense(10, activation="softmax")(x)
+        end_to_end_model = keras.Model(inputs, outputs)
+        isE2E=True
+        return end_to_end_model,isE2E
     def str2sequence(self, l, isBigrams=True):
-        from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
         # Example training data, of dtype `string`.
         training_data = np.array(l)
         # Create a TextVectorization layer instance. It can be configured to either
@@ -149,7 +197,7 @@ class Dataset(object):
         model = Model(inputs, outputs)
         # model.summary()
         # Compile the model
-        model.compile(optimizer="adam", loss="sparse_categorical_crossentropy",
+        model.compile(optimizer='adam', loss="sparse_categorical_crossentropy",
                       metrics=[
                           keras.metrics.SparseCategoricalAccuracy(name="acc")],
                       run_eagerly=run_eagerly
