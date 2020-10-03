@@ -56,7 +56,10 @@ class TDD_TEST_KERAS(unittest.TestCase):
                                         0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1])
         self.assertEqual(list(val[1]), [0, 1, 1, 0, 0,
                                         1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0])
-
+        loss1=self.d.asynPreprocess(l).history['loss'][0]
+        loss2=self.d.asynPreprocess(l,isAsyn=False).history['loss'][0]
+        self.assertAlmostEqual(loss1,loss2,-2)
+        self.assertTrue(self.d.e2e(l)[1])
     def test_normalize_features(self):
         size = (64, 200, 200, 3)
         data = self.d.setImgData(size).normalizeFeatures()
