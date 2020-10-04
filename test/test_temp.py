@@ -11,7 +11,14 @@ class TDD_TEST_TEMP(unittest.TestCase):
         s="<class 'tensorflow.python.keras.losses.SparseCategoricalCrossentropy'>"
         g=self.conver2str(s)
         self.assertEqual(g,'sparse_categorical_crossentropy')
-
+    def test_sun(self):
+        # p=σ*T**4 Stefan-Boltzmann law
+        p=6e7
+        σ=5.67e-8
+        T=(p/σ)**(1/4)
+        C=T+273.15
+        self.assertAlmostEqual(T,5700,-3)
+        self.assertAlmostEqual(C,5977,0)
     def conver2str(self, s):
         def addUnderscore(matchobj):
             s=matchobj.group(0)

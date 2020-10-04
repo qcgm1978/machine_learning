@@ -13,6 +13,7 @@ def main():
         ]
         ]
     dirName = '/'.join(l[:-1])
+    print(dirName,sys.argv[1],dirName+'/test_'+l[-1])
     # Create target directory & all intermediate directories if don't exists
     try:
         print("Directory " , dirName ,  " Created ")
@@ -20,7 +21,7 @@ def main():
     except FileExistsError:
         print("Directory " , dirName ,  " already exists")
     for item in alist:
-        f = open(sys.argv[1] + ".py", "w+")
+        f = open(dirName+'/test_'+l[-1] + ".py", "w+")
         # for i in range(10):
         #      f.write("This is line %d\r\n" % (i+1))
         content = """import unittest{2}
