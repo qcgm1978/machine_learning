@@ -25,7 +25,7 @@ def main():
         # for i in range(10):
         #      f.write("This is line %d\r\n" % (i+1))
         content = """import unittest{2}
-from utilities import getPath,parseNumber
+# from utilities import getPath,parseNumber
 class TDD_{0}(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
