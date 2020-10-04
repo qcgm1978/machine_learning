@@ -1,7 +1,7 @@
 import unittest
 
 from tensorflow._api.v2.data import Dataset
-from utilities import getPath,parseNumber
+# from utilities import getPath,parseNumber
 import numpy as np
 from .Intro_m import Intro
 class TDD_INTRO(unittest.TestCase):
