@@ -15,7 +15,7 @@
             "name": "Some File",
             "type": "python",
             "request": "launch",
-            "module": "test.AIWP.test_keras_visual",
+            "module": "test.keras.test_intro",
             "console": "integratedTerminal"
 
         },
