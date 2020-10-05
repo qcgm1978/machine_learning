@@ -38,15 +38,18 @@ class TDD_INTRO(unittest.TestCase):
         self.assertEqual(processed_data.shape,(first,num_classes))
     def test_api(self):
         chain=Chain()
-        chain.setInputs().setDense().setX().setX(chain.x).outputs().createModel().summary().plot(show_shapes=True).t_e_i()
+        chain.setInputs().setDense().setX().setX(chain.x).outputs().createModel().summary().plot(show_shapes=True).t_e_i().save().delete().load()
         self.assertEqual(chain.inputs.shape.as_list(),[None,784])
         intro = self.intro
         self.assertEqual(chain.inputs.dtype,intro.get_tf().float32)
         self.assertTrue(intro.is_tensor(chain.x))
         self.assertTrue(intro.is_model(chain.model))
-        self.assertLess(chain.loss,.2)
+        self.assertLess(chain.loss,.3)
         self.assertAlmostEqual(math.floor(chain.accuracy*10)/10,.9,1)
-    
+    def test_same_layers(self):
+        chain=Chain()
+        chain.encoder().decoder()
+        self.assertEqual(chain.encoder_input.shape.as_list(),chain.decoder_output.shape.as_list())
     # Train your model with the built-in Keras fit() method, while being mindful of checkpointing, metrics monitoring, and fault tolerance.
     # Evaluate your model on a test data and how to use it for inference on new data.
     # Customize what fit() does, for instance to build a GAN.
