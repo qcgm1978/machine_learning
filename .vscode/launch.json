@@ -16,6 +16,7 @@
             "type": "python",
             "request": "launch",
             "module": "test.keras.test_intro",
+            "justMyCode": false,
             "console": "integratedTerminal"
 
         },
