@@ -1,5 +1,6 @@
 import  os
 import re
+import json
 def parseNumber(value, as_int=False):
     try:
         number = float(re.sub('[^.\-\d]', '', value))
@@ -14,3 +15,10 @@ def getPath(file,chdir=None):
     pre = os.getcwd()
     file = os.path.join(pre, file)
     return file
+def dump_json(p,duration):
+    with open(p, "r") as jsonFile:
+        data = json.load(jsonFile)
+    data.append(round(duration))
+    with open(p, "w") as jsonFile:
+        json.dump(data, jsonFile)
+    return data
