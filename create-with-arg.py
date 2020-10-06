@@ -1,3 +1,4 @@
+from os.path import dirname
 import sys,os
 
 print(sys.argv)
@@ -24,7 +25,10 @@ def main():
         f = open(dirName+'/test_'+l[-1] + ".py", "w+")
         # for i in range(10):
         #      f.write("This is line %d\r\n" % (i+1))
-        content = """import unittest{2}
+        content = """import os,time
+t0=time.time()
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+import unittest{2}
 # from utilities import getPath,parseNumber
 class TDD_{0}(unittest.TestCase):
     @classmethod
@@ -32,13 +36,21 @@ class TDD_{0}(unittest.TestCase):
         cls.foo = 1
     def test_{1}(self):
         self.assertEqual(self.foo,1)
+p = '/Users/zhanghongliang/Documents/ml/{3}/json-update.json'
+duration=time.time()-t0
+data = update_json(p,duration)
+print( data[-2:],'\n',data[-1]-data[-2])
 if __name__ == '__main__':
     unittest.main()
 
                 """
-        f.write(content.format(item[0], item[1],item[2]))
+        f.write(content.format(item[0], item[1],item[2],dirName))
         f.close()
-
+    # create json if not exists
+    file_name = dirName+'/json-update.json'
+    f = open(file_name, 'a+')  # open file in append mode
+    f.write('[0]')
+    f.close()
 
 if __name__ == "__main__":
     main()

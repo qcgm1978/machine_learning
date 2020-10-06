@@ -1,5 +1,5 @@
 import  os
-import re
+import re,math
 import json
 def parseNumber(value, as_int=False):
     try:
@@ -15,10 +15,15 @@ def getPath(file,chdir=None):
     pre = os.getcwd()
     file = os.path.join(pre, file)
     return file
-def dump_json(p,duration):
+def update_json(p,duration):
     with open(p, "r") as jsonFile:
-        data = json.load(jsonFile)
+        try:
+            data = json.load(jsonFile)
+        except json.decoder.JSONDecodeError:
+            data=[]
     data.append(round(duration))
     with open(p, "w") as jsonFile:
         json.dump(data, jsonFile)
     return data
+def truncate(n,fixedTo=0):
+    return math.floor(n*10**fixedTo)/10

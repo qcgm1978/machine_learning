@@ -2,7 +2,7 @@ import time,math
 t0=time.time()
 import unittest
 # from tensorflow._api.v2.data import Dataset
-from utilities import getPath,parseNumber,dump_json
+from utilities import getPath,parseNumber,update_json
 from .Intro_m import Intro
 from .functional_API import *
 class TDD_INTRO(unittest.TestCase):
@@ -57,7 +57,7 @@ class TDD_INTRO(unittest.TestCase):
     # Refine your model through hyperparameter tuning.
 p = '/Users/zhanghongliang/Documents/ml/test/keras/json-dump.json'
 duration=time.time()-t0
-data = dump_json(p,duration)
+data = update_json(p,duration)
 print( data[-2:],'\n',data[-1]-data[-2])
 if __name__ == '__main__':
     unittest.main()
