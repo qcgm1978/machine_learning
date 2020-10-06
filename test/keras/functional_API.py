@@ -115,3 +115,4 @@ class Chain(object):
         # autoencoder.summary()  
         self.decoder_output=decoder_output
         return self
+    # todo All models are callable, just like layers https://keras.io/guides/functional_api/
