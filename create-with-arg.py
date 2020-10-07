@@ -36,10 +36,12 @@ class TDD_{0}(unittest.TestCase):
         cls.foo = 1
     def test_{1}(self):
         self.assertEqual(self.foo,1)
-p = '/Users/zhanghongliang/Documents/ml/{3}/json-update.json'
-duration=time.time()-t0
-data = update_json(p,duration)
-print( data[-2:],'\n',data[-1]-data[-2])
+    @classmethod
+    def tearDownClass(cls):
+        p = '/Users/zhanghongliang/Documents/ml/test/tf/json-update.json'
+        duration=time.time()-t0
+        data = update_json(p,duration)
+        print( 'Previouse two duration: {0}'.format(data[-2:]),'\n','Difference: {0}'.format(data[-1]-data[-2]))
 if __name__ == '__main__':
     unittest.main()
 
