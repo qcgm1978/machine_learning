@@ -4,3 +4,4 @@ venv/
 data/creditcard.csv
 data/weatherAUS.csv
 data/pima-indians-diabetes.data.csv
+node_modules

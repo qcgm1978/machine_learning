@@ -3,13 +3,14 @@ t0=time.time()
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 import unittest
 import numpy as np
-from .beginners import *
 from utilities import getPath,parseNumber,update_json,truncate
+from .beginners import *
 class TDD_ML_MODELS(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.cols=10
-        a=Beginners(cls.cols)
+        cls.test_rows=5
+        a=Beginners(cls.cols,cls.test_rows)
         cls.b=a.prepare_data().get_model().op_model()
     def test_type(self):
         b=self.b
@@ -34,7 +35,8 @@ class TDD_ML_MODELS(unittest.TestCase):
         self.assertTrue(b.is_history)
         self.assertFalse(b.is_s)
         self.assertAlmostEqual(b.sc[1],.98,2)
-        self.assertEqual(b.p_m.shape,(5,cols))
+        self.assertEqual(b.p_m.shape,(self.test_rows,cols))
+    
     @classmethod
     def tearDownClass(cls):
         p = '/Users/zhanghongliang/Documents/ml/test/tf/json-update.json'

@@ -3,18 +3,21 @@ from tensorflow.python.keras.engine.training import _is_scalar
 mnist = tf.keras.datasets.mnist
 
 class Beginners(object):
-  def __init__(self,cols,*args):
-    self.cols=cols
+  def __init__(self,cols=None,test_rows=None,data=None):
+    if cols:
+      Beginners.cols=cols
+    if test_rows:
+      Beginners.test_rows=test_rows
     names=('x_train', 'y_train','x_test', 'y_test')
-    if len(args)==len(names):
-      for name,arg in zip(names,args):
+    if data is not None:
+      for name,arg in zip(names,data):
         setattr(self, name,arg)
   def prepare_data(self):
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
     x_train, x_test = x_train / 255.0, x_test / 255.0
     #     instead of modifying internal properties and returning a reference to the same object, the object is instead cloned, with properties changed on the cloned object, and that object returned.
     # https://en.wikipedia.org/wiki/Fluent_interface
-    return Beginners(self.cols,x_train, y_train,x_test, y_test)
+    return Beginners(data=(x_train, y_train,x_test, y_test))
   def get_model(self):
     self.model=tf.keras.models.Sequential([ tf.keras.layers.Flatten(input_shape=(28, 28)), tf.keras.layers.Dense(128, activation='relu'), tf.keras.layers.Dropout(0.2), tf.keras.layers.Dense(self.cols) ])
     return self
@@ -36,5 +39,5 @@ class Beginners(object):
       model,
       tf.keras.layers.Softmax()
     ])
-    self.p_m=probability_model(self.x_test[:5])
+    self.p_m=probability_model(self.x_test[:self.test_rows])
     return self
