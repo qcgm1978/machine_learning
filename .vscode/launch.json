@@ -15,7 +15,7 @@
             "name": "Some File",
             "type": "python",
             "request": "launch",
-            "module": "test.tf.test_classify",
+            "module": "test.pytoch.test_pytoch",
             "justMyCode": false,
             "console": "integratedTerminal"
 
