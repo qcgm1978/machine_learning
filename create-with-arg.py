@@ -29,7 +29,7 @@ def main():
 t0=time.time()
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 import unittest{2}
-# from utilities import getPath,parseNumber
+from utilities import getPath,parseNumber,update_json
 class TDD_{0}(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -41,7 +41,7 @@ class TDD_{0}(unittest.TestCase):
         p = '/Users/zhanghongliang/Documents/ml/test/tf/json-update.json'
         duration=time.time()-t0
         data = update_json(p,duration)
-        print( 'Previouse two duration: {0}'.format(data[-2:]),'\n','Difference: {0}'.format(data[-1]-data[-2]))
+        print( 'Previouse two duration: {{0}}'.format(data[-2:]),'\\n','Difference: {{0}}'.format(data[-1]-data[-2]))
 if __name__ == '__main__':
     unittest.main()
 
