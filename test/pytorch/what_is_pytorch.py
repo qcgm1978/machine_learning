@@ -3,6 +3,9 @@ import torch
 from torch import is_tensor
 from torch.tensor import Tensor
 class GetStarted(object):
+    def __init__(self,loca=None):
+        if loca:
+            self.setSelf(loca)
     def Tensors(self):
         x1 = torch.rand(5, 3)
         x2 = torch.empty(5, 3)
@@ -15,12 +18,12 @@ class GetStarted(object):
         is_f1=torch.is_floating_point(x5)
         x6 = torch.randn_like(x5, dtype=torch.float)    # override dtype!
         is_f2=torch.is_floating_point(x6)
-        self.setSelf(locals())
-        return self
+        return GetStarted(locals())
     def setSelf(self,loca):
         keys = loca.keys()
         for key in list(keys):
-            exec('self.'+key+'=loca.get(key)')
+            if key!='self':
+                exec('self.'+key+'=loca.get(key)')
     def Operations(self):
         y = torch.rand(5, 3)
         add=self.x6+y
@@ -52,5 +55,4 @@ class GetStarted(object):
             z = x + y
             print(z)
             print(z.to("cpu", torch.double))       # ``.to`` can also change dtype together!
-
-
+        return self

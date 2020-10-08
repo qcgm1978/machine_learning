@@ -15,8 +15,8 @@
             "name": "Some File",
             "type": "python",
             "request": "launch",
-            "module": "test.pytoch.test_pytoch",
-            "justMyCode": false,
+            "module": "test.pytorch.test_pytorch",
+            "justMyCode": true,
             "console": "integratedTerminal"
 
         },

@@ -4,8 +4,8 @@ from .what_is_pytorch import GetStarted
 class TDD_PYTORCH(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.gs=GetStarted()
-        cls.gs.Tensors().Operations().numpy_bridge().CUDA_Tensors()
+        original=GetStarted()
+        cls.gs=original.Tensors().Operations().numpy_bridge().CUDA_Tensors()
     def test_pytoch(self):
         gs=self.gs
         self.assertTrue(gs.is_t)
