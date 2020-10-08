@@ -1,4 +1,5 @@
 from __future__ import print_function
+from functools import total_ordering
 import torch
 from torch import is_tensor
 from torch.tensor import Tensor
@@ -23,7 +24,11 @@ class GetStarted(object):
         keys = loca.keys()
         for key in list(keys):
             if key!='self':
-                exec('self.'+key+'=loca.get(key)')
+                if hasattr(self,key):
+                    raise ValueError('the key {0} already exists'.format(key))
+                else:
+                    exec('self.'+key+'=loca.get(key)')
+        return self
     def Operations(self):
         y = torch.rand(5, 3)
         add=self.x6+y
@@ -36,14 +41,12 @@ class GetStarted(object):
         x8 = torch.randn(1)
         is_t3=is_tensor(x8)
         is_f3=torch.is_floating_point(x8)
-        self.setSelf(locals())
-        return self
+        return self.setSelf(locals())
     def numpy_bridge(self):
         a = torch.ones(5)
         b = a.numpy()
         a.add_(1)
-        self.setSelf(locals())
-        return self
+        return self.setSelf(locals())
     def from_numpy(self,a):
         return  torch.from_numpy(a)
     def CUDA_Tensors(self):
@@ -56,3 +59,18 @@ class GetStarted(object):
             print(z)
             print(z.to("cpu", torch.double))       # ``.to`` can also change dtype together!
         return self
+    def autograd(self):
+        x = torch.ones(2, 2, requires_grad=True)
+        a1 = torch.randn(2, 2)
+        a1 = ((a1 * 3) / (a1 - 1))
+        y2 = x + 2
+        z1 = y2 * y2 * 3
+        out = z1.mean()
+        out.backward()
+        return self.setSelf(locals())
+    # a tensor divided by itself such as: (((a + offset) * times)**power) / a *total_offset. e.g. ((a+2)*(a+2)*3)/4/a. offset=2, times=3,power=2,total_offset==1/4
+    def divide_self(self,a,offset,times,power,total_offset):
+        b_by_a=(a+offset)*(power-1)*offset*total_offset*times
+        return b_by_a.data[0][0]
+    def is_tensor(self,tens):
+        return is_tensor(tens)

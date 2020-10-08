@@ -1,11 +1,12 @@
 import unittest,numpy as np
+from torch import is_tensor
 # from utilities import getPath,parseNumber,update_json
 from .what_is_pytorch import GetStarted
 class TDD_PYTORCH(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         original=GetStarted()
-        cls.gs=original.Tensors().Operations().numpy_bridge().CUDA_Tensors()
+        cls.gs=original.Tensors().Operations().numpy_bridge().CUDA_Tensors().autograd()
     def test_pytoch(self):
         gs=self.gs
         self.assertTrue(gs.is_t)
@@ -40,5 +41,20 @@ class TDD_PYTORCH(unittest.TestCase):
         np.add(a, 1, out=a)
         self.assertEqual(list(a),[2,2,2,2,2])
         self.assertEqual(list(b),[2,2,2,2,2])
+    def test_autograd(self):
+        gs=self.gs
+        self.assertTrue(gs.is_tensor(gs.x))
+        y=gs.x+2
+        self.assertTrue(hasattr(y,'grad_fn'))
+        z=y*y*3
+        out = z.mean()
+        data=map(lambda item:list(item),z.data)
+        self.assertEqual(list(data),[[27,27],[27,27]])
+        self.assertEqual(out,27)
+        g=map(lambda item:list(item),gs.x.grad)
+        self.assertEqual(list(g),[[4.5,4.5],[4.5,4.5]])
+        self.assertEqual(list(map(lambda item:list(item),gs.x.data)),[[1,1],[1,1]])
+        ratio=gs.divide_self(gs.x,2,3,2,1/4)
+        self.assertEqual(ratio,4.5)
 if __name__ == '__main__':
     unittest.main()
