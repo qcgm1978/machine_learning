@@ -54,7 +54,8 @@ class TDD_PYTORCH(unittest.TestCase):
         g=map(lambda item:list(item),gs.x.grad)
         self.assertEqual(list(g),[[4.5,4.5],[4.5,4.5]])
         self.assertEqual(list(map(lambda item:list(item),gs.x.data)),[[1,1],[1,1]])
-        ratio=gs.divide_self(gs.x,2,3,2,1/4)
-        self.assertEqual(ratio,4.5)
+        ratio_equality=gs.divide_self(gs.x,2,3,2,1/4)
+        self.assertEqual(ratio_equality[0],4.5)
+        self.assertEqual(ratio_equality[1],'αο/αχι|χι=1.0 = 4.5')
 if __name__ == '__main__':
     unittest.main()
