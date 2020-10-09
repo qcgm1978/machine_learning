@@ -1,5 +1,4 @@
 from __future__ import print_function
-from functools import total_ordering
 import torch
 from torch import is_tensor
 from torch.tensor import Tensor
@@ -69,8 +68,11 @@ class GetStarted(object):
         out.backward()
         return self.setSelf(locals())
     # a tensor divided by itself such as: (((a + offset) * times)**power) / a *total_offset. e.g. ((a+2)*(a+2)*3)/4/a. offset=2, times=3,power=2,total_offset==1/4
-    def divide_self(self,a,offset,times,power,total_offset):
-        b_by_a=(a+offset)*(power-1)*offset*total_offset*times
-        return b_by_a.data[0][0]
+    def divide_self(self,tensor,offset,times,power,total_offset):
+        backprop_scalar=tensor.data[0][0]
+        χι_plus_offset = (backprop_scalar+offset)*(power-1)
+        coef = offset*total_offset*times
+        αο_by_αχι=χι_plus_offset*coef
+        return αο_by_αχι,'αο/αχι|χι={0} = {1}'.format(backprop_scalar,αο_by_αχι)
     def is_tensor(self,tens):
         return is_tensor(tens)
