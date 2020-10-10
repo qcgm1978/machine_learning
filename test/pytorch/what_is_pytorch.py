@@ -2,10 +2,7 @@ from __future__ import print_function
 import torch
 from torch import is_tensor
 from torch.tensor import Tensor
-class GetStarted(object):
-    def __init__(self,loca=None):
-        if loca:
-            self.setSelf(loca)
+class ParentClass(object):
     def Tensors(self):
         x1 = torch.rand(5, 3)
         x2 = torch.empty(5, 3)
@@ -18,7 +15,8 @@ class GetStarted(object):
         is_f1=torch.is_floating_point(x5)
         x6 = torch.randn_like(x5, dtype=torch.float)    # override dtype!
         is_f2=torch.is_floating_point(x6)
-        return GetStarted(locals())
+        return self.setSelf(locals())
+        # return GetStarted(locals())
     def setSelf(self,loca):
         keys = loca.keys()
         for key in list(keys):
@@ -67,6 +65,9 @@ class GetStarted(object):
         out = z1.mean()
         out.backward()
         return self.setSelf(locals())
+    def is_tensor(self,tens):
+        return is_tensor(tens)
+class Algorithms(object):
     # a tensor divided by itself such as: (((a + offset) * times)**power) / a *total_offset. e.g. ((a+2)*(a+2)*3)/4/a. offset=2, times=3,power=2,total_offset==1/4
     def divide_self(self,tensor,offset,times,power,total_offset):
         backprop_scalar=tensor.data[0][0]
@@ -74,5 +75,6 @@ class GetStarted(object):
         coef = offset*total_offset*times
         αο_by_αχι=χι_plus_offset*coef
         return αο_by_αχι,'αο/αχι|χι={0} = {1}'.format(backprop_scalar,αο_by_αχι)
-    def is_tensor(self,tens):
-        return is_tensor(tens)
+class GetStarted(ParentClass,Algorithms):
+    def __init__(self,loca=None):
+        pass

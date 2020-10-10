@@ -7,6 +7,10 @@ class TDD_PYTORCH(unittest.TestCase):
     def setUpClass(cls):
         original=GetStarted()
         cls.gs=original.Tensors().Operations().numpy_bridge().CUDA_Tensors().autograd()
+    def test_syntactic_sugar(self):
+        l=[1,2,3]
+        l[:2]=[4 for _ in range(2)]
+        self.assertEqual(l,[4,4,3])
     def test_pytoch(self):
         gs=self.gs
         self.assertTrue(gs.is_t)
