@@ -60,7 +60,9 @@ class TDD_PYTORCH(unittest.TestCase):
         self.assertEqual(ratio_equality[0],4.5)
         self.assertEqual(ratio_equality[1], 'αο/αχι|χι=1.0 = 4.5')
     def test_Jacobian_matrix(self):
-        gs=self.gs
-        self.assertTrue(gs.is_tensor(gs.y0))
+        gs = self.gs
+        y=gs.vector_Jacobian_product_y
+        self.assertTrue(gs.is_tensor(y))
+        self.assertTrue(callable(y.grad_fn))
 if __name__ == '__main__':
     unittest.main()
