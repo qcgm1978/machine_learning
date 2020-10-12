@@ -21,11 +21,13 @@ class ParentClass(object):
         keys = loca.keys()
         for key in list(keys):
             if key!='self':
-                if hasattr(self,key):
-                    raise ValueError('the key {0} already exists'.format(key))
-                else:
-                    exec('self.'+key+'=loca.get(key)')
+                self.set_key(loca,key)
         return self
+    def set_key(self, loca,key,ini=0):
+        if hasattr(self,key):
+            self.set_key(loca,key+str(ini),ini+1)
+        else:
+            exec('self.'+key+'=loca.get("{0}")'.format(key[:-1] if ini else key))
     def Operations(self):
         y = torch.rand(5, 3)
         add=self.x6+y
@@ -75,6 +77,14 @@ class Algorithms(object):
         coef = offset*total_offset*times
         αο_by_αχι=χι_plus_offset*coef
         return αο_by_αχι,'αο/αχι|χι={0} = {1}'.format(backprop_scalar,αο_by_αχι)
+    def vector_Jacobian_product(self):
+        torch.manual_seed(0)
+        x = torch.randn(3, requires_grad=True)
+        y = x * 2
+        while y.data.norm() < 1000:
+            y = y * 2
+        print(y)
+        return self.setSelf(locals())
 class GetStarted(ParentClass,Algorithms):
     def __init__(self,loca=None):
         pass

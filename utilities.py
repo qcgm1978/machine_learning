@@ -1,4 +1,4 @@
-import  os
+import  os,traceback
 import re,math
 import json
 def parseNumber(value, as_int=False):
@@ -26,4 +26,7 @@ def update_json(p,duration):
         json.dump(data, jsonFile)
     return data
 def truncate(n,fixedTo=0):
-    return math.floor(n*10**fixedTo)/10
+    return math.floor(n * 10 ** fixedTo) / 10
+def get_method_name():
+        name=traceback.extract_stack(None, 2)[0][2]
+        return name

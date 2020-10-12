@@ -1,12 +1,10 @@
 import unittest,numpy as np
-from torch import is_tensor
-# from utilities import getPath,parseNumber,update_json
 from .what_is_pytorch import GetStarted
 class TDD_PYTORCH(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         original=GetStarted()
-        cls.gs=original.Tensors().Operations().numpy_bridge().CUDA_Tensors().autograd()
+        cls.gs=original.Tensors().Operations().numpy_bridge().CUDA_Tensors().autograd().vector_Jacobian_product()
     def test_syntactic_sugar(self):
         l=[1,2,3]
         l[:2]=[4 for _ in range(2)]
@@ -60,6 +58,9 @@ class TDD_PYTORCH(unittest.TestCase):
         self.assertEqual(list(map(lambda item:list(item),gs.x.data)),[[1,1],[1,1]])
         ratio_equality=gs.divide_self(gs.x,2,3,2,1/4)
         self.assertEqual(ratio_equality[0],4.5)
-        self.assertEqual(ratio_equality[1],'αο/αχι|χι=1.0 = 4.5')
+        self.assertEqual(ratio_equality[1], 'αο/αχι|χι=1.0 = 4.5')
+    def test_Jacobian_matrix(self):
+        gs=self.gs
+        self.assertTrue(gs.is_tensor(gs.y0))
 if __name__ == '__main__':
     unittest.main()
