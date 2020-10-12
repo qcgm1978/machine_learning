@@ -12,7 +12,7 @@ class Calculus(object):
     def get_ratio(self):
         return 'dy/dx'
     def get_limite_shorthand(self):
-        return self.get_ratio(),'dy with respect to x'
+        return self.get_ratio(),'dy with respect to x','dy by dx','dy over dx'
     def get_replaced_sign(self):
         return ('ξ','Δ')
     def get_Lagrange_notation(self):
@@ -32,7 +32,21 @@ class Calculus(object):
             return lambda x:x*2
     def get_distance_v_constants(self,v,t):
         return v*t
-    def coin_set(self,h,d,truncate):
+    def coin_set(self,h,d,truncate,prob_truncate):
         tg1 = 0.01746
         power=10**truncate
-        return math.floor(h/d/tg1*power)/power
+        power1=10**prob_truncate
+        degree = math.floor(h/d/tg1*power)/power
+        prob = math.floor(degree*2/180*power1)/power1
+        return degree,prob
+    def read_partial_derivative(self):
+        return 'the partial derivative of z with respect to x','∂z/∂x'
+    def find_point_slope(self,point,derivative):
+        return self.read_partial_derivative()[0]+' at ({0},{1}) is {2}'.format(point[0],point[1],derivative)
+    def derivative_every_point(self):
+        return 'f′',('the derivative function','the derivative of f')
+    def get_expr_derivate(self,difference,xi):
+        cancellation=difference[:-2]
+        derivate=sympify(cancellation)
+        return derivate.evalf(subs={'xi':xi,'h':0})
+    

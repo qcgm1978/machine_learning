@@ -20,9 +20,13 @@ class TDD_CALCULUS(unittest.TestCase):
         double_f=c.differentiation_operator(lambda x:x**2)
         self.assertEqual(double_f(input),derivative) 
         self.assertEqual(c.get_distance_v_constants(50,3),150)
+        self.assertEqual(c.read_partial_derivative()[0],'the partial derivative of z with respect to x')
+        self.assertEqual(c.find_point_slope((1,1),3), 'the partial derivative of z with respect to x at (1,1) is 3')
+        self.assertEqual(c.derivative_every_point()[0],'f′')
+        self.assertEqual(c.get_expr_derivate('1/4*3*(2*xi+h+4)*h',1),4.5)
     def test_geometry_probability(self):
         c=self.c
-        self.assertEqual(c.coin_set(1.85,25,2),4.23)
+        self.assertEqual(c.coin_set(1.85,25,2,3),(4.23,.047))
 if __name__ == '__main__':
     unittest.main()
                 
