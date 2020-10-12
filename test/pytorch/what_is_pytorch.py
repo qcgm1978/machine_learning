@@ -1,4 +1,5 @@
 from __future__ import print_function
+import inspect
 import torch
 from torch import is_tensor
 from torch.tensor import Tensor
@@ -18,16 +19,15 @@ class ParentClass(object):
         return self.setSelf(locals())
         # return GetStarted(locals())
     def setSelf(self,loca):
+        name=inspect.stack()[1].function
         keys = loca.keys()
         for key in list(keys):
-            if key!='self':
-                self.set_key(loca,key)
+            if key != 'self':
+                if hasattr(self,key):
+                    exec('self.'+name+'_'+key+'=loca.get("'+key+'")')
+                else:
+                    exec('self.'+key+'=loca.get("'+key+'")')
         return self
-    def set_key(self, loca,key,ini=0):
-        if hasattr(self,key):
-            self.set_key(loca,key+str(ini),ini+1)
-        else:
-            exec('self.'+key+'=loca.get("{0}")'.format(key[:-1] if ini else key))
     def Operations(self):
         y = torch.rand(5, 3)
         add=self.x6+y
@@ -84,6 +84,14 @@ class Algorithms(object):
         while y.data.norm() < 1000:
             y = y * 2
         print(y)
+        v = torch.tensor([0.1, 1.0, 0.0001], dtype=torch.float)
+        y.backward(v)
+        print(x.grad)
+        print(x.requires_grad)
+        print((x ** 2).requires_grad)
+        with torch.no_grad():
+            z=((x ** 2).requires_grad)
+
         return self.setSelf(locals())
 class GetStarted(ParentClass,Algorithms):
     def __init__(self,loca=None):
