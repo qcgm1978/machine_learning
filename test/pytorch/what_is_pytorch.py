@@ -18,13 +18,16 @@ class ParentClass(object):
         is_f2=torch.is_floating_point(x6)
         return self.setSelf(locals())
         # return GetStarted(locals())
-    def setSelf(self,loca):
+    def setSelf(self,loca,name_function=False):
         name=inspect.stack()[1].function
         keys = loca.keys()
         for key in list(keys):
             if key != 'self':
-                if hasattr(self,key):
-                    exec('self.'+name+'_'+key+'=loca.get("'+key+'")')
+                if hasattr(self, key):
+                    if name_function:
+                        exec('self.'+name+'_'+key+'=loca.get("'+key+'")')
+                    else:
+                        raise ValueError('the key {0} already exists'.format(key))
                 else:
                     exec('self.'+key+'=loca.get("'+key+'")')
         return self
@@ -83,16 +86,17 @@ class Algorithms(object):
         y = x * 2
         while y.data.norm() < 1000:
             y = y * 2
-        print(y)
         v = torch.tensor([0.1, 1.0, 0.0001], dtype=torch.float)
         y.backward(v)
-        print(x.grad)
-        print(x.requires_grad)
-        print((x ** 2).requires_grad)
         with torch.no_grad():
-            z=((x ** 2).requires_grad)
-
-        return self.setSelf(locals())
+            z = ((x ** 2).requires_grad)
+        return self.setSelf(locals(),name_function=True)
+    def detach(self):
+        x = torch.randn(3, requires_grad=True)
+        y = x.detach()
+        z=y.requires_grad
+        z1=x.eq(y).all()
+        return self.setSelf(locals(),name_function=True)
 class GetStarted(ParentClass,Algorithms):
     def __init__(self,loca=None):
         pass

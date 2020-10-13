@@ -22,9 +22,7 @@ def main():
         f = open(dirName+'/test_'+l[-1] + ".py", "w+")
         # for i in range(10):
         #      f.write("This is line %d\r\n" % (i+1))
-        content = """#import os,time
-# os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-import unittest{2}
+        content = """import unittest{2}
 # from utilities import getPath,parseNumber,update_json
 class TDD_{0}(unittest.TestCase):
     @classmethod

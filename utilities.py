@@ -30,3 +30,7 @@ def truncate(n,fixedTo=0):
 def get_method_name():
         name=traceback.extract_stack(None, 2)[0][2]
         return name
+def saveAndShow(plt,name='demo',enableShow=False):
+        file='img/{0}.png'.format(name)
+        plt.savefig(file)
+        enableShow and plt.show()

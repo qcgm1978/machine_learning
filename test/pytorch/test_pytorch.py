@@ -1,10 +1,12 @@
 import unittest,numpy as np
 from .what_is_pytorch import GetStarted
+from .nn import Net
+from .classifier import Classifier
 class TDD_PYTORCH(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         original=GetStarted()
-        cls.gs=original.Tensors().Operations().numpy_bridge().CUDA_Tensors().autograd().vector_Jacobian_product()
+        cls.gs=original.Tensors().Operations().numpy_bridge().CUDA_Tensors().autograd().vector_Jacobian_product().detach()
     def test_syntactic_sugar(self):
         l=[1,2,3]
         l[:2]=[4 for _ in range(2)]
@@ -64,5 +66,33 @@ class TDD_PYTORCH(unittest.TestCase):
         y=gs.vector_Jacobian_product_y
         self.assertTrue(gs.is_tensor(y))
         self.assertTrue(callable(y.grad_fn))
+        self.assertFalse(gs.vector_Jacobian_product_z)
+        self.assertFalse(gs.detach_z)
+        self.assertTrue(gs.detach_z1)
+    def test_netural_networks(self):
+        net = Net()
+        self.assertEqual(net.__class__,Net)
+        self.assertIsInstance(net,Net)
+        net.get_parameters().input_32().zero_backprops().loss().backprop().update()
+        self.assertEqual(net.len,10)
+        self.assertEqual(list(net.size),[6,1,3,3])
+        self.assertTrue(callable(net.out.grad_fn))
+        is_tensor=net.torch().is_tensor
+        self.assertTrue(is_tensor(net.loss))
+        self.assertEqual(str(net.acc.__class__).split('\'')[1],'AccumulateGrad')
+        self.assertTrue(is_tensor(net.g))
+        self.assertFalse(any(net.g_befor_backward))
+        self.assertTrue(all(net.g))
+        self.assertFalse(any(net.g_after_zero))
+    def test_training_classifier(self):
+        net =Net(3)
+        size=net.interpret_size('3x32x32')
+        self.assertEqual(size,{'channel':3,'width':32,'height':32})
+        c=Classifier(net)
+        # c.DataLoader().show_random_imgs()
+        # c.DataLoader().feed_inputs(False).save().display_test_img()
+        # net.load(c.get_path()).predict(c.images, c.classes)
+        # net.DataLoader().load_dict(c.get_path()).perform_dataset().class_difference(c.classes)
+        net.CUDA()
 if __name__ == '__main__':
     unittest.main()
