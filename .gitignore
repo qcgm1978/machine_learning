@@ -7,3 +7,4 @@ data/pima-indians-diabetes.data.csv
 node_modules
 *.pth
 cifar-10-batches-py/
+*.gz
