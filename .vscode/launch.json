@@ -15,7 +15,7 @@
             "name": "Some File",
             "type": "python",
             "request": "launch",
-            "module": "test.pytorch.test_pytorch",
+            "module": "test.pytorch.evolution.test_np",
             "justMyCode": true,
             "console": "integratedTerminal"
 

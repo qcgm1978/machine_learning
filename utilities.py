@@ -1,4 +1,4 @@
-import  os,traceback
+import  os,traceback,inspect
 import re,math
 import json
 def parseNumber(value, as_int=False):
@@ -34,3 +34,16 @@ def saveAndShow(plt,name='demo',enableShow=False):
         file='img/{0}.png'.format(name)
         plt.savefig(file)
         enableShow and plt.show()
+def setSelf(self,loca,name_function=False):
+        name=inspect.stack()[1].function
+        keys = loca.keys()
+        for key in list(keys):
+            if key != 'self':
+                if hasattr(self, key):
+                    if name_function:
+                        exec('self.'+name+'_'+key+'=loca.get("'+key+'")')
+                    else:
+                        raise ValueError('the key {0} already exists'.format(key))
+                else:
+                    exec('self.'+key+'=loca.get("'+key+'")')
+        return self
