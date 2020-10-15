@@ -9,6 +9,17 @@ pip installpython -m ensurepip
 比如：
 pip install -i https://pypi.douban.com/simple requests
 
+Git lfs - "this exceeds GitHub's file size limit of 100.00 MB" - Stack Overflow
+
+git filter-branch -f --index-filter 'git rm --cached --ignore-unmatch tensorflow.csv'
+
+For a list of files to be pushed, run:
+
+git diff --stat --cached [remote/branch]
+example:
+
+git diff --stat --cached origin/master
+
 [source](https://www.w3schools.com/python/python_ml_standard_deviation.asp)
 
 https://brownmath.com/swt/symbol.htm

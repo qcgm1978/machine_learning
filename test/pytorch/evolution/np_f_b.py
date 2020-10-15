@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import numpy as np
+
+
 class NP(object):
     # N is batch size; D_in is input dimension;
     # H is hidden dimension; D_out is output dimension.
@@ -11,17 +13,17 @@ class NP(object):
     w1 = np.random.randn(D_in, H)
     w2 = np.random.randn(H, D_out)
     learning_rate = 1e-6
-    l=[]
+    _l = []
     for t in range(500):
         # Forward pass: compute predicted y
-        h = x.dot(w1)#(N,H)
+        h = x.dot(w1)  # (N,H)
         h_relu = np.maximum(h, 0)
-        y_pred = h_relu.dot(w2)#(N,D_out)
+        y_pred = h_relu.dot(w2)  # (N,D_out)
         # Compute and print loss
         loss = np.square(y_pred - y).sum()
-        l.append(loss)
+        _l.append(loss)
         # Backprop to compute gradients of w1 and w2 with respect to loss
-        grad_y_pred = 2.0 * (y_pred - y)
+        grad_y_pred = 2.0 * (y_pred - y)  # (N,D_out)
         grad_w2 = h_relu.T.dot(grad_y_pred)
         grad_h_relu = grad_y_pred.dot(w2.T)
         grad_h = grad_h_relu.copy()

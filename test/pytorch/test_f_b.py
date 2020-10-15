@@ -13,7 +13,7 @@ class TDD_G_D(unittest.TestCase):
     def setUpClass(cls):
         cls.foo = 1
     def test_g_d(self):
-        l=NP().l
+        l=NP()._l
         r = self.get_tendency(l,condition=lambda item:item<1)        
         r1 = self.get_tendency(l1)        
         r2 = self.get_tendency(l2)        
