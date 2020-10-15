@@ -35,10 +35,10 @@ if __name__ == '__main__':
                 """
         f.write(content.format(item[0], item[1],item[2],dirName))
         f.close()
-    # create json if not exists
-    file_name = dirName+'/json-update.json'
-    f = open(file_name, 'a+')  # open file in append mode
-    f.write('[0]')
-    f.close()
+    # # create json if not exists
+    # file_name = dirName+'/json-update.json'
+    # f = open(file_name, 'a+')  # open file in append mode
+    # f.write('[0]')
+    # f.close()
 if __name__ == "__main__":
     main()
