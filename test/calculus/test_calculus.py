@@ -26,7 +26,9 @@ class TDD_CALCULUS(unittest.TestCase):
         self.assertEqual(c.get_expr_derivate('1/4*3*(2*xi+h+4)*h',1),4.5)
     def test_geometry_probability(self):
         c=self.c
-        self.assertEqual(c.coin_set(1.85,25,2,3),(4.23,.047))
+        self.assertEqual(c.coin_set(1.85, 25, 2, 3), (4.23, .047))
+    def test_chain_rule(self):
+        self.assertTrue(True)
 if __name__ == '__main__':
     unittest.main()
                 
