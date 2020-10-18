@@ -11,12 +11,12 @@ from .np_f_b import NP
 class TDD_NP(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.foo = 1
-    
-    def test_np(self):
         N, D_in, H, D_out=(10, 1000, 100, 10)
         # N, D_in, H, D_out=(64, 1000, 100, 10)
-        n = NP((N, D_in, H, D_out))
+        cls.n = NP((N, D_in, H, D_out))
+    def test_np(self):
+        n=self.n
+        N, D_in, H, D_out=(10, 1000, 100, 10)
         n.f_b()
         self.assertEqual(n.x.shape, (N, D_in))
         
@@ -48,7 +48,10 @@ class TDD_NP(unittest.TestCase):
         self.assertEqual(output.tolist(), [np.maximum(
             randn, 0).tolist(), np.maximum(-randn, 0).tolist()])
 
-    
+    def test_chain_rule(self):
+        n=self.n
+        self.assertAlmostEqual(n.get_change_rate(10),699,0)
+        self.assertEqual(n.cal_units().units,'pascal / second')
 
 if __name__ == '__main__':
     unittest.main()

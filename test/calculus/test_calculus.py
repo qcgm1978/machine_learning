@@ -28,7 +28,8 @@ class TDD_CALCULUS(unittest.TestCase):
         c=self.c
         self.assertEqual(c.coin_set(1.85, 25, 2, 3), (4.23, .047))
     def test_chain_rule(self):
-        self.assertTrue(True)
+        c = self.c
+        self.assertAlmostEqual(c.get_change_rate(10),699,0)
 if __name__ == '__main__':
     unittest.main()
                 

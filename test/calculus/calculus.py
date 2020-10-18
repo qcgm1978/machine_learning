@@ -49,4 +49,14 @@ class Calculus(object):
         cancellation=difference[:-2]
         derivate=sympify(cancellation)
         return derivate.evalf(subs={'xi':xi,'h':0})
-    
+    def get_change_rate(self, seconds):
+        # (f \circ g)'(t) = f'(g(t))\cdot g'(t).
+        t, e = symbols('t e')
+        g_t='1/2*g*t**2'#.5*g*((t+h)**2-t**2)/h, .5*g*2t=g*t
+        h='4000-{0}'.format(g_t)
+        f_prime_h = '-10.1325*e**(-0.0001*({0}))'.format(h)
+        g_t_prime='g*t'
+        f_g_prime_t = '{0}*(-{1})'.format(f_prime_h, g_t_prime)
+        print(f_g_prime_t)
+        change_rate = sympify(f_g_prime_t).evalf(subs={'t': seconds, 'e': math.e,'g':9.8})
+        return change_rate

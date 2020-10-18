@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-import numpy as np
+import numpy as np,math
+from sympy import *
+import pint
 from utilities import setSelf
 
 
@@ -61,3 +63,18 @@ class NP(object):
         h_relu = np.maximum(h, 0)
         y_pred = h_relu.dot(w2)  # (N,D_out) mul relu and weights2
         return y_pred, h_relu, h
+    def cal_units(self):
+        ureg = pint.UnitRegistry()
+        return ureg.pascal*(ureg['meter/second**2'] * ureg.second**2)**-1*ureg.meter/ureg.second**2*ureg.second
+    def get_change_rate(self, seconds):
+        # (f \circ g)'(t) = f'(g(t))\cdot g'(t).
+        if self.cal_units().units=='pascal / second':
+            t, e = symbols('t e')
+            g_t='1/2*g*t**2'#.5*g*((t+h)**2-t**2)/h, .5*g*2t=g*t
+            h='4000-{0}'.format(g_t)
+            f_prime_h = '-10.1325*e**(-0.0001*({0}))'.format(h)
+            g_t_prime='g*t'
+            f_g_prime_t = '{0}*(-{1})'.format(f_prime_h, g_t_prime)
+            print(f_g_prime_t)
+            change_rate = sympify(f_g_prime_t).evalf(subs={'t': seconds, 'e': math.e,'g':9.8})
+            return change_rate
