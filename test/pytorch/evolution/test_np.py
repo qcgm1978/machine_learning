@@ -50,8 +50,8 @@ class TDD_NP(unittest.TestCase):
 
     def test_chain_rule(self):
         n=self.n
-        # self.assertEqual(n.cal_units(['pascal','meter/second**2','second**2']).units,'pascal / second')
         self.assertAlmostEqual(n.get_change_rate(10),699,0)
-
+        self.assertEqual(n.cal_units(['°C','1/km','km','1/hour']).units,'kelvin / hour')
+        self.assertEqual(n.chain_rule([-6.5,  2.5],['°C','1/km','km','1/hour'],'kelvin / hour' ), -16.25 )
 if __name__ == '__main__':
     unittest.main()

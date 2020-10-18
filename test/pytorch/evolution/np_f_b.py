@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from functools import reduce
 import numpy as np
 import math
 from sympy import *
@@ -67,19 +68,22 @@ class NP(object):
 
     def cal_units(self, l):
         ureg = pint.UnitRegistry()
-        ret = None
+        acc = None
         for item in l:
-            if ret is None:
-                ret = ureg[item]
-            elif isinstance(item, str):
-                ret = ret * ureg[item]
-            else:
-                ret=ret*(ureg[item[0]]**item[1])
-        return ret
-
+            if isinstance(item, str):
+                item = [item]
+            it=ureg[item[0]]
+            if item[0] == '°C':
+                it = it.to(ureg.kelvin)
+            it=it**(item[1] if len(item)==2 else 1)
+            acc= it if acc is None else acc*it
+        return acc
+    def chain_rule(self, vals, units,target):
+        if self.cal_units(units).units==target:
+            return np.prod(vals)
     def get_change_rate(self, seconds):
         # (f \circ g)'(t) = f'(g(t))\cdot g'(t).
-        phy = self.cal_units(
+        phy = self.cal_units(   
             ['pascal', ('meter/second**2*second**2',-1),'meter/second**2','second'])
         print(phy)
         if phy.units == 'pascal / second':
