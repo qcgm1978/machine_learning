@@ -25,11 +25,6 @@ class TDD_NP(unittest.TestCase):
         self.assertEqual((n.y_pred - n.y).shape, n.y.shape)
         self.assertEqual(n.x.ndim, n.w1.ndim, 2)
         self.assertEqual(n.y_pred.shape, (n.N,n.D_out),(N,D_out))
-        self.assertEqual(n.h_relu.shape, (n.N,n.H),(N,H))
-        self.assertEqual(n.h_relu.T.shape, (n.H,n.N),(H,N))
-        self.assertEqual(n.grad_w2.shape, (n.H,n.D_out))
-        self.assertEqual(n.grad_h_relu.shape, (n.N,n.H))
-        self.assertEqual(n.grad_w1.shape, (n.D_in, n.H))
         self.assertLess(n._l[-1],1e-5)
     def test_ReLU(self):
         torch.manual_seed(2)

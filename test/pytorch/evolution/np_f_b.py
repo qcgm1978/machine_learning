@@ -28,13 +28,13 @@ class NP(object):
         _l = []
         for t in range(500):
             # Forward pass: compute predicted y(y_pred)
-            y_pred, h_relu, h = self.predictY(
+            y_pred = self.predictY(
                 x, w1, w2)  # (N,D_out) mul relu and weights2
             # Compute loss
             loss = self.compute_loss(y_pred, y, _l)
             # Backprop to compute gradients of w1 and w2 with respect to loss
             grad_w1, grad_w2 = self.backprop_compute_gradients(
-                loss, h_relu, w2, h, x)
+                loss,w1, w2, x)
             # Update weights
             self.update_weights(learning_rate, grad_w1, grad_w2)
         return setSelf(self, locals(), name_function=True)
@@ -43,12 +43,12 @@ class NP(object):
         self.w1 -= learning_rate * grad_w1
         self.w2 -= learning_rate * grad_w2
 
-    def backprop_compute_gradients(self, loss, h_relu, w2, h, x):
-        grad_y_pred = 2.0 * loss  # (N,D_out)
-        grad_w2 = h_relu.T.dot(grad_y_pred)
+    def backprop_compute_gradients(self, loss, w1, w2, x):
+        grad_y_pred = 2.0 * loss
+        h=x.dot(w1)
+        grad_w2 = np.maximum(h, 0).T.dot(grad_y_pred)
         # The method calculates the gradient of a loss function with respects to all the weights in the network.
-        grad_h_relu = grad_y_pred.dot(w2.T)
-        grad_h = grad_h_relu.copy()
+        grad_h = grad_y_pred.dot(w2.T).copy()
         grad_h[h < 0] = 0
         grad_w1 = x.T.dot(grad_h)
         setSelf(self, locals(), name_function=True)
@@ -61,11 +61,10 @@ class NP(object):
         return loss
 
     def predictY(self, x, w1, w2):
-        h = x.dot(w1)  # (N,H) mul input and weights
-        h_relu = np.maximum(h, 0)
+        
         # y_pred = h_relu.dot(w2)  # (N,D_out) mul relu and weights2
-        y_pred = np.maximum(w1.dot(w2), 0).dot(w2)  # the chain rule
-        return y_pred, h_relu, h
+        y_pred = np.maximum(x.dot(w1), 0).dot(w2)  # the chain rule
+        return y_pred
 
     def cal_units(self, l):
         ureg = pint.UnitRegistry()
