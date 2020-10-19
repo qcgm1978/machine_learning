@@ -26,11 +26,17 @@ class NP(object):
         w2 = self.w2
         learning_rate = 1e-6
         _l = []
+        memoization={}
         # solve the same sub-problems over and over
         for t in range(500):
             # Forward pass: compute predicted y(y_pred)
             y_pred = self.predictY(
                 x, w1, w2)  # (N,D_out) mul relu and weights2
+            s_pred=str(y_pred)
+            if s_pred in memoization:
+                continue
+            else:
+                memoization[s_pred]=y_pred
             # Compute loss, memoize or store the solutions to the sub-problems
             loss = self.compute_loss(y_pred, y, _l)
             # Backprop to compute gradients of w1 and w2 with respect to loss

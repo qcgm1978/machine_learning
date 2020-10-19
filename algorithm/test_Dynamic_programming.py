@@ -1,6 +1,6 @@
 import unittest
 # from utilities import getPath,parseNumber,update_json
-from dy_program import *
+from algorithm.dy_program import *
 
 
 class TDD_DYNAMIC_PROGRAMMING(unittest.TestCase):
