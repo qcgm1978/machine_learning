@@ -19,25 +19,27 @@ class NP(object):
         # Create random input and output data
         x = np.random.randn(N, D_in)
         y = np.random.randn(N, D_out)
-        # Randomly initialize weights. H is hidden dimension
+        # Randomly initialize weights. H is hidden dimension. Top-down approach
         self.w1 = np.random.randn(D_in, H)
         self.w2 = np.random.randn(H, D_out)
         w1 = self.w1
         w2 = self.w2
         learning_rate = 1e-6
         _l = []
+        # solve the same sub-problems over and over
         for t in range(500):
             # Forward pass: compute predicted y(y_pred)
             y_pred = self.predictY(
                 x, w1, w2)  # (N,D_out) mul relu and weights2
-            # Compute loss
+            # Compute loss, memoize or store the solutions to the sub-problems
             loss = self.compute_loss(y_pred, y, _l)
             # Backprop to compute gradients of w1 and w2 with respect to loss
             grad_w1, grad_w2 = self.backprop_compute_gradients(
-                loss,w1, w2, x)
+                loss, w1, w2, x)
             # Update weights
             self.update_weights(learning_rate, grad_w1, grad_w2)
         return setSelf(self, locals(), name_function=True)
+    #  call-by-name evaluation
 
     def update_weights(self, learning_rate, grad_w1, grad_w2):
         self.w1 -= learning_rate * grad_w1
@@ -45,7 +47,7 @@ class NP(object):
 
     def backprop_compute_gradients(self, loss, w1, w2, x):
         grad_y_pred = 2.0 * loss
-        h=x.dot(w1)
+        h = x.dot(w1)
         grad_w2 = np.maximum(h, 0).T.dot(grad_y_pred)
         # The method calculates the gradient of a loss function with respects to all the weights in the network.
         grad_h = grad_y_pred.dot(w2.T).copy()
@@ -61,7 +63,7 @@ class NP(object):
         return loss
 
     def predictY(self, x, w1, w2):
-        
+
         # y_pred = h_relu.dot(w2)  # (N,D_out) mul relu and weights2
         y_pred = np.maximum(x.dot(w1), 0).dot(w2)  # the chain rule
         return y_pred
