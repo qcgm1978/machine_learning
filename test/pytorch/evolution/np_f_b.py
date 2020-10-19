@@ -63,7 +63,8 @@ class NP(object):
     def predictY(self, x, w1, w2):
         h = x.dot(w1)  # (N,H) mul input and weights
         h_relu = np.maximum(h, 0)
-        y_pred = h_relu.dot(w2)  # (N,D_out) mul relu and weights2
+        # y_pred = h_relu.dot(w2)  # (N,D_out) mul relu and weights2
+        y_pred = np.maximum(w1.dot(w2), 0).dot(w2)  # the chain rule
         return y_pred, h_relu, h
 
     def cal_units(self, l):
@@ -72,19 +73,21 @@ class NP(object):
         for item in l:
             if isinstance(item, str):
                 item = [item]
-            it=ureg[item[0]]
+            it = ureg[item[0]]
             if item[0] == '°C':
                 it = it.to(ureg.kelvin)
-            it=it**(item[1] if len(item)==2 else 1)
-            acc= it if acc is None else acc*it
+            it = it**(item[1] if len(item) == 2 else 1)
+            acc = it if acc is None else acc*it
         return acc
-    def chain_rule(self, vals, units,target):
-        if self.cal_units(units).units==target:
+
+    def chain_rule(self, vals, units, target):
+        if self.cal_units(units).units == target:
             return np.prod(vals)
+
     def get_change_rate(self, seconds):
         # (f \circ g)'(t) = f'(g(t))\cdot g'(t).
-        phy = self.cal_units(   
-            ['pascal', ('meter/second**2*second**2',-1),'meter/second**2','second'])
+        phy = self.cal_units(
+            ['pascal', ('meter/second**2*second**2', -1), 'meter/second**2', 'second'])
         print(phy)
         if phy.units == 'pascal / second':
             t, e = symbols('t e')
